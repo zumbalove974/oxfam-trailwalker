@@ -1,0 +1,27 @@
+version: '3'
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    volumes:
+      - ./db-data:/docker-entrypoint-initdb.d
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  vue-ui:
+    build:
+      context: ./app
+      dockerfile: Dockerfile-Vue
+    ports:
+      - "8080:8080"
+    container_name: vue-ui
+    volumes:
+      - ./app:/usr/src/app/app
+      - /usr/src/app/app/node_modules
