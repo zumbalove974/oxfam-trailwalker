@@ -2,10 +2,11 @@ version: '3'
 services:
 
   db:
-    image: postgres
+    image: postgis/postgis
     restart: always
     environment:
-      POSTGRES_PASSWORD: example
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
     volumes:
       - ./db-data:/docker-entrypoint-initdb.d
     ports:
