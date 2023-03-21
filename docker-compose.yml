@@ -8,19 +8,21 @@ services:
       POSTGRES_PASSWORD: example
     volumes:
       - ./db-data:/docker-entrypoint-initdb.d
+    ports:
+      - 6500:5432
 
   adminer:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 7500:8080
 
   vue-ui:
     build:
       context: ./app
       dockerfile: Dockerfile-Vue
     ports:
-      - "8080:8080"
+      - "8500:80"
     container_name: vue-ui
     volumes:
       - ./app:/usr/src/app/app
