@@ -20,4 +20,4 @@ jobs:
         with:
           resource: http://localhost:8500
           timeout: 3000
-      - run: docker run -w /usr/src/test container_test npm run test 
+      - run: docker exec -w /usr/src/test container_test npm run test 
