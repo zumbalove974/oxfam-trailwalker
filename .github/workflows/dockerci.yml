@@ -18,6 +18,6 @@ jobs:
       - name: wait for services to be up
         uses: ifaxity/wait-on-action
         with:
-          resource: http://localhost:8500
+          resource: http://localhost:8500@v1
           timeout: 3000
       - run: docker exec vue-cli npm --prefix /usr/src/app/app run test
