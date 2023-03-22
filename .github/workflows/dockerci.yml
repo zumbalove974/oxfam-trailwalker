@@ -1,0 +1,13 @@
+name: docker compose CI
+on: 
+  push:
+    - main
+  pull-request:
+    - main
+jobs:
+  docker-compose-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker compose build --no-cache
+      - run: docker compose up
