@@ -65,5 +65,7 @@ function addObjects() {
   cube.position.z = 0;
   controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
 }
+/*
+function addItineraire() {
 
-//init();
+}*/
