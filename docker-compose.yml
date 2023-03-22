@@ -23,7 +23,13 @@ services:
       context: ./app
     ports:
       - "8500:80"
-    container_name: vue-ui
     volumes:
       - ./app:/usr/src/app/app
       - ./app/node_modules:/usr/src/app/app/node_modules
+
+  container_test:
+    image: node:lts-alpine
+    working_dir: /usr/src/test
+    volume:
+      - ./test:/usr/src/test
+    command: "npm run test"
