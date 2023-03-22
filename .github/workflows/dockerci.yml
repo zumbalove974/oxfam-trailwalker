@@ -20,4 +20,4 @@ jobs:
         with:
           resource: http://localhost:8500
           timeout: 3000
-      - run: docker exec vue-cli npm --prefix /usr/src/app/app run test
+      - run: docker exec vue-ui npm --prefix /usr/src/app/app run test
