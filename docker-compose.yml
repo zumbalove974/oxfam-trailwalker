@@ -25,10 +25,11 @@ services:
       - "8500:80"
     volumes:
       - ./app:/usr/src/app/app
-      - ./app/node_modules:/usr/src/app/app/node_modules
+      - /usr/src/app/app/node_modules
 
   container_test:
     image: node:lts-alpine
     working_dir: /usr/src/test
+    container_name: container_test
     volumes:
       - ./test:/usr/src/test
