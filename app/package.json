@@ -1,14 +1,25 @@
 {
-  "name": "app",
+  "name": "trail-project",
   "version": "0.1.0",
   "private": true,
+  "main": "index.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@turf/turf": "^5.1.6",
     "core-js": "^3.8.3",
+    "data": "^0.6.1",
+    "geotiff": "^1.0.0-beta.16",
+    "ol": "^7.3.0",
+    "ol-mapbox-style": "^9.4.0",
+    "parcel-bundler": "^1.12.4",
+    "proj4": "^2.6.3",
+    "regenerator-runtime": "^0.13.7",
+    "three": "^0.124.0",
+    "turf": "^3.0.14",
     "vue": "^3.2.13"
   },
   "devDependencies": {
