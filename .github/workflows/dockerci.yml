@@ -20,5 +20,4 @@ jobs:
         with:
           resource: http://localhost:8500
           timeout: 3000
-        run: docker image build ../tests/Dockerfile
-        run: docker run -w /usr/src/test container_test npm run test 
+      - run: docker run -w /usr/src/test container_test npm run test 

@@ -32,4 +32,3 @@ services:
     working_dir: /usr/src/test
     volume:
       - ./test:/usr/src/test
-    command: "npm run test"
