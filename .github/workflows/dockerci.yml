@@ -14,4 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: docker compose build --no-cache
-      - run: docker compose up &
+      - run: docker compose up -d
+      - name: wait for services to be up
+        uses: ifaxity/wait-on-action
+        with:
+          resource: http://localhost:8500
+          timeout: 3000
+      - run: docker exec vue-cli npm --prefix /usr/src/app/app run test
