@@ -1,9 +1,13 @@
 name: docker compose CI
 on: 
   push:
-    - main
+    branches:
+      - main
+      - dev
   pull-request:
-    - main
+    branches:
+      - main
+      - dev
 jobs:
   docker-compose-build:
     runs-on: ubuntu-latest
