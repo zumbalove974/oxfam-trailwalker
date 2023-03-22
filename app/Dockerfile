@@ -10,6 +10,6 @@ RUN npm run build
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /usr/src/app/app/dist /usr/share/nginx/html
 RUN curl -sL https://deb.nodesource.com/setup_12.x
-RUN sudo apt install nodejs
+RUN apt-get install nodejs
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
