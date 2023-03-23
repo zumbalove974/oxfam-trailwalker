@@ -12,7 +12,6 @@ const pool = new Pool({
   port: 6500,
 });
 
-let jsonValue = {};
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -23,18 +22,13 @@ router.get('/', function (req, res, next) {
       console.log("1");
 
       await pool.connect();
-      const response = await pool.query('SELECT * FROM public."Device_3504"');
+      const response = await pool.query('SELECT x, y FROM public."Device_3504"');
 
       console.log("2");
 
-      jsonValue = {
-        test: 4
-      }
 
       console.log(response);
 
-      //await pool.end();
-      console.log("3");
 
       return response;
     } catch (error) {
