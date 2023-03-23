@@ -22,7 +22,11 @@ export default {
   mounted() {
     this.init();
     this.getAllLiveData();
+  },
+  methods() {
+
   }
+
 }
 </script>
 
@@ -37,5 +41,3 @@ export default {
 }
 </style>
 
-
-12346987
