@@ -7,6 +7,8 @@ import { muetStyle } from "./OLViewer"; //  planStyle, grisStyle,
 import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 
+console.log("___teste_ççç")
+
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
 //import covidData from "../../data/covid_data.json";
@@ -26,7 +28,8 @@ const paramsCovid = {
   zoom: 10,
   layers: [],
   style: planStyle
-};*/
+};
+*/
 
 const paramsWind = {
   center: vavinCenter,
@@ -41,6 +44,7 @@ export const init = async function init() {
   // to read tiff file: https://geotiffjs.github.io/geotiff.js/. other files to be read should be added to the data folder
   // let tiffData = await geotiff.fromUrl("Hauteurs.tif");
 
+
   controller = new VTController(
     width,
     height,
@@ -51,6 +55,7 @@ export const init = async function init() {
     params.style, //style for the tiles
     false
   );
+
   addObjects();
 }
 
@@ -66,4 +71,21 @@ function addObjects() {
   controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
 }
 
-//init();
+
+
+export const addItineraire = function addItineraire(coords) {
+  const material = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  const points = [];
+  for (const coord in coords) {
+    points.push(new THREE.Vector3(coord.x, coord.y, 0));
+  }
+
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  const line = new THREE.Line(geometry, material);
+  controller.threeViewer.scene.add(line);
+}

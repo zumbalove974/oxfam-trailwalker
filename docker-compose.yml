@@ -20,12 +20,12 @@ services:
 
   vue-ui:
     build:
-      context: ./app
+      context: ./app/Front
     ports:
       - "8500:80"
     volumes:
-      - ./app:/usr/src/app/app
-      - /usr/src/app/app/node_modules
+      - ./app/Front:/usr/src/app/Front
+      - /usr/src/app/Front/node_modules
     healthcheck:
       test:
         [
@@ -49,3 +49,15 @@ services:
       vue-ui:
         condition: service_healthy
     command: npm run test
+
+  express-back:
+    build:
+      context: ./app/Back
+    ports:
+      - "5500:3000"
+    container_name: express-back
+    volumes:
+      - ./app/Back:/usr/src/app/Back
+      - /usr/src/app/Back/node_modules
+    links:
+      - "db:database"

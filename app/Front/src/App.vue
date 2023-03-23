@@ -1,26 +1,37 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App 00000000000000000000000" />
   <div id="map" class="map"></div>
+  <button @click="addLine()">Add line</button>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import { init } from './client/index.js'
+import { init, addItineraire } from './client/index.js'
+import { getAllLiveData } from './client/bddConnexion.js'
+
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+
   },
   data() {
     return {
-      init: init
+      init: init,
+      getAllLiveData: getAllLiveData,
+      result: null,
+      addItineraire: addItineraire
     }
   },
   mounted() {
     this.init();
+    this.result = this.getAllLiveData();
+  },
+  methods: {
+    addLine() {
+      this.addItineraire(this.result);
+    }
   }
+
 }
 </script>
 
@@ -34,6 +45,3 @@ export default {
   margin-top: 60px;
 }
 </style>
-
-
-12346987
