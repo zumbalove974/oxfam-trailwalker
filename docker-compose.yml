@@ -25,5 +25,17 @@ services:
       - "8500:80"
     container_name: vue-ui
     volumes:
-      - ./app/Front:/usr/src/app/app
-      - ./app/Front/node_modules:/usr/src/app/app/node_modules
+      - ./app/Front:/usr/src/app/Front
+      - /usr/src/app/Front/node_modules
+
+  express-back:
+    build:
+      context: ./app/Back
+    ports:
+      - "5500:3000"
+    container_name: express-back
+    volumes:
+      - ./app/Back:/usr/src/app/Back
+      - /usr/src/app/Back/node_modules
+    links:
+      - "db:database"
