@@ -21,4 +21,4 @@ jobs:
           resource: http://localhost:8500
           timeout: 3000
       - name: Run integration tests in separate container
-        run: docker run -w /usr/src/test -v ./test:/usr/src/test --name container_test node:lts-alpine npm run test
+        run: docker run -w /usr/src/test -v ./test:/usr/src/test node:lts-alpine npm run test
