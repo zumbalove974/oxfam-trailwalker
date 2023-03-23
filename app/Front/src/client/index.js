@@ -44,6 +44,7 @@ export const init = async function init() {
   // to read tiff file: https://geotiffjs.github.io/geotiff.js/. other files to be read should be added to the data folder
   // let tiffData = await geotiff.fromUrl("Hauteurs.tif");
 
+
   controller = new VTController(
     width,
     height,
@@ -54,6 +55,7 @@ export const init = async function init() {
     params.style, //style for the tiles
     false
   );
+
   addObjects();
 }
 
@@ -68,7 +70,22 @@ function addObjects() {
   cube.position.z = 0;
   controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
 }
-/*
-function addItineraire() {
 
-}*/
+
+
+export const addItineraire = function addItineraire(coords) {
+  const material = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  const points = [];
+  for (const coord in coords) {
+    points.push(new THREE.Vector3(coord.x, coord.y, 0));
+  }
+
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  const line = new THREE.Line(geometry, material);
+  controller.threeViewer.scene.add(line);
+}

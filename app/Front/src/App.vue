@@ -1,10 +1,11 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
   <div id="map" class="map"></div>
+  <button @click="addLine()">Add line</button>
 </template>
 
 <script>
-import { init } from './client/index.js'
+import { init, addItineraire } from './client/index.js'
 import { getAllLiveData } from './client/bddConnexion.js'
 
 
@@ -16,15 +17,19 @@ export default {
   data() {
     return {
       init: init,
-      getAllLiveData: getAllLiveData
+      getAllLiveData: getAllLiveData,
+      result: null,
+      addItineraire: addItineraire
     }
   },
   mounted() {
     this.init();
-    this.getAllLiveData();
+    this.result = this.getAllLiveData();
   },
-  methods() {
-
+  methods: {
+    addLine() {
+      this.addItineraire(this.result);
+    }
   }
 
 }
@@ -40,4 +45,3 @@ export default {
   margin-top: 60px;
 }
 </style>
-
