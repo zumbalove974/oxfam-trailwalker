@@ -20,10 +20,10 @@ services:
 
   vue-ui:
     build:
-      context: ./app
+      context: ./app/Front
     ports:
       - "8500:80"
     container_name: vue-ui
     volumes:
-      - ./app:/usr/src/app/app
-      - ./app/node_modules:/usr/src/app/app/node_modules
+      - ./app/Front:/usr/src/app/app
+      - ./app/Front/node_modules:/usr/src/app/app/node_modules

@@ -1,5 +1,5 @@
 console.log("_______test");
-
+/*
 var Connection = require('tedious').Connection;
 var config = {
     server: 'https://localhost:6500',  //update me
@@ -17,7 +17,7 @@ connection.on('connect', function (err) {
     console.log("Connected");
 });
 console.log("_______test");
-connection.connect();
+connection.connect();*/
 /*
 var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES;

@@ -7,6 +7,8 @@ import { muetStyle } from "./OLViewer"; //  planStyle, grisStyle,
 import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 
+console.log("___teste_ççç")
+
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
 //import covidData from "../../data/covid_data.json";
@@ -70,3 +72,4 @@ function addObjects() {
 function addItineraire() {
 
 }*/
+
