@@ -6,10 +6,10 @@ dotenv.config();
 
 const pool = new Pool({
   user: 'postgres_user',
-  host: 'localhost',
+  host: 'database',
   database: 'postgres_user',
   password: 'postgres_password',
-  port: 6500,
+  port: 5432,
 });
 
 
