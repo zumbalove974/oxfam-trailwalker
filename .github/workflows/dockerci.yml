@@ -1,0 +1,22 @@
+name: docker compose CI
+on: 
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+jobs:
+  docker-compose-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker compose build --no-cache
+      - run: docker compose up -d
+      - name: wait for services to be up
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http://localhost:8500
+          timeout: 3000

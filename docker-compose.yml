@@ -23,10 +23,32 @@ services:
       context: ./app/Front
     ports:
       - "8500:80"
-    container_name: vue-ui
     volumes:
       - ./app/Front:/usr/src/app/Front
       - /usr/src/app/Front/node_modules
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "--ipv4",
+          "http://localhost:80/"
+        ]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+
+  container_test:
+    build:
+      context: ./test
+    working_dir: /usr/src/test
+    volumes:
+      - ./test:/usr/src/test
+    depends_on:
+      vue-ui:
+        condition: service_healthy
+    command: npm run test
 
   express-back:
     build:
