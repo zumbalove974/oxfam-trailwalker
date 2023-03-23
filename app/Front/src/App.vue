@@ -5,6 +5,8 @@
 
 <script>
 import { init } from './client/index.js'
+import { getAllLiveData } from './client/bddConnexion.js'
+
 
 export default {
   name: 'App',
@@ -13,11 +15,13 @@ export default {
   },
   data() {
     return {
-      init: init
+      init: init,
+      getAllLiveData: getAllLiveData
     }
   },
   mounted() {
     this.init();
+    this.getAllLiveData();
   }
 }
 </script>

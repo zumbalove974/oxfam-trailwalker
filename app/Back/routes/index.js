@@ -1,25 +1,41 @@
 var express = require('express');
 var router = express.Router();
-const { Client } = require("pg");
+const { Pool } = require("pg");
 const dotenv = require("dotenv");
 dotenv.config();
 
+const pool = new Pool({
+  user: 'postgres_user',
+  host: 'localhost',
+  database: 'postgres_user',
+  password: 'postgres_password',
+  port: 6500,
+});
+
+let jsonValue = {};
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
+  console.log("0");
 
   const connectDb = async () => {
     try {
-      const client = new Client({
-        user: "postgres_user",
-        host: "localhost",
-        database: "postgres_user",
-        password: "postgres_password",
-        port: 6500,
-      });
+      console.log("1");
 
-      await client.connect();
-      const response = await client.query('SELECT * FROM public."Device_3504"');
-      await client.end();
+      await pool.connect();
+      const response = await pool.query('SELECT * FROM public."Device_3504"');
+
+      console.log("2");
+
+      jsonValue = {
+        test: 4
+      }
+
+      console.log(response);
+
+      //await pool.end();
+      console.log("3");
+
       return response;
     } catch (error) {
       console.log(error)
@@ -27,9 +43,13 @@ router.get('/', function (req, res, next) {
   }
 
   connectDb().then(r => {
-    res.render('index', { title: r });
+    //res.render('index', { title: r });
+    res.json(r);
+    console.log("4");
+    pool.end();
   })
 
-});
 
+});
+console.log('325');
 module.exports = router;
