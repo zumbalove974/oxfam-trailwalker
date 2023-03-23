@@ -26,7 +26,8 @@ const paramsCovid = {
   zoom: 10,
   layers: [],
   style: planStyle
-};*/
+};
+*/
 
 const paramsWind = {
   center: vavinCenter,
