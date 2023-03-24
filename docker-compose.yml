@@ -22,7 +22,7 @@ services:
     build:
       context: ./app/Front
     ports:
-      - "8500:80"
+      - "8500:8080"
     volumes:
       - ./app/Front:/usr/src/app/Front
       - /usr/src/app/Front/node_modules
@@ -33,7 +33,7 @@ services:
           "curl",
           "--fail",
           "--ipv4",
-          "http://localhost:80/"
+          "http://localhost:8080/"
         ]
       interval: 1s
       timeout: 5s
