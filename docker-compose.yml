@@ -33,7 +33,7 @@ services:
           "curl",
           "--fail",
           "--ipv4",
-          "http://localhost:8080/"
+          "http://localhost:80/"
         ]
       interval: 1s
       timeout: 5s

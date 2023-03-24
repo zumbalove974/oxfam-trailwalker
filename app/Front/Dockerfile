@@ -5,5 +5,5 @@ RUN npm install
 COPY . .
 RUN npm run test
 RUN apk update && apk add curl
-EXPOSE 8080
-CMD [ "npm",  "run", "serve", "--", "--port", "8080"]
+EXPOSE 80
+CMD [ "npm",  "run", "serve", "--", "--port", "80"]
