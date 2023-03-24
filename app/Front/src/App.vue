@@ -22,9 +22,10 @@ export default {
       addItineraire: addItineraire
     }
   },
-  mounted() {
+  async mounted() {
     this.init();
-    this.result = this.getAllLiveData();
+    this.result = await this.getAllLiveData();
+    console.log(this.result);
   },
   methods: {
     addLine() {

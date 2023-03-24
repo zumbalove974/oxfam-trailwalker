@@ -1,5 +1,5 @@
 export const getAllLiveData = async function getAllLiveData() {
-    return fetch("http://localhost:3000", {
+    return fetch("http://localhost:5500", {
         method: 'GET'
     })
         .then(response => response.json())
@@ -8,6 +8,6 @@ export const getAllLiveData = async function getAllLiveData() {
             console.log("_________________");
             console.log(response);
 
-            return response;
+            return response.rows;
         })
 }

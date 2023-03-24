@@ -20,7 +20,7 @@ const height = window.innerHeight; // this makes the 3D canvas full screen
 //let parisLatLon = [48.8534, 2.3488];
 //let parisCenter = proj4(proj4326, proj3857, [parisLatLon[1], parisLatLon[0]]);
 
-let vavinLatLon = [48.8425824, 2.3275981];
+let vavinLatLon = [49.93825150, 1.21090698];
 let vavinCenter = proj4(proj4326, proj3857, [vavinLatLon[1], vavinLatLon[0]]);
 /*
 const paramsCovid = {
@@ -34,7 +34,7 @@ const paramsCovid = {
 const paramsWind = {
   center: vavinCenter,
   zoom: 18,
-  layers: ["bati_surf", "bati_zai"],
+  layers: [],//["bati_surf", "bati_zai"],
   style: muetStyle
 };
 
@@ -75,17 +75,27 @@ function addObjects() {
 
 export const addItineraire = function addItineraire(coords) {
   const material = new THREE.LineBasicMaterial({
-    color: 0x0000ff
+    color: 0xff0000
   });
 
   const points = [];
-  for (const coord in coords) {
-    points.push(new THREE.Vector3(coord.x, coord.y, 0));
+  for (let i = 0; i < coords.length; i++) {
+    points.push(new THREE.Vector3(
+      controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
+      controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
+      1));
   }
-
+  console.log("points", points)
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   const line = new THREE.Line(geometry, material);
+  console.log("line", line)
+  console.log("coords")
+  console.log(coords[0]);
+  /*
+  controller.threeViewer.currentCamera.position.set(coords[0].x, coords[0].y, 11)
+  controller.threeViewer.currentCamera.lookAt(new Vector3(coords[0].x, coords[0].y, 0))
+  controller.threeViewer.currentCamera.updateProjectionMatrix()*/
   controller.threeViewer.scene.add(line);
 }
