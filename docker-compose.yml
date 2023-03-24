@@ -22,7 +22,7 @@ services:
     build:
       context: ./app/Front
     ports:
-      - "8500:8080"
+      - "8500:80"
     volumes:
       - ./app/Front:/usr/src/app/Front
       - /usr/src/app/Front/node_modules
