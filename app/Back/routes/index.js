@@ -40,7 +40,7 @@ router.get('/', function (req, res, next) {
     //res.render('index', { title: r });
     res.json(r);
     console.log("4");
-    pool.end();
+    //pool.end();
   })
 
 
