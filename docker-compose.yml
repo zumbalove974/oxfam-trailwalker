@@ -38,6 +38,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   container_test:
     build:
