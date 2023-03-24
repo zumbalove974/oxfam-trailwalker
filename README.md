@@ -17,7 +17,7 @@ cd oxfam-trailwalker
 
 Lancer le projet avec 
 ```cmd
-sudo docker compose build --no-cache && sudo docker compose up &
+sudo docker compose up -d
 ```
 
 Les services sont utilisables.
