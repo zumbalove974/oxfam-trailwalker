@@ -8,6 +8,6 @@ export const getAllLiveData = async function getAllLiveData() {
             console.log("_________________");
             console.log(response);
 
-            return response;
+            return response.rows;
         })
 }

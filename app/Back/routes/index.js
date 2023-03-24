@@ -4,21 +4,21 @@ const { Pool } = require("pg");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const pool = new Pool({
-  user: 'postgres_user',
-  host: 'database',
-  database: 'postgres_user',
-  password: 'postgres_password',
-  port: 5432,
-});
-
-
 /* GET home page. */
 router.get('/', function (req, res, next) {
   console.log("0");
 
+  const pool = new Pool({
+    user: 'postgres_user',
+    host: 'database',
+    database: 'postgres_user',
+    password: 'postgres_password',
+    port: 5432,
+  });
+
   const connectDb = async () => {
     try {
+
       console.log("1");
 
       await pool.connect();
@@ -40,7 +40,7 @@ router.get('/', function (req, res, next) {
     //res.render('index', { title: r });
     res.json(r);
     console.log("4");
-    //pool.end();
+    pool.end();
   })
 
 
