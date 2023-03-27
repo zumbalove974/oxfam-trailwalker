@@ -66,11 +66,11 @@ export const init = async function init() {
 
     if (changeZ < z) {
       controller.olViewer.map.getView().setZoom(controller.olViewer.map.getView().getZoom() + zoomPas);
+      controller.threeViewer.perspectiveCamera.position.z = z;
     } else if (changeZ > z) {
       controller.olViewer.map.getView().setZoom(controller.olViewer.map.getView().getZoom() - zoomPas);
+      controller.threeViewer.perspectiveCamera.position.z = z;
     }
-
-    controller.threeViewer.perspectiveCamera.position.set(0, 0, z);
   });
 
   addObjects();
