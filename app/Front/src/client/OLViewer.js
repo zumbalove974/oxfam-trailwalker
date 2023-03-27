@@ -13,7 +13,7 @@ export const grisStyle = "Gris";
 export const muetStyle = "Muet";
 
 //const urlTilesStyle = "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=O0SJusifamZn4On2hGFw";
-const urlTiles = "https://wxs.ign.fr/essentiels/geoportail/tms/1.0.0/PLAN.IGN/16/33191/22557.pbf";
+const urlTiles = "https://wxs.ign.fr/essentiels/geoportail/tms/1.0.0/PLAN.IGN/{z}/{x}/{y}.pbf";
 const urlLayerStyle = "https://api.maptiler.com/maps/streets-v2/style.json?key=O0SJusifamZn4On2hGFw";
 
 let ignStyleMap = new Map();
@@ -74,7 +74,7 @@ export class OLViewer {
     let response = await fetch(defaultUrl);
     let style = await response.json();
 
-    console.log("___");
+    console.log("___style___");
     console.log(style);
 
     for (let layer of style.layers) {
