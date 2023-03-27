@@ -25,7 +25,6 @@ export default {
   async mounted() {
     this.init();
     this.result = await this.getAllLiveData();
-    console.log("HHHHHHHHHHHHHHHHHHHhHHHHHHHHHHHHHHHHHH", this.result);
   },
   methods: {
     addLine() {

@@ -105,7 +105,7 @@ export class VTController {
   }
 
   loadTileFeatures(evt) {
-    console.log("tile load end!");
+    //console.log("tile load end!");
     //var z = evt.tile.getTileCoord()[0];
     var features = evt.tile.getFeatures();
     let layer = "";

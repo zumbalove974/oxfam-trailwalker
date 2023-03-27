@@ -54,6 +54,25 @@ export const init = async function init() {
     false
   );
 
+  const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
+  const zoomPas = 0.5;
+
+  controller.threeViewer.controls.addEventListener('change', function () {
+
+    const changeZ = controller.threeViewer.perspectiveCamera.position.z;
+    const z = window.innerHeight / depht_s;
+
+    console.log("yyy")
+
+    if (changeZ < z) {
+      controller.olViewer.map.getView().setZoom(controller.olViewer.map.getView().getZoom() + zoomPas);
+    } else if (changeZ > z) {
+      controller.olViewer.map.getView().setZoom(controller.olViewer.map.getView().getZoom() - zoomPas);
+    }
+
+    controller.threeViewer.perspectiveCamera.position.set(0, 0, z);
+  });
+
   addObjects();
 }
 

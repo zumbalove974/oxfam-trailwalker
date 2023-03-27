@@ -44,7 +44,6 @@ export class OLViewer {
 
     this.map = new Map({
       layers: [],
-      //target: "map",
       target: "map",
       view: new View({
         center: center,
@@ -62,13 +61,11 @@ export class OLViewer {
         // décommenter pour afficher les tiles
         url:
           urlTiles
-
       }),
       minResolution: 0,
       maxResolution: 200000,
       declutter: true
     });
-
 
     var defaultUrl = ignStyleMap.get(styleName);
     let response = await fetch(defaultUrl);
@@ -89,6 +86,6 @@ export class OLViewer {
 
     await olms.apply(this.map, urlLayerStyle); // permet d'afficher une mpa
     //await olms.applyStyle(this.layer, style); // permet d'afficher une tile
-    this.map.addLayer(this.layer);
+    //this.map.addLayer(this.layer);
   }
 }

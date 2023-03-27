@@ -66,10 +66,10 @@ export class VTThreeViewer {
       this.renderer.domElement
     );
     if (!this.zoomEnabled) {
-      this.controls.enableZoom = false;
+      this.controls.enableDamping = false;
     }
     this.controls.maxPolarAngle = Math.PI / 2;
-    //this.controls.enabled = false;
+    //this.controls.enabled = false;//
 
     var geometry = new THREE.PlaneBufferGeometry(
       this.width * 2,
