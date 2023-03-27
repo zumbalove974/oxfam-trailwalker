@@ -12,7 +12,26 @@ for i in range(len(l)):
 f = open('./db-data/init.sql', "a")
 
 for i in range(len(names)):
-    string = "DROP TABLE IF EXISTS public.\"{device_name}\";\nCREATE TABLE public.\"{device_name}\" (id INT, speed FLOAT, \"timestamp\" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);\n\n".format(device_name = names[i])
+    string = "DROP TABLE IF EXISTS public.\"{device_name}\";\nCREATE TABLE public.\"{device_name}\" (id INT,speed FLOAT,\"timestamp\" TIMESTAMP,device INT,x FLOAT,y FLOAT,alt FLOAT,newtimestamp TIMESTAMP,\"day\" CHAR,\"month\" CHAR,\"year\" CHAR,hourminuteseconde CHAR,\"_crc\" CHAR,geom geometry);\n\n".format(device_name = names[i])
     f.write(string)
 
 f.close()
+
+"""
+CREATE TABLE public."Device_3843" (
+    id INT,
+    speed FLOAT,
+    "timestamp" TIMESTAMP,
+    device INT,
+    x FLOAT,
+    y FLOAT,
+    alt FLOAT,
+    newtimestamp TIMESTAMP,
+    "day" CHAR,
+    "month" CHAR,
+    "year" CHAR,
+    hourminuteseconde CHAR,
+    "_crc" CHAR,
+    geom geometry
+);
+"""
