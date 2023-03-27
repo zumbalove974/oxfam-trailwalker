@@ -19,7 +19,7 @@ router.get('/', function (req, res, next) {
   const connectDb = async () => {
     try {
 
-      console.log("1");
+      console.log("-----------------------------------------------1-----------------------------------------------");
 
       await pool.connect();
       const response = await pool.query('SELECT * FROM public."Device_3504"');
