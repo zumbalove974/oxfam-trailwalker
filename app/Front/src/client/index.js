@@ -6,6 +6,8 @@ import { mergedRender } from "./VTThreeViewer";// singleRender
 import { planStyle } from "./OLViewer"; //  planStyle, grisStyle, 
 import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
+import { ZOOM_RES_L93 } from "./Utils";
+
 
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
@@ -29,9 +31,12 @@ const paramsCovid = {
 };
 */
 
+let line;
+let coordinates;
+
 const paramsWind = {
   center: vavinCenter,
-  zoom: 18,
+  zoom: 12,
   layers: ["bati_surf", "bati_zai"],//["bati_surf", "bati_zai"],
   style: planStyle
 };
@@ -55,22 +60,36 @@ export const init = async function init() {
   );
 
   const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
-  const zoomPas = 0.5;
+  const zoomPas = 1;
 
   controller.threeViewer.controls.addEventListener('change', function () {
+    if (coordinates) {
+      const changeZ = controller.threeViewer.perspectiveCamera.position.z;
+      const z = window.innerHeight / depht_s;
 
-    const changeZ = controller.threeViewer.perspectiveCamera.position.z;
-    const z = window.innerHeight / depht_s;
+      console.log("yyy")
 
-    console.log("yyy")
+      let zoom = controller.olViewer.map.getView().getZoom();
 
-    if (changeZ < z) {
-      controller.olViewer.map.getView().setZoom(controller.olViewer.map.getView().getZoom() + zoomPas);
-      controller.threeViewer.perspectiveCamera.position.z = z;
-    } else if (changeZ > z) {
-      controller.olViewer.map.getView().setZoom(controller.olViewer.map.getView().getZoom() - zoomPas);
-      controller.threeViewer.perspectiveCamera.position.z = z;
+      if (changeZ < z) {
+
+        controller.olViewer.map.getView().setZoom(Math.round(zoom + zoomPas));
+        controller.threeViewer.perspectiveCamera.position.z = z;
+        controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom + zoomPas)];
+        controller.threeViewer.scene.remove(line);
+        addItineraire(coordinates);
+
+      } else if (changeZ > z) {
+
+        controller.olViewer.map.getView().setZoom(Math.round(zoom - zoomPas));
+        controller.threeViewer.perspectiveCamera.position.z = z;
+        controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom - zoomPas)];
+        controller.threeViewer.scene.remove(line);
+        addItineraire(coordinates);
+
+      }
     }
+    //console.log(controller.olViewer.zoom)
   });
 
   addObjects();
@@ -90,8 +109,10 @@ function addObjects() {
 }
 
 
-
 export const addItineraire = function addItineraire(coords) {
+
+  coordinates = coords;
+
   const material = new THREE.LineBasicMaterial({
     color: 0xff0000
   });
@@ -107,7 +128,7 @@ export const addItineraire = function addItineraire(coords) {
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
-  const line = new THREE.Line(geometry, material);
+  line = new THREE.Line(geometry, material);
   /*
   controller.threeViewer.currentCamera.position.set(coords[0].x, coords[0].y, 11)
   controller.threeViewer.currentCamera.lookAt(new Vector3(coords[0].x, coords[0].y, 0))

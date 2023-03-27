@@ -85,6 +85,7 @@ export class OLViewer {
     //await olms.applyStyle(this.layer, urlLayerStyle);
 
     await olms.apply(this.map, urlLayerStyle); // permet d'afficher une mpa
+
     //await olms.applyStyle(this.layer, style); // permet d'afficher une tile
     //this.map.addLayer(this.layer);
   }
