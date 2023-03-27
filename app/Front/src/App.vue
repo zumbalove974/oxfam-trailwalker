@@ -1,11 +1,11 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
   <div id="map" class="map"></div>
   <button @click="addLine()">Add line</button>
+  <button @click="addEpaisseur()">Add epaisseur</button>
 </template>
 
 <script>
-import { init, addItineraire } from './client/index.js'
+import { init, addItineraire, addItineraireEpaisseur } from './client/index.js'
 import { getAllLiveData } from './client/bddConnexion.js'
 
 
@@ -19,7 +19,8 @@ export default {
       init: init,
       getAllLiveData: getAllLiveData,
       result: null,
-      addItineraire: addItineraire
+      addItineraire: addItineraire,
+      addItineraireEpaisseur: addItineraireEpaisseur
     }
   },
   async mounted() {
@@ -30,6 +31,9 @@ export default {
   methods: {
     addLine() {
       this.addItineraire(this.result);
+    },
+    addEpaisseur() {
+      this.addItineraireEpaisseur(this.result);
     }
   }
 
