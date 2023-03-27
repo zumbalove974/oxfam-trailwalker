@@ -109,8 +109,6 @@ export const addItineraireEpaisseur = function addItineraireEpaisseur(trace) {
     color: "blue"
   });
 
-  console.log("index.trace", trace)
-
   const shapes = [];
 
   for (let i = 0; i < trace.length - 1; i++) {
@@ -144,7 +142,6 @@ export const addItineraireEpaisseur = function addItineraireEpaisseur(trace) {
       shapes.push(shape);
     }
   }
-  console.log(shapes[0])
   const geometry = new THREE.ShapeBufferGeometry(shapes);
   const mesh = new THREE.Mesh(geometry, material);
   controller.threeViewer.scene.add(mesh);
