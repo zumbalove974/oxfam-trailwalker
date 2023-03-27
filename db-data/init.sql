@@ -42,8 +42,14 @@ CREATE TABLE public."Device_3746" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3837";
 CREATE TABLE public."Device_3837" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3947";
+CREATE TABLE public."Device_3947" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3808";
 CREATE TABLE public."Device_3808" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3989";
+CREATE TABLE public."Device_3989" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3850";
 CREATE TABLE public."Device_3850" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -51,8 +57,14 @@ CREATE TABLE public."Device_3850" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3584";
 CREATE TABLE public."Device_3584" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3973";
+CREATE TABLE public."Device_3973" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3838";
 CREATE TABLE public."Device_3838" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3991";
+CREATE TABLE public."Device_3991" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3580";
 CREATE TABLE public."Device_3580" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -71,6 +83,9 @@ CREATE TABLE public."Device_3634" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3839";
 CREATE TABLE public."Device_3839" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3946";
+CREATE TABLE public."Device_3946" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3804";
 CREATE TABLE public."Device_3804" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -174,6 +189,9 @@ CREATE TABLE public."Device_3867" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3809";
 CREATE TABLE public."Device_3809" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3999";
+CREATE TABLE public."Device_3999" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3813";
 CREATE TABLE public."Device_3813" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -192,6 +210,9 @@ CREATE TABLE public."Device_3933" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3765";
 CREATE TABLE public."Device_3765" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3964";
+CREATE TABLE public."Device_3964" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3844";
 CREATE TABLE public."Device_3844" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -200,6 +221,9 @@ CREATE TABLE public."Device_3681" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3689";
 CREATE TABLE public."Device_3689" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3979";
+CREATE TABLE public."Device_3979" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3656";
 CREATE TABLE public."Device_3656" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -215,6 +239,9 @@ CREATE TABLE public."Device_3635" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3779";
 CREATE TABLE public."Device_3779" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3965";
+CREATE TABLE public."Device_3965" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3650";
 CREATE TABLE public."Device_3650" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -270,6 +297,12 @@ CREATE TABLE public."Device_3633" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3883";
 CREATE TABLE public."Device_3883" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3950";
+CREATE TABLE public."Device_3950" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3997";
+CREATE TABLE public."Device_3997" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3698";
 CREATE TABLE public."Device_3698" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -278,6 +311,9 @@ CREATE TABLE public."Device_3615" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3787";
 CREATE TABLE public."Device_3787" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3952";
+CREATE TABLE public."Device_3952" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3612";
 CREATE TABLE public."Device_3612" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -336,6 +372,9 @@ CREATE TABLE public."Device_3629" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3610";
 CREATE TABLE public."Device_3610" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3970";
+CREATE TABLE public."Device_3970" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3725";
 CREATE TABLE public."Device_3725" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -369,6 +408,9 @@ CREATE TABLE public."Device_3665" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3758";
 CREATE TABLE public."Device_3758" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3954";
+CREATE TABLE public."Device_3954" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3520";
 CREATE TABLE public."Device_3520" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -386,6 +428,9 @@ CREATE TABLE public."Device_3566" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3772";
 CREATE TABLE public."Device_3772" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3971";
+CREATE TABLE public."Device_3971" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3711";
 CREATE TABLE public."Device_3711" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -411,8 +456,17 @@ CREATE TABLE public."Device_3857" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3849";
 CREATE TABLE public."Device_3849" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3978";
+CREATE TABLE public."Device_3978" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3998";
+CREATE TABLE public."Device_3998" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3858";
 CREATE TABLE public."Device_3858" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3945";
+CREATE TABLE public."Device_3945" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3609";
 CREATE TABLE public."Device_3609" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -444,6 +498,9 @@ CREATE TABLE public."Device_3756" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3686";
 CREATE TABLE public."Device_3686" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3972";
+CREATE TABLE public."Device_3972" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3743";
 CREATE TABLE public."Device_3743" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -464,6 +521,12 @@ CREATE TABLE public."Device_3728" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3569";
 CREATE TABLE public."Device_3569" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3983";
+CREATE TABLE public."Device_3983" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3975";
+CREATE TABLE public."Device_3975" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3637";
 CREATE TABLE public."Device_3637" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -512,6 +575,9 @@ CREATE TABLE public."Device_3732" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3611";
 CREATE TABLE public."Device_3611" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3944";
+CREATE TABLE public."Device_3944" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3817";
 CREATE TABLE public."Device_3817" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -696,6 +762,9 @@ CREATE TABLE public."Device_3752" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3922";
 CREATE TABLE public."Device_3922" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3985";
+CREATE TABLE public."Device_3985" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3805";
 CREATE TABLE public."Device_3805" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -704,6 +773,9 @@ CREATE TABLE public."Device_3577" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3675";
 CREATE TABLE public."Device_3675" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3966";
+CREATE TABLE public."Device_3966" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3816";
 CREATE TABLE public."Device_3816" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -768,6 +840,9 @@ CREATE TABLE public."Device_3691" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3880";
 CREATE TABLE public."Device_3880" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3948";
+CREATE TABLE public."Device_3948" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3842";
 CREATE TABLE public."Device_3842" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -786,6 +861,9 @@ CREATE TABLE public."Device_3560" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3552";
 CREATE TABLE public."Device_3552" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3976";
+CREATE TABLE public."Device_3976" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3826";
 CREATE TABLE public."Device_3826" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -803,6 +881,12 @@ CREATE TABLE public."Device_3734" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3512";
 CREATE TABLE public."Device_3512" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3943";
+CREATE TABLE public."Device_3943" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3956";
+CREATE TABLE public."Device_3956" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3912";
 CREATE TABLE public."Device_3912" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -845,6 +929,9 @@ CREATE TABLE public."Device_3876" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3887";
 CREATE TABLE public."Device_3887" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3982";
+CREATE TABLE public."Device_3982" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3799";
 CREATE TABLE public."Device_3799" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
@@ -906,6 +993,9 @@ CREATE TABLE public."Device_3539" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 DROP TABLE IF EXISTS public."Device_3712";
 CREATE TABLE public."Device_3712" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
+DROP TABLE IF EXISTS public."Device_3963";
+CREATE TABLE public."Device_3963" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
 DROP TABLE IF EXISTS public."Device_3777";
 CREATE TABLE public."Device_3777" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
@@ -944,6 +1034,9 @@ CREATE TABLE public."Device_3657" (id INT, speed FLOAT, "timestamp" TIMESTAMP, d
 
 DROP TABLE IF EXISTS public."Device_3868";
 CREATE TABLE public."Device_3868" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
+
+DROP TABLE IF EXISTS public."Device_3962";
+CREATE TABLE public."Device_3962" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
 
 DROP TABLE IF EXISTS public."Device_3771";
 CREATE TABLE public."Device_3771" (id INT, speed FLOAT, "timestamp" TIMESTAMP, device INT, x FLOAT, y FLOAT, alt FLOAT, geom geometry);
