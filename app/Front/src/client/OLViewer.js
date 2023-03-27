@@ -74,8 +74,8 @@ export class OLViewer {
     let response = await fetch(defaultUrl);
     let style = await response.json();
 
-    console.log("___");
-    console.log(style);
+    // console.log("OLViewer.style");
+    // console.log(style);
 
     for (let layer of style.layers) {
       //console.log(layer.type);

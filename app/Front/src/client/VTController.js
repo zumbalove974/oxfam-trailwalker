@@ -45,7 +45,7 @@ export class VTController {
     );
     let self = this;
     this.olViewer.map.on("rendercomplete", function () {
-      console.log("map render complete!");
+      //console.log("map render complete!");
       var mapContainer = document.getElementById("map");
       var mapCanvas = mapContainer.getElementsByTagName("canvas")[0];
       self.threeViewer.setPlaneTexture(mapCanvas);
@@ -53,14 +53,14 @@ export class VTController {
 
     this.olViewer.layer.getSource().on("tileloadstart", function (evt) {
       self.state.loading++;
-      console.log(evt);
+      console.log("OLViewer.state", evt);
     });
 
     this.olViewer.layer.getSource().on("tileloadend", this.loadTileFeatures);
 
     if (this.tileZoom) {
       this.threeViewer.renderer.domElement.addEventListener("wheel", event => {
-        console.log("wheeeel ");
+        //console.log("wheeeel ");
         self.zoomOlViewer(event);
       });
     }
@@ -105,7 +105,7 @@ export class VTController {
   }
 
   loadTileFeatures(evt) {
-    console.log("tile load end!");
+    //console.log("tile load end!");
     //var z = evt.tile.getTileCoord()[0];
     var features = evt.tile.getFeatures();
     let layer = "";
