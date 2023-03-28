@@ -19,7 +19,7 @@ router.get('/:deviceNumber', function (req, res, next) {
         try {
 
             await pool.connect();
-            const response = await pool.query(`SELECT * FROM public."Device_${req.params.deviceNumber}"`);
+            const response = await pool.query(`SELECT * FROM public."Device_${req.params.deviceNumber}" ORDER BY "timestamp"`);
 
             console.log(response);
 

@@ -11,3 +11,17 @@ export const getAllLiveData = async function getAllLiveData() {
             return response;
         })
 }
+
+export const getLiveDataDevice = async function getLiveDataDevice(deviceNumber) {
+    return fetch(`http://localhost:5500/device/${deviceNumber}`, {
+        method: 'GET'
+    })
+        .then(response => response.json())
+        .then(response => {
+
+            // console.log("bddConnection.response");
+            // console.log(response);
+
+            return response;
+        })
+}
