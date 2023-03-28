@@ -11,6 +11,8 @@ for i in range(len(l)):
 
 f = open('./db-data/init.sql', "a")
 
+f.write("CREATE EXTENSION IF NOT EXISTS postgis;\n\n")
+
 for i in range(len(names)):
     string = "DROP TABLE IF EXISTS public.\"{device_name}\";\nCREATE TABLE public.\"{device_name}\" (id INT,speed FLOAT,\"timestamp\" TIMESTAMP,device INT,x FLOAT,y FLOAT,alt FLOAT,geom geometry);\n\n".format(device_name = names[i])
     f.write(string)
