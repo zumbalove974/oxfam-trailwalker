@@ -13,7 +13,7 @@ export const grisStyle = "Gris";
 export const muetStyle = "Muet";
 
 //const urlTilesStyle = "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=O0SJusifamZn4On2hGFw";
-const urlTiles = "https://wxs.ign.fr/essentiels/geoportail/tms/1.0.0/PLAN.IGN/16/33191/22557.pbf";
+const urlTiles = "https://wxs.ign.fr/essentiels/geoportail/tms/1.0.0/PLAN.IGN/{z}/{x}/{y}.pbf";
 const urlLayerStyle = "https://api.maptiler.com/maps/streets-v2/style.json?key=O0SJusifamZn4On2hGFw";
 
 let ignStyleMap = new Map();
@@ -44,7 +44,6 @@ export class OLViewer {
 
     this.map = new Map({
       layers: [],
-      //target: "map",
       target: "map",
       view: new View({
         center: center,
@@ -62,20 +61,18 @@ export class OLViewer {
         // décommenter pour afficher les tiles
         url:
           urlTiles
-
       }),
       minResolution: 0,
       maxResolution: 200000,
       declutter: true
     });
 
-
     var defaultUrl = ignStyleMap.get(styleName);
     let response = await fetch(defaultUrl);
     let style = await response.json();
 
-    // console.log("OLViewer.style");
-    // console.log(style);
+    console.log("___style___");
+    console.log(style);
 
     for (let layer of style.layers) {
       //console.log(layer.type);
@@ -88,7 +85,8 @@ export class OLViewer {
     //await olms.applyStyle(this.layer, urlLayerStyle);
 
     await olms.apply(this.map, urlLayerStyle); // permet d'afficher une mpa
+
     //await olms.applyStyle(this.layer, style); // permet d'afficher une tile
-    this.map.addLayer(this.layer);
+    //this.map.addLayer(this.layer);
   }
 }
