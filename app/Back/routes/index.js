@@ -17,12 +17,25 @@ router.get('/', function (req, res, next) {
   const connectDb = async () => {
     try {
 
-      console.log("-----------------------------------------------1-----------------------------------------------");
-
       await pool.connect();
-      const response = await pool.query('SELECT * FROM public."Device_3504"');
+      const info_schema = await pool.query(
+        "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Device%';"
+      );
 
-      return response;
+      let promise_array = [];
+      info_schema.rows.forEach(async table => {
+        promise_array.push(pool.query(`SELECT * FROM public."${table.table_name}"`));
+      })
+
+      let return_array = [];
+      return Promise.all(promise_array)
+        .then((response_array) => {
+          response_array.forEach((response) => {
+            return_array.push(response.rows);
+          })
+          return return_array
+        })
+
     } catch (error) {
       console.log(error)
     }
