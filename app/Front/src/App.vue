@@ -1,41 +1,37 @@
 <template>
   <div id="map" class="map"></div>
+  <input type="text" v-model="deviceNumber" />
   <button @click="addLine()">Add line</button>
   <button @click="addEpaisseur()">Add epaisseur</button>
 </template>
 
 <script>
 import { init, addItineraire, addItineraireEpaisseur } from './client/index.js'
-import { getAllLiveData } from './client/bddConnexion.js'
+//import { getAllLiveData } from './client/bddConnexion.js'
 
 
 export default {
   name: 'App',
-  components: {
 
+  components: {
   },
   data() {
     return {
       init: init,
-      getAllLiveData: getAllLiveData,
-      result: null,
       addItineraire: addItineraire,
-      addItineraireEpaisseur: addItineraireEpaisseur
+      addItineraireEpaisseur: addItineraireEpaisseur,
     }
   },
   async mounted() {
     this.init();
-    this.result = await this.getAllLiveData();
-
-    // console.log("App.bddConnection.result", this.result);
-
+    //this.result = await this.getAllLiveData();
   },
   methods: {
     addLine() {
-      this.addItineraire(this.result);
+      this.addItineraire(this.deviceNumber);
     },
     addEpaisseur() {
-      this.addItineraireEpaisseur(this.result);
+      this.addItineraireEpaisseur(this.deviceNumber);
     }
   }
 

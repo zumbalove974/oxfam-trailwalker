@@ -7,6 +7,7 @@ import { planStyle } from "./OLViewer"; //  planStyle, grisStyle,
 import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
+import { getLiveDataDevice } from "./bddConnexion";
 
 
 //data can be imported like this or read from the data folder
@@ -117,9 +118,9 @@ function addObjects() {
 }
 
 
-export const addItineraire = function addItineraire(coords) {
+export const addItineraire = async function addItineraire(deviceNumber) {
 
-  coordinates = coords;
+  const coords = await getLiveDataDevice(deviceNumber);
 
   const material = new THREE.LineBasicMaterial({
     color: 0xff0000
@@ -137,12 +138,15 @@ export const addItineraire = function addItineraire(coords) {
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   line = new THREE.Line(geometry, material);
-  /*
-  controller.threeViewer.currentCamera.position.set(coords[0].x, coords[0].y, 11)
-  controller.threeViewer.currentCamera.lookAt(new Vector3(coords[0].x, coords[0].y, 0))
-  controller.threeViewer.currentCamera.updateProjectionMatrix()*/
+
+  // controller.threeViewer.currentCamera.position.set(coords[0].y, coords[0].x, 11)
+  // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
+  // controller.threeViewer.currentCamera.updateProjectionMatrix()
 
   controller.threeViewer.scene.add(line);
+
+  console.log("line", line)
+
 }
 
 export const addItineraireEpaisseur = function addItineraireEpaisseur(trace) {
