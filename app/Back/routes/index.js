@@ -26,14 +26,14 @@ router.get('/', function (req, res, next) {
 
       let promise_array = [];
       info_schema.rows.forEach(async table => {
-        promise_array.push(pool.query(`SELECT * FROM ${table.table_name}`));
+        promise_array.push(pool.query(`SELECT * FROM public."${table.table_name}"`));
       })
 
       let return_array = [];
       return Promise.all(promise_array)
         .then((response_array) => {
-          response_array.rows.forEach((row) => {
-            return_array.push(row);
+          response_array.forEach((response) => {
+            return_array.push(response.rows);
           })
           return return_array
         })
