@@ -26,7 +26,9 @@ export default {
   async mounted() {
     this.init();
     this.result = await this.getAllLiveData();
+
     // console.log("App.bddConnection.result", this.result);
+
   },
   methods: {
     addLine() {

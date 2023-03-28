@@ -3,9 +3,11 @@ import * as THREE from "three";
 //import Feature from "ol/Feature";
 import { VTController } from "./VTController";
 import { mergedRender } from "./VTThreeViewer";// singleRender
-import { muetStyle } from "./OLViewer"; //  planStyle, grisStyle, 
+import { planStyle } from "./OLViewer"; //  planStyle, grisStyle, 
 import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
+import { ZOOM_RES_L93 } from "./Utils";
+
 
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
@@ -20,7 +22,6 @@ const height = window.innerHeight; // this makes the 3D canvas full screen
 
 let vavinLatLon = [49.93825150, 1.21090698];
 let vavinCenter = proj4(proj4326, proj3857, [vavinLatLon[1], vavinLatLon[0]]);
-//console.log("index.vavinCenter ", vavinCenter)
 
 /*
 const paramsCovid = {
@@ -31,11 +32,14 @@ const paramsCovid = {
 };
 */
 
+let line;
+let coordinates;
+
 const paramsWind = {
   center: vavinCenter,
-  zoom: 18,
-  layers: [],//["bati_surf", "bati_zai"],
-  style: muetStyle
+  zoom: 12,
+  layers: ["bati_surf", "bati_zai"],//["bati_surf", "bati_zai"],
+  style: planStyle
 };
 
 let params = paramsWind;
@@ -56,6 +60,46 @@ export const init = async function init() {
     false
   );
 
+  const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
+  const zoomPas = 1;
+  let lastCameraZ = window.innerHeight / depht_s;
+
+  /* On désactive l'orbit control lors du click (drag) */
+  document.addEventListener("pointerup", () => {
+    controller.threeViewer.controls.enabled = true;
+  });
+
+  document.addEventListener("pointerdown", () => {
+    controller.threeViewer.controls.enabled = false;
+  });
+
+  /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
+  controller.threeViewer.controls.addEventListener('change', function () {
+    console.log("__scroll__");
+
+    const changeZ = controller.threeViewer.perspectiveCamera.position.z;
+
+    let zoom = controller.olViewer.map.getView().getZoom();
+
+    if (changeZ != lastCameraZ) {
+      if (changeZ < lastCameraZ) {
+        zoom += zoomPas;
+      } else if (changeZ > lastCameraZ) {
+        zoom -= zoomPas;
+      }
+
+      controller.olViewer.map.getView().setZoom(Math.round(zoom));
+      controller.threeViewer.perspectiveCamera.position.z = lastCameraZ;
+      controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
+      controller.threeViewer.scene.remove(line);
+
+      if (coordinates)
+        addItineraire(coordinates);
+    } else {
+      lastCameraZ = changeZ;
+    }
+  });
+
   addObjects();
 }
 
@@ -69,37 +113,34 @@ function addObjects() {
   cube.position.y = worldCoords[1];
   cube.position.z = 0;
 
-  // console.log("cube.position.x =", cube.position.x)
-  // console.log("cube.position.y =", cube.position.y)
   controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
 }
 
 
-
 export const addItineraire = function addItineraire(coords) {
+
+  coordinates = coords;
+
   const material = new THREE.LineBasicMaterial({
     color: 0xff0000
   });
 
   const points = [];
   for (let i = 0; i < coords.length; i++) {
+
     points.push(new THREE.Vector3(
       controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
       controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
       1));
   }
-  //console.log("points", points)
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
-  const line = new THREE.Line(geometry, material);
-  //console.log("line", line)
-  // console.log("coords")
-  // console.log(coords);
-
-  // controller.threeViewer.currentCamera.position.set(coords[0].x, coords[0].y, 11)
-  // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].x, coords[0].y, 0))
-  // controller.threeViewer.currentCamera.updateProjectionMatrix()
+  line = new THREE.Line(geometry, material);
+  /*
+  controller.threeViewer.currentCamera.position.set(coords[0].x, coords[0].y, 11)
+  controller.threeViewer.currentCamera.lookAt(new Vector3(coords[0].x, coords[0].y, 0))
+  controller.threeViewer.currentCamera.updateProjectionMatrix()*/
 
   controller.threeViewer.scene.add(line);
 }
