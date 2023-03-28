@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 DROP TABLE IF EXISTS public."Device_3500";
 CREATE TABLE public."Device_3500" (id INT,speed FLOAT,"timestamp" TIMESTAMP,device INT,x FLOAT,y FLOAT,alt FLOAT,geom geometry);
 
