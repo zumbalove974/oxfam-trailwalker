@@ -62,15 +62,72 @@ export const init = async function init() {
 
   const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
   const zoomPas = 1;
-  let lastCameraZ = window.innerHeight / depht_s;
+  const cameraZ = window.innerHeight / depht_s;
+
+  // eslint-disable-next-line no-unused-vars
+  let initPointerX;
+  // eslint-disable-next-line no-unused-vars
+  let initPointerY;
+  // eslint-disable-next-line no-unused-vars
+  let lastPointerX;
+  // eslint-disable-next-line no-unused-vars
+  let lastPointerY;
+  // eslint-disable-next-line no-unused-vars
+  let newPointerX;
+  // eslint-disable-next-line no-unused-vars
+  let newPointerY;
+  // eslint-disable-next-line no-unused-vars
+  let pointerIsDown = false;
+
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
 
   /* On désactive l'orbit control lors du click (drag) */
   document.addEventListener("pointerup", () => {
     controller.threeViewer.controls.enabled = true;
+    pointerIsDown = false;
+
+    pointer.x = 0;
+    pointer.y = 0;
+
+    raycaster.setFromCamera(pointer, controller.threeViewer.perspectiveCamera);
+    let intersects = raycaster.intersectObjects(controller.threeViewer.planes.children);
+    let x = intersects[0].point.x * controller.threeViewer.zoomFactor + controller.threeViewer.mapCenter[0];
+    let y = intersects[0].point.y * controller.threeViewer.zoomFactor + controller.threeViewer.mapCenter[1];
+
+    console.log(intersects);
+    controller.olViewer.map.getView().setCenter([x, y]);
+    controller.threeViewer.mapCenter = [x, y];
+    controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
+
+    controller.threeViewer.scene.remove(line);
+
+    if (coordinates)
+      addItineraire(coordinates);
   });
 
-  document.addEventListener("pointerdown", () => {
+  document.addEventListener("pointerdown", (event) => {
     controller.threeViewer.controls.enabled = false;
+    pointerIsDown = true;
+
+    initPointerX = event.clientX;
+    initPointerY = event.clientY;
+
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
+  });
+
+  document.addEventListener("pointermove", (event) => {
+    if (pointerIsDown) {
+      newPointerX = event.clientX;
+      newPointerY = event.clientY;
+
+      controller.threeViewer.perspectiveCamera.position.x += (lastPointerX - newPointerX);
+      controller.threeViewer.perspectiveCamera.position.y += (newPointerY - lastPointerY);
+
+      lastPointerX = newPointerX;
+      lastPointerY = newPointerY;
+    }
   });
 
   /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
@@ -81,22 +138,20 @@ export const init = async function init() {
 
     let zoom = controller.olViewer.map.getView().getZoom();
 
-    if (changeZ != lastCameraZ) {
-      if (changeZ < lastCameraZ) {
+    if (changeZ != cameraZ) {
+      if (changeZ < cameraZ) {
         zoom += zoomPas;
-      } else if (changeZ > lastCameraZ) {
+      } else if (changeZ > cameraZ) {
         zoom -= zoomPas;
       }
 
       controller.olViewer.map.getView().setZoom(Math.round(zoom));
-      controller.threeViewer.perspectiveCamera.position.z = lastCameraZ;
+      controller.threeViewer.perspectiveCamera.position.z = cameraZ;
       controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
       controller.threeViewer.scene.remove(line);
 
       if (coordinates)
         addItineraire(coordinates);
-    } else {
-      lastCameraZ = changeZ;
     }
   });
 
