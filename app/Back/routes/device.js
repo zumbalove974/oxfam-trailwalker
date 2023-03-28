@@ -23,7 +23,7 @@ router.get('/:deviceNumber', function (req, res, next) {
 
             console.log(response);
 
-            return response;
+            return response.rows;
         } catch (error) {
             console.log(error)
         }

@@ -8,6 +8,6 @@ export const getAllLiveData = async function getAllLiveData() {
             // console.log("bddConnection.response");
             // console.log(response);
 
-            return response.rows;
+            return response;
         })
 }
