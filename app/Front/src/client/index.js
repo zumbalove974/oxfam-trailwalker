@@ -45,10 +45,10 @@ const paramsWind = {
 
 let params = paramsWind;
 let controller = null;
+
 export const init = async function init() {
   // to read tiff file: https://geotiffjs.github.io/geotiff.js/. other files to be read should be added to the data folder
   // let tiffData = await geotiff.fromUrl("Hauteurs.tif");
-
 
   controller = new VTController(
     width,
@@ -61,102 +61,143 @@ export const init = async function init() {
     false
   );
 
-  const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
-  const zoomPas = 1;
-  const cameraZ = window.innerHeight / depht_s;
+  addObjects();
+}
 
-  // eslint-disable-next-line no-unused-vars
-  let initPointerX;
-  // eslint-disable-next-line no-unused-vars
-  let initPointerY;
-  // eslint-disable-next-line no-unused-vars
-  let lastPointerX;
-  // eslint-disable-next-line no-unused-vars
-  let lastPointerY;
-  // eslint-disable-next-line no-unused-vars
-  let newPointerX;
-  // eslint-disable-next-line no-unused-vars
-  let newPointerY;
-  // eslint-disable-next-line no-unused-vars
-  let pointerIsDown = false;
+const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
+const zoomPas = 1;
+const cameraZ = window.innerHeight / depht_s;
 
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
+// eslint-disable-next-line no-unused-vars
+let initPointerX;
+// eslint-disable-next-line no-unused-vars
+let initPointerY;
+// eslint-disable-next-line no-unused-vars
+let lastPointerX;
+// eslint-disable-next-line no-unused-vars
+let lastPointerY;
+// eslint-disable-next-line no-unused-vars
+let newPointerX;
+// eslint-disable-next-line no-unused-vars
+let newPointerY;
+// eslint-disable-next-line no-unused-vars
+let pointerIsDown = false;
 
-  /* On désactive l'orbit control lors du click (drag) */
-  document.addEventListener("pointerup", () => {
-    controller.threeViewer.controls.enabled = true;
-    pointerIsDown = false;
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
 
-    pointer.x = 0;
-    pointer.y = 0;
+function clickUp() {
+  controller.threeViewer.controls.enabled = true;
+  pointerIsDown = false;
 
-    raycaster.setFromCamera(pointer, controller.threeViewer.perspectiveCamera);
-    let intersects = raycaster.intersectObjects(controller.threeViewer.planes.children);
+  pointer.x = 0;
+  pointer.y = 0;
+
+  raycaster.setFromCamera(pointer, controller.threeViewer.perspectiveCamera);
+  let intersects = raycaster.intersectObjects(controller.threeViewer.planes.children);
+  console.log("intersects", intersects);
+
+  if (intersects.length) {
     let x = intersects[0].point.x * controller.threeViewer.zoomFactor + controller.threeViewer.mapCenter[0];
     let y = intersects[0].point.y * controller.threeViewer.zoomFactor + controller.threeViewer.mapCenter[1];
 
-    console.log(intersects);
     controller.olViewer.map.getView().setCenter([x, y]);
     controller.threeViewer.mapCenter = [x, y];
-    controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
+  }
 
+  controller.threeViewer.controls.enabled = false;
+
+  controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
+  console.log(controller.threeViewer.perspectiveCamera.rotation);
+  controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
+  controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
+
+  controller.threeViewer.controls.enabled = true;
+
+  controller.threeViewer.scene.remove(line);
+
+  if (device)
+    addItineraire(device);
+}
+
+function clickDown(event) {
+  controller.threeViewer.controls.enabled = false;
+  pointerIsDown = true;
+
+  initPointerX = event.clientX;
+  initPointerY = event.clientY;
+
+  lastPointerX = event.clientX;
+  lastPointerY = event.clientY;
+}
+
+function clickMove(event) {
+  if (pointerIsDown) {
+    newPointerX = event.clientX;
+    newPointerY = event.clientY;
+
+    controller.threeViewer.perspectiveCamera.position.x += (lastPointerX - newPointerX);
+    controller.threeViewer.perspectiveCamera.position.y += (newPointerY - lastPointerY);
+
+    lastPointerX = newPointerX;
+    lastPointerY = newPointerY;
+  }
+}
+
+function scroll() {
+  console.log("__scroll__");
+
+  const changeZ = controller.threeViewer.perspectiveCamera.position.z;
+
+  let zoom = controller.olViewer.map.getView().getZoom();
+
+  if (changeZ != cameraZ) {
+    if (changeZ < cameraZ) {
+      zoom += zoomPas;
+    } else if (changeZ > cameraZ) {
+      zoom -= zoomPas;
+    }
+
+    controller.olViewer.map.getView().setZoom(Math.round(zoom));
+    controller.threeViewer.perspectiveCamera.position.z = cameraZ;
+    controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
     controller.threeViewer.scene.remove(line);
 
     if (device)
       addItineraire(device);
-  });
+  }
+}
 
-  document.addEventListener("pointerdown", (event) => {
+export const createDimensionEnvironment = function createDimensionEnvironment(dimension) {
+
+  if (dimension == 2) {//remettre le bail droit
+    console.log("___dimension 2___");
+
     controller.threeViewer.controls.enabled = false;
-    pointerIsDown = true;
 
-    initPointerX = event.clientX;
-    initPointerY = event.clientY;
+    controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
+    console.log(controller.threeViewer.perspectiveCamera.rotation);
+    controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
+    controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
 
-    lastPointerX = event.clientX;
-    lastPointerY = event.clientY;
-  });
+    controller.threeViewer.controls.enabled = true;
 
-  document.addEventListener("pointermove", (event) => {
-    if (pointerIsDown) {
-      newPointerX = event.clientX;
-      newPointerY = event.clientY;
 
-      controller.threeViewer.perspectiveCamera.position.x += (lastPointerX - newPointerX);
-      controller.threeViewer.perspectiveCamera.position.y += (newPointerY - lastPointerY);
+    /* On désactive l'orbit control lors du click (drag) */
+    document.addEventListener("pointerup", clickUp, true);
+    document.addEventListener("pointerdown", clickDown, true);
+    document.addEventListener("pointermove", clickMove, true);
+    /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
+    controller.threeViewer.controls.addEventListener('change', scroll, true);
 
-      lastPointerX = newPointerX;
-      lastPointerY = newPointerY;
-    }
-  });
+  } else {
+    console.log("___dimension 3___");
 
-  /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
-  controller.threeViewer.controls.addEventListener('change', function () {
-    console.log("__scroll__");
-
-    const changeZ = controller.threeViewer.perspectiveCamera.position.z;
-
-    let zoom = controller.olViewer.map.getView().getZoom();
-
-    if (changeZ != cameraZ) {
-      if (changeZ < cameraZ) {
-        zoom += zoomPas;
-      } else if (changeZ > cameraZ) {
-        zoom -= zoomPas;
-      }
-
-      controller.olViewer.map.getView().setZoom(Math.round(zoom));
-      controller.threeViewer.perspectiveCamera.position.z = cameraZ;
-      controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
-      controller.threeViewer.scene.remove(line);
-
-      if (device)
-        addItineraire(device);
-    }
-  });
-
-  addObjects();
+    document.removeEventListener("pointerup", clickUp, true);
+    document.removeEventListener("pointerdown", clickDown, true);
+    document.removeEventListener("pointermove", clickMove, true);
+    controller.threeViewer.controls.removeEventListener('change', scroll, true);
+  }
 }
 
 function addObjects() {
@@ -251,5 +292,38 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
   controller.threeViewer.scene.add(mesh);
 
   addItineraire(deviceNumber);
+
+}
+
+
+export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
+
+  device = deviceNumber;
+
+  const data = await getLiveDataDevice(deviceNumber);
+
+  const material = new THREE.LineBasicMaterial({
+    color: 0x00ff00
+  });
+
+  const points = [];
+
+  for (let i = 0; i < data.length; i++) {
+
+    points.push(new THREE.Vector3(
+      controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
+      controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
+      data[i].speed));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  line = new THREE.Line(geometry, material);
+
+  // controller.threeViewer.currentCamera.position.set(coords[0].y, coords[0].x, 11)
+  // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
+  // controller.threeViewer.currentCamera.updateProjectionMatrix()
+
+  controller.threeViewer.scene.add(line);
 
 }
