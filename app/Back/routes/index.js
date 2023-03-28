@@ -17,7 +17,6 @@ router.get('/', function (req, res, next) {
   const connectDb = async () => {
     try {
 
-      await pool.connect();
       const info_schema = await pool.query(
         "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Device%';"
       );

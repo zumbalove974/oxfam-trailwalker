@@ -18,7 +18,6 @@ router.get('/:deviceNumber', function (req, res, next) {
     const connectDb = async () => {
         try {
 
-            await pool.connect();
             const response = await pool.query(`SELECT * FROM public."Device_${req.params.deviceNumber}" ORDER BY "timestamp"`);
 
             console.log(response);
@@ -32,7 +31,6 @@ router.get('/:deviceNumber', function (req, res, next) {
     connectDb().then(r => {
         //res.render('index', { title: r });
         res.json(r);
-        console.log("4");
         pool.end();
     })
 
