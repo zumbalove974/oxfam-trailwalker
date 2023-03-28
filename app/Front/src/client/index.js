@@ -63,13 +63,38 @@ export const init = async function init() {
   const zoomPas = 1;
   let lastCameraZ = window.innerHeight / depht_s;
 
+  // eslint-disable-next-line no-unused-vars
+  let lastPointerX;
+  let lastPointerY;
+  let newPointerX;
+  let newPointerY;
+  let pointerIsDown = false;
+
   /* On désactive l'orbit control lors du click (drag) */
   document.addEventListener("pointerup", () => {
     controller.threeViewer.controls.enabled = true;
+    pointerIsDown = false;
   });
 
-  document.addEventListener("pointerdown", () => {
+  document.addEventListener("pointerdown", (event) => {
     controller.threeViewer.controls.enabled = false;
+    pointerIsDown = true;
+
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
+  });
+
+  document.addEventListener("pointermove", (event) => {
+    if (pointerIsDown) {
+      newPointerX = event.clientX;
+      newPointerY = event.clientY;
+
+      controller.threeViewer.perspectiveCamera.position.x += (lastPointerX - newPointerX);
+      controller.threeViewer.perspectiveCamera.position.y += (newPointerY - lastPointerY);
+
+      lastPointerX = newPointerX;
+      lastPointerY = newPointerY;
+    }
   });
 
   /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
