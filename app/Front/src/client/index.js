@@ -34,7 +34,7 @@ const paramsCovid = {
 */
 
 let line;
-let coordinates;
+let device;
 
 const paramsWind = {
   center: vavinCenter,
@@ -103,8 +103,8 @@ export const init = async function init() {
 
     controller.threeViewer.scene.remove(line);
 
-    if (coordinates)
-      addItineraire(coordinates);
+    if (device)
+      addItineraire(device);
   });
 
   document.addEventListener("pointerdown", (event) => {
@@ -151,8 +151,8 @@ export const init = async function init() {
       controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
       controller.threeViewer.scene.remove(line);
 
-      if (coordinates)
-        addItineraire(coordinates);
+      if (device)
+        addItineraire(device);
     }
   });
 
@@ -174,6 +174,8 @@ function addObjects() {
 
 
 export const addItineraire = async function addItineraire(deviceNumber) {
+
+  device = deviceNumber;
 
   const coords = await getLiveDataDevice(deviceNumber);
 
