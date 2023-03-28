@@ -61,35 +61,42 @@ export const init = async function init() {
 
   const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
   const zoomPas = 1;
+  let lastCameraZ = window.innerHeight / depht_s;
 
+  /* On désactive l'orbit control lors du click (drag) */
+  document.addEventListener("pointerup", () => {
+    controller.threeViewer.controls.enabled = true;
+  });
+
+  document.addEventListener("pointerdown", () => {
+    controller.threeViewer.controls.enabled = false;
+  });
+
+  /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
   controller.threeViewer.controls.addEventListener('change', function () {
-    if (coordinates) {
-      const changeZ = controller.threeViewer.perspectiveCamera.position.z;
-      const z = window.innerHeight / depht_s;
+    console.log("__scroll__");
 
-      console.log("yyy")
+    const changeZ = controller.threeViewer.perspectiveCamera.position.z;
 
-      let zoom = controller.olViewer.map.getView().getZoom();
+    let zoom = controller.olViewer.map.getView().getZoom();
 
-      if (changeZ < z) {
-
-        controller.olViewer.map.getView().setZoom(Math.round(zoom + zoomPas));
-        controller.threeViewer.perspectiveCamera.position.z = z;
-        controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom + zoomPas)];
-        controller.threeViewer.scene.remove(line);
-        addItineraire(coordinates);
-
-      } else if (changeZ > z) {
-
-        controller.olViewer.map.getView().setZoom(Math.round(zoom - zoomPas));
-        controller.threeViewer.perspectiveCamera.position.z = z;
-        controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom - zoomPas)];
-        controller.threeViewer.scene.remove(line);
-        addItineraire(coordinates);
-
+    if (changeZ != lastCameraZ) {
+      if (changeZ < lastCameraZ) {
+        zoom += zoomPas;
+      } else if (changeZ > lastCameraZ) {
+        zoom -= zoomPas;
       }
+
+      controller.olViewer.map.getView().setZoom(Math.round(zoom));
+      controller.threeViewer.perspectiveCamera.position.z = lastCameraZ;
+      controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
+      controller.threeViewer.scene.remove(line);
+
+      if (coordinates)
+        addItineraire(coordinates);
+    } else {
+      lastCameraZ = changeZ;
     }
-    //console.log(controller.olViewer.zoom)
   });
 
   addObjects();
