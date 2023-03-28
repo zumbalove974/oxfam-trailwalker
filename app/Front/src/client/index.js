@@ -127,6 +127,7 @@ export const addItineraire = async function addItineraire(deviceNumber) {
   });
 
   const points = [];
+
   for (let i = 0; i < coords.length; i++) {
 
     points.push(new THREE.Vector3(
@@ -145,11 +146,12 @@ export const addItineraire = async function addItineraire(deviceNumber) {
 
   controller.threeViewer.scene.add(line);
 
-  console.log("line", line)
-
 }
 
-export const addItineraireEpaisseur = function addItineraireEpaisseur(trace) {
+export const addItineraireEpaisseur = async function addItineraireEpaisseur(deviceNumber) {
+
+  const trace = await getLiveDataDevice(deviceNumber);
+
   const material = new THREE.MeshBasicMaterial({
     color: "blue"
   });
@@ -191,6 +193,6 @@ export const addItineraireEpaisseur = function addItineraireEpaisseur(trace) {
   const mesh = new THREE.Mesh(geometry, material);
   controller.threeViewer.scene.add(mesh);
 
-  addItineraire(trace);
+  addItineraire(deviceNumber);
 
 }
