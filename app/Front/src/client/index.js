@@ -33,7 +33,8 @@ const paramsCovid = {
 };
 */
 
-let line;
+let visu_meshes = [];
+let visu_function;
 let device;
 
 const paramsWind = {
@@ -101,10 +102,12 @@ export const init = async function init() {
     controller.threeViewer.mapCenter = [x, y];
     controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
 
-    controller.threeViewer.scene.remove(line);
+    while (visu_meshes.length > 0) {
+      controller.threeViewer.scene.remove(visu_meshes.pop());
+    }
 
-    if (device)
-      addItineraire(device);
+    if (device && visu_function)
+      visu_function(device);
   });
 
   document.addEventListener("pointerdown", (event) => {
@@ -149,10 +152,13 @@ export const init = async function init() {
       controller.olViewer.map.getView().setZoom(Math.round(zoom));
       controller.threeViewer.perspectiveCamera.position.z = cameraZ;
       controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
-      controller.threeViewer.scene.remove(line);
 
-      if (device)
-        addItineraire(device);
+      while (visu_meshes.length > 0) {
+        controller.threeViewer.scene.remove(visu_meshes.pop());
+      }
+
+      if (device && visu_function)
+        visu_function(device);
     }
   });
 
@@ -176,6 +182,7 @@ function addObjects() {
 export const addItineraire = async function addItineraire(deviceNumber) {
 
   device = deviceNumber;
+  visu_function = addItineraire;
 
   const coords = await getLiveDataDevice(deviceNumber);
 
@@ -195,13 +202,14 @@ export const addItineraire = async function addItineraire(deviceNumber) {
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
-  line = new THREE.Line(geometry, material);
+  let visu_mesh = new THREE.Line(geometry, material);
+  visu_meshes.push(visu_mesh);
 
   // controller.threeViewer.currentCamera.position.set(coords[0].y, coords[0].x, 11)
   // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
   // controller.threeViewer.currentCamera.updateProjectionMatrix()
 
-  controller.threeViewer.scene.add(line);
+  controller.threeViewer.scene.add(visu_mesh);
 
 }
 
@@ -261,9 +269,12 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
   )
 
   const geometry = new THREE.ShapeBufferGeometry(shape);
-  const mesh = new THREE.Mesh(geometry, material);
-  controller.threeViewer.scene.add(mesh);
+  let visu_mesh = new THREE.Mesh(geometry, material);
+  visu_meshes.push(visu_mesh)
+  controller.threeViewer.scene.add(visu_mesh);
 
   addItineraire(deviceNumber);
+
+  visu_function = addItineraireEpaisseur;
 
 }
