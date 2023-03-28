@@ -22,6 +22,7 @@ const height = window.innerHeight; // this makes the 3D canvas full screen
 
 let vavinLatLon = [49.93825150, 1.21090698];
 let vavinCenter = proj4(proj4326, proj3857, [vavinLatLon[1], vavinLatLon[0]]);
+
 /*
 const paramsCovid = {
   center: parisCenter,
@@ -165,5 +166,52 @@ export const addItineraire = function addItineraire(coords) {
   controller.threeViewer.currentCamera.position.set(coords[0].x, coords[0].y, 11)
   controller.threeViewer.currentCamera.lookAt(new Vector3(coords[0].x, coords[0].y, 0))
   controller.threeViewer.currentCamera.updateProjectionMatrix()*/
+
   controller.threeViewer.scene.add(line);
+}
+
+export const addItineraireEpaisseur = function addItineraireEpaisseur(trace) {
+  const material = new THREE.MeshBasicMaterial({
+    color: "blue"
+  });
+
+  const shapes = [];
+
+  for (let i = 0; i < trace.length - 1; i++) {
+
+    if (trace[i].speed > 0 || trace[i + 1] > 0) {
+      let shape = new THREE.Shape();
+      let xA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[0];
+      let yA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[1];
+      let xB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[0];
+      let yB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[1];
+      let dA = trace[i].speed;
+      let dB = trace[i + 1].speed;
+      let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+
+      shape.moveTo(
+        xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yA - dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
+      shape.lineTo(
+        xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
+      shape.lineTo(
+        xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
+      shape.lineTo(
+        xA - dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yA + dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
+      shape.lineTo(
+        xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yA - dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
+
+      shapes.push(shape);
+    }
+  }
+  const geometry = new THREE.ShapeBufferGeometry(shapes);
+  const mesh = new THREE.Mesh(geometry, material);
+  controller.threeViewer.scene.add(mesh);
+
+  addItineraire(trace);
+
 }

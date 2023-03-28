@@ -5,8 +5,8 @@ export const getAllLiveData = async function getAllLiveData() {
         .then(response => response.json())
         .then(response => {
 
-            console.log("_________________");
-            console.log(response);
+            // console.log("bddConnection.response");
+            // console.log(response);
 
             return response.rows;
         })
