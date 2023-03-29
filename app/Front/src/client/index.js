@@ -129,6 +129,7 @@ function clickUp() {
 
   if (device && visu_function)
     visu_function(device);
+
 }
 
 function clickDown(event) {
