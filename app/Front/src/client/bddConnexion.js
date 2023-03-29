@@ -19,8 +19,8 @@ export const getLiveDataDevice = async function getLiveDataDevice(deviceNumber) 
         .then(response => response.json())
         .then(response => {
 
-            // console.log("bddConnection.response");
-            // console.log(response);
+            console.log("bddConnection.response");
+            console.log(response);
 
             return response;
         })
