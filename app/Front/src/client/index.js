@@ -114,21 +114,18 @@ function clickUp() {
   controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
   controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
 
-    while (visu_meshes.length > 0) {
-      controller.threeViewer.scene.remove(visu_meshes.pop());
-    }
+  while (visu_meshes.length > 0) {
+    controller.threeViewer.scene.remove(visu_meshes.pop());
+  }
 
-    if (device && visu_function)
-      visu_function(device);
-  });
+  if (device && visu_function) {
+    visu_function(device);
+  };
 
 
   controller.threeViewer.controls.enabled = true;
 
   controller.threeViewer.scene.remove(line);
-
-  if (device)
-    addItineraire(device);
 }
 
 function clickDown(event) {
