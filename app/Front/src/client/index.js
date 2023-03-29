@@ -236,6 +236,7 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
     let dA = trace[i].speed;
     let dB = trace[i + 1].speed;
     let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+    if (normAB <= 0) { continue }
 
     shape.lineTo(
       xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
@@ -254,6 +255,7 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
     let dA = trace[i].speed;
     let dB = trace[i + 1].speed;
     let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+    if (normAB <= 0) { continue }
 
     shape.lineTo(
       xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
