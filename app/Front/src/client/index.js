@@ -8,7 +8,7 @@ import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
 import { getLiveDataDevice } from "./bddConnexion";
-//import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
@@ -510,6 +510,9 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
+    geometry.computeBoundingSphere();
+    console.log(BufferGeometryUtils);
+    geometry = BufferGeometryUtils.toCreasedNormals(geometry);
     /*
     geometry.deleteAttribute('normal');
     geometry.deleteAttribute('uv');
