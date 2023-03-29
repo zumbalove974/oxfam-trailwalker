@@ -36,6 +36,8 @@ const paramsCovid = {
 let visu_meshes = [];
 let visu_function;
 let device;
+let line;
+let line3d;
 
 const paramsWind = {
   center: vavinCenter,
@@ -114,13 +116,12 @@ function clickUp() {
   controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
   controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
 
-    while (visu_meshes.length > 0) {
-      controller.threeViewer.scene.remove(visu_meshes.pop());
-    }
+  while (visu_meshes.length > 0) {
+    controller.threeViewer.scene.remove(visu_meshes.pop());
+  }
 
-    if (device && visu_function)
-      visu_function(device);
-  });
+  if (device && visu_function)
+    visu_function(device);
 
 
   controller.threeViewer.controls.enabled = true;
@@ -193,7 +194,7 @@ function scroll() {
 
 export const createDimensionEnvironment = function createDimensionEnvironment(dimension) {
 
-  if (dimension == 2) {//remettre le bail droit
+  if (dimension == 2) {
     console.log("___dimension 2___");
 
     controller.threeViewer.controls.enabled = false;
@@ -205,7 +206,6 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 
     controller.threeViewer.controls.enabled = true;
 
-
     /* On désactive l'orbit control lors du click (drag) */
     document.addEventListener("pointerup", clickUp, true);
     document.addEventListener("pointerdown", clickDown, true);
@@ -213,6 +213,7 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
     controller.threeViewer.controls.addEventListener('change', scroll, true);
 
+    controller.threeViewer.scene.remove(line3d);
   } else {
     console.log("___dimension 3___");
 
@@ -403,13 +404,9 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber, dime
   controller.threeViewer.scene.remove(line);
 
   // create line 
-  line = new THREE.Line(geometry, material);
-  line.computeLineDistances();
+  line3d = new THREE.Line(geometry, material);
+  line3d.computeLineDistances();
 
   // add line to scene so it can be rendered
-  controller.threeViewer.scene.add(line);
-
-  visu_function = addItineraireEpaisseur;
-
-
+  controller.threeViewer.scene.add(line3d);
 }
