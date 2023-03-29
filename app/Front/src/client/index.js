@@ -38,6 +38,8 @@ let visu_function;
 let device;
 let line;
 let line3d;
+let mesh;
+let dimension;
 
 const paramsWind = {
   center: vavinCenter,
@@ -108,7 +110,6 @@ function clickUp() {
     controller.threeViewer.mapCenter = [x, y];
   }
 
-
   controller.threeViewer.controls.enabled = false;
 
   controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
@@ -116,20 +117,18 @@ function clickUp() {
   controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
   controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
 
+  controller.threeViewer.controls.enabled = true;
+
+  controller.threeViewer.scene.remove(line);
+  controller.threeViewer.scene.remove(line3d);
+  controller.threeViewer.scene.remove(mesh);
   while (visu_meshes.length > 0) {
     controller.threeViewer.scene.remove(visu_meshes.pop());
   }
 
+
   if (device && visu_function)
     visu_function(device);
-
-
-  controller.threeViewer.controls.enabled = true;
-
-  controller.threeViewer.scene.remove(line);
-
-  if (device)
-    addItineraire(device);
 }
 
 function clickDown(event) {
@@ -172,27 +171,27 @@ function scroll() {
       controller.olViewer.map.getView().setZoom(Math.round(zoom));
       controller.threeViewer.perspectiveCamera.position.z = cameraZ;
       controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
-
-      while (visu_meshes.length > 0) {
-        controller.threeViewer.scene.remove(visu_meshes.pop());
-      }
-
-      if (device && visu_function)
-        visu_function(device);
-
     }
 
     controller.olViewer.map.getView().setZoom(Math.round(zoom));
     controller.threeViewer.perspectiveCamera.position.z = cameraZ;
     controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
-    controller.threeViewer.scene.remove(line);
 
-    if (device)
-      addItineraire(device);
+    controller.threeViewer.scene.remove(line);
+    controller.threeViewer.scene.remove(line3d);
+    controller.threeViewer.scene.remove(mesh);
+    while (visu_meshes.length > 0) {
+      controller.threeViewer.scene.remove(visu_meshes.pop());
+    }
+
+    if (device && visu_function)
+      visu_function(device);
   }
 }
 
-export const createDimensionEnvironment = function createDimensionEnvironment(dimension) {
+export const createDimensionEnvironment = function createDimensionEnvironment(dimensionNb) {
+
+  dimension = dimensionNb;
 
   if (dimension == 2) {
     console.log("___dimension 2___");
@@ -214,6 +213,7 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     controller.threeViewer.controls.addEventListener('change', scroll, true);
 
     controller.threeViewer.scene.remove(line3d);
+    controller.threeViewer.scene.remove(mesh);
   } else {
     console.log("___dimension 3___");
 
@@ -226,7 +226,7 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 /*
 function addObjects() {
   //example to add an object to the scene
-
+ 
   let worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
   var geometry = new THREE.BoxBufferGeometry(10, 10, 10);
   var material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
@@ -234,7 +234,7 @@ function addObjects() {
   cube.position.x = worldCoords[0];
   cube.position.y = worldCoords[1];
   cube.position.z = 0;
-
+ 
   controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
 }*/
 
@@ -268,17 +268,13 @@ export const addItineraire = async function addItineraire(deviceNumber) {
   // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
   // controller.threeViewer.currentCamera.updateProjectionMatrix()
 
-
-  controller.threeViewer.scene.add(line);
-
   controller.threeViewer.scene.add(visu_mesh);
-
-
 }
 
 export const addItineraireEpaisseur = async function addItineraireEpaisseur(deviceNumber) {
 
   const trace = await getLiveDataDevice(deviceNumber);
+  visu_function = addItineraireEpaisseur;
 
   const material = new THREE.MeshBasicMaterial({
     color: "blue"
@@ -338,15 +334,14 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
   visu_meshes.push(visu_mesh)
   controller.threeViewer.scene.add(visu_mesh);
 
-  addItineraire(deviceNumber);
-
-
+  //addItineraire(deviceNumber);
 }
 
 
-export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber, dimension) {
+export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
 
   device = deviceNumber;
+  visu_function = addItineraireSpeed3D;
 
   const data = await getLiveDataDevice(deviceNumber);
 
@@ -355,189 +350,172 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber, dime
   let speeds = [];
 
   for (let i = 0; i < data.length; i++) {
-    let z;
-
-    if (dimension == 2) {
-      z = 0;
-    } else {
-      z = data[i].speed;
-    }
-
     speeds.push(data[i].speed);
-
-    points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-    points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    points.push(z);
-  }
-
-  for (let i = data.length - 1; i >= 0; i--) {
-    points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-    points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    points.push(0);
   }
 
   let min = Math.min(...speeds);
   let max = Math.max(...speeds);
 
-
+  /* Normalisation des vitesses pour les utiliser dans les couleurs */
   for (let i = 0; i < speeds.length; i++) {
     speeds[i] = (speeds[i] - min) / (max - min);
   }
 
-  for (let i = 0; i < data.length; i++) {
-    colors.push(speeds[i]);
-    colors.push(0.5);
-    colors.push(0.5);
+  if (dimension == 2) {
+    for (let i = 0; i < data.length; i++) {
+      points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+      points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+      points.push(0);
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      colors.push(speeds[i]);
+      colors.push(1 - speeds[i]);
+      colors.push(0.2);
+    }
+
+    // create geometry
+    const geometry = new THREE.BufferGeometry();
+
+    geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
+
+    geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+
+    // create material
+    const material = new THREE.MeshBasicMaterial({
+      vertexColors: THREE.VertexColors
+    });
+
+    controller.threeViewer.scene.remove(line);
+
+    line3d = new THREE.Line(geometry, material);
+    line3d.computeLineDistances();
+
+    // add line to scene so it can be rendered
+    controller.threeViewer.scene.add(line3d);
+  } else {
+
+    const geometry = new THREE.BufferGeometry();
+    // create a simple square shape. We duplicate the top left and bottom right
+    // vertices because each vertex needs to appear once per triangle.
+    let vertices = [];
+    let colors = [];
+
+    for (let i = 0; i < (data.length - 1); i++) {
+      //Face 1
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+      vertices.push(data[i].speed);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+      vertices.push(0);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+      vertices.push(0);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+      vertices.push(0);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+      vertices.push(data[i + 1].speed);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+      vertices.push(data[i].speed);
+
+      // Face 2
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+      vertices.push(data[i].speed);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+      vertices.push(0);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+      vertices.push(0);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+      vertices.push(0);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+      vertices.push(data[i].speed);
+
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+      vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+      vertices.push(data[i + 1].speed);
+    }
+
+    for (let i = 0; i < (data.length - 1); i++) {
+      // Face 1
+      colors.push(speeds[i]);
+      colors.push(0.2);
+      colors.push(0.2);
+
+      colors.push(0.2);
+      colors.push(1.0);
+      colors.push(0.2);
+
+      colors.push(0.2);
+      colors.push(1.0);
+      colors.push(0.2);
+
+      colors.push(0.2);
+      colors.push(1.0);
+      colors.push(0.2);
+
+      colors.push(speeds[i + 1]);
+      colors.push(0.2);
+      colors.push(0.2);
+
+      colors.push(speeds[i]);
+      colors.push(0.2);
+      colors.push(0.2);
+
+      //Face 2
+      colors.push(speeds[i]);
+      colors.push(0.2);
+      colors.push(0.2);
+
+      colors.push(0.2);
+      colors.push(1.0);
+      colors.push(0.2);
+
+      colors.push(0.2);
+      colors.push(1.0);
+      colors.push(0.2);
+
+      colors.push(0.2);
+      colors.push(1.0);
+      colors.push(0.2);
+
+      colors.push(speeds[i]);
+      colors.push(0.2);
+      colors.push(0.2);
+
+      colors.push(speeds[i + 1]);
+      colors.push(0.2);
+      colors.push(0.2);
+    }
+
+    // itemSize = 3 because there are 3 values (components) per vertex
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+
+    // create material
+    const material = new THREE.MeshBasicMaterial({
+      vertexColors: THREE.VertexColors
+    });
+
+    mesh = new THREE.Mesh(geometry, material);
+
+    controller.threeViewer.scene.add(mesh);
   }
-
-  for (let i = data.length - 1; i >= 0; i--) {
-    colors.push(0.0);
-    colors.push(0.5);
-    colors.push(0.5);
-  }
-
-  // create geometry
-  const geometry = new THREE.BufferGeometry();
-
-  geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
-
-  geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
-
-  // create material
-  const material = new THREE.MeshBasicMaterial({
-    vertexColors: THREE.VertexColors
-  });
-
-  controller.threeViewer.scene.remove(line);
-
-  line = new THREE.Line(geometry, material);
-  line.computeLineDistances();
-
-  // add line to scene so it can be rendered
-  controller.threeViewer.scene.add(line);
-
-  const geometry2 = new THREE.BufferGeometry();
-  // create a simple square shape. We duplicate the top left and bottom right
-  // vertices because each vertex needs to appear once per triangle.
-  let vertices = [];
-  let colors2 = [];
-
-  for (let i = 0; i < (data.length - 1); i++) {
-    //Face 1
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    vertices.push(data[i].speed);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    vertices.push(0);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-    vertices.push(0);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-    vertices.push(0);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-    vertices.push(data[i + 1].speed);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    vertices.push(data[i].speed);
-
-    // Face 2
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    vertices.push(data[i].speed);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-    vertices.push(0);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    vertices.push(0);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-    vertices.push(0);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    vertices.push(data[i].speed);
-
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-    vertices.push(data[i + 1].speed);
-  }
-
-  for (let i = 0; i < (data.length - 1); i++) {
-    // Face 1
-    colors2.push(speeds[i]);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(0.0);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(0.0);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(0.0);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(speeds[i + 1]);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(speeds[i]);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    //Face 2
-    colors2.push(speeds[i]);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(0.0);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(0.0);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(0.0);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(speeds[i]);
-    colors2.push(0.2);
-    colors2.push(0.2);
-
-    colors2.push(speeds[i + 1]);
-    colors2.push(0.2);
-    colors2.push(0.2);
-  }
-
-  // itemSize = 3 because there are 3 values (components) per vertex
-  geometry2.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
-  geometry2.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors2), 3));
-
-  // create material
-  const material2 = new THREE.MeshBasicMaterial({
-    vertexColors: THREE.VertexColors
-  });
-
-  const mesh = new THREE.Mesh(geometry2, material2);
-
-  controller.threeViewer.scene.add(mesh);
-  console.log(new Float32Array(vertices));
-  console.log(vertices);
 }
