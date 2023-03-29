@@ -20,6 +20,6 @@ Puis, on ramene ces nouveaux points moyennes sur une trajectoire de reference, c
 
 Nous allons utiliser les donnees de la base de donnees Oxfam, presente sur le port 5500 en localhost. Il est fort probable que ce port soit ensuite utilise pour exposer les donnees obtenues grace a cette methode.
 
-Le moyennage se fera comme suit : le point n de la trajectoire moyennee est la moyenne des points 3n, 3n+1 et 3n+2 de la trajectoire GPS.
+Le moyennage se fera comme suit : le point n de la trajectoire moyennee est la moyenne des points n-2, n-1, n et n+1 et n+2 de la trajectoire GPS.
 
 La trajectoire de reference sera la trajectoire moyennee du device 3883, qui realise le trajet prevu par l'organisation Oxfam.
