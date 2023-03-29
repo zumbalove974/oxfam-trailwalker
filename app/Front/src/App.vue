@@ -4,7 +4,7 @@
   <button @click="addLine()">Add line</button>
   <button @click="addEpaisseur()">Add epaisseur</button>
   <button @click="addSpeed3D()">Add speed 2D+1</button>
-  <button @click="changerDeDimension()">3D</button>
+  <button @click="changerDeDimension()">{{ dimension }}D</button>
 </template>
 
 <script>
@@ -40,13 +40,14 @@ export default {
       this.addItineraireEpaisseur(this.deviceNumber);
     },
     addSpeed3D() {
-      this.addItineraireSpeed3D(this.deviceNumber);
+      this.addItineraireSpeed3D(this.deviceNumber, this.dimension);
     },
     changerDeDimension() {
-      if (this.dimension == 2)
+      if (this.dimension == 2) {
         this.dimension = 3;
-      else
+      } else {
         this.dimension = 2
+      }
 
       createDimensionEnvironment(this.dimension);
     }

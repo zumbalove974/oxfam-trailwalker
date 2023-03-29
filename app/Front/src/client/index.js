@@ -202,6 +202,7 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 
 function addObjects() {
   //example to add an object to the scene
+
   let worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
   var geometry = new THREE.BoxBufferGeometry(10, 10, 10);
   var material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
@@ -231,7 +232,7 @@ export const addItineraire = async function addItineraire(deviceNumber) {
     points.push(new THREE.Vector3(
       controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
       controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
-      1));
+      0));
   }
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -243,7 +244,6 @@ export const addItineraire = async function addItineraire(deviceNumber) {
   // controller.threeViewer.currentCamera.updateProjectionMatrix()
 
   controller.threeViewer.scene.add(line);
-
 }
 
 export const addItineraireEpaisseur = async function addItineraireEpaisseur(deviceNumber) {
@@ -296,34 +296,68 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
 }
 
 
-export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
+export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber, dimension) {
 
   device = deviceNumber;
 
   const data = await getLiveDataDevice(deviceNumber);
 
-  const material = new THREE.LineBasicMaterial({
-    color: 0x00ff00
-  });
-
   const points = [];
+  const colors = [];
+  let speeds = [];
 
   for (let i = 0; i < data.length; i++) {
+    let z;
 
-    points.push(new THREE.Vector3(
-      controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
-      controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
-      data[i].speed));
+    if (dimension == 2) {
+      z = 0;
+    } else {
+      z = data[i].speed;
+    }
+
+    speeds.push(data[i].speed);
+
+    points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+    points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+    points.push(z);
   }
 
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  let min = Math.min(...speeds);
+  let max = Math.max(...speeds);
 
+
+  for (let i = 0; i < speeds.length; i++) {
+    speeds[i] = (speeds[i] - min) / (max - min);
+    console.log(speeds[i]);
+  }
+
+  for (let i = 0; i < data.length; i++) {
+    colors.push(speeds[i]);
+    colors.push(speeds[i]);
+    colors.push(speeds[i]);
+  }
+
+  // create geometry
+  const geometry = new THREE.BufferGeometry();
+
+  geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
+
+  geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+
+  // create material
+  const material = new THREE.LineBasicMaterial({
+    vertexColors: THREE.VertexColors, // inform material that geometry 
+    // will provide color info
+    linewidth: 4                // lineWidth not universally supported
+    // works with safari
+  });
+
+  controller.threeViewer.scene.remove(line);
+
+  // create line 
   line = new THREE.Line(geometry, material);
+  line.computeLineDistances();
 
-  // controller.threeViewer.currentCamera.position.set(coords[0].y, coords[0].x, 11)
-  // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
-  // controller.threeViewer.currentCamera.updateProjectionMatrix()
-
+  // add line to scene so it can be rendered
   controller.threeViewer.scene.add(line);
-
 }
