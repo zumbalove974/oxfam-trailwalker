@@ -8,7 +8,7 @@ import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
 import { getLiveDataDevice } from "./bddConnexion";
-
+//import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
@@ -396,7 +396,7 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
     controller.threeViewer.scene.add(line3d);
   } else {
 
-    const geometry = new THREE.BufferGeometry();
+    let geometry = new THREE.BufferGeometry();
     // create a simple square shape. We duplicate the top left and bottom right
     // vertices because each vertex needs to appear once per triangle.
     let vertices = [];
@@ -510,12 +510,26 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
+    /*
+    geometry.deleteAttribute('normal');
+    geometry.deleteAttribute('uv');
+
+    geometry.computeBoundingSphere();
+
+    geometry = BufferGeometryUtils.mergeVertices(geometry, 0.1);
+    geometry.computeVertexNormals();
+    */
+
     // create material
     const material = new THREE.MeshBasicMaterial({
-      vertexColors: THREE.VertexColors
+      vertexColors: THREE.VertexColors,
+      transparent: true,
+      opacity: 0.8
     });
 
     mesh = new THREE.Mesh(geometry, material);
+
+    console.log("-------------", geometry)
 
     controller.threeViewer.scene.add(mesh);
   }
