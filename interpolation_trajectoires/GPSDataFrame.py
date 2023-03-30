@@ -4,7 +4,7 @@
 import psycopg2
 import pandas as pd
 import sys
-
+from sqlalchemy import create_engine
 
 def connect():
 
@@ -65,11 +65,12 @@ def deviceList():
 def deviceDF(tableName):
 
     query = """
-        SELECT * FROM public."{table_name}" ORDER BY "timestamp"
+        SELECT "id", "speed", "timestamp", "device", "x", "y", "alt" 
+        FROM public."{table_name}" ORDER BY "timestamp"
         """.format(table_name=tableName)
     # creating a list with columns names to pass into the function
     column_names = ["id", "speed", "timestamp",
-                    "device", "x", "y", "alt", "geom"]
+                    "device", "x", "y", "alt"]
     # opening the connection
     conn = connect()
     # loading our dataframe
@@ -80,3 +81,11 @@ def deviceDF(tableName):
     print(df)
 
     return df
+
+def df_to_sql(df, table_name):
+
+    engine = create_engine(
+        'postgresql://postgres_user:postgres_password@localhost:6500/postgres_user'
+        )
+    df.to_sql(table_name, con=engine, index=False, method='multi')
+    engine.dispose()
