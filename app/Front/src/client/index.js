@@ -8,7 +8,6 @@ import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
 import { getLiveDataDevice } from "./bddConnexion";
-import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
@@ -401,12 +400,13 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
     // vertices because each vertex needs to appear once per triangle.
     let vertices = [];
     let colors = [];
+    const maxZ = 50;
 
     for (let i = 0; i < (data.length - 1); i++) {
       //Face 1
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-      vertices.push(data[i].speed);
+      vertices.push(data[i].speed / max * maxZ);
 
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
@@ -422,16 +422,16 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
 
       vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
       vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-      vertices.push(data[i + 1].speed);
+      vertices.push(data[i + 1].speed / max * maxZ);
 
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-      vertices.push(data[i].speed);
+      vertices.push(data[i].speed / max * maxZ);
 
       // Face 2
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-      vertices.push(data[i].speed);
+      vertices.push(data[i].speed / max * maxZ);
 
       vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
       vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
@@ -447,18 +447,18 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
 
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
       vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-      vertices.push(data[i].speed);
+      vertices.push(data[i].speed / max * maxZ);
 
       vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
       vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-      vertices.push(data[i + 1].speed);
+      vertices.push(data[i + 1].speed / max * maxZ);
     }
 
     for (let i = 0; i < (data.length - 1); i++) {
       // Face 1
       colors.push(speeds[i]);
-      colors.push(0.2);
-      colors.push(0.2);
+      colors.push(0.0);
+      colors.push(0.0);
 
       colors.push(0.2);
       colors.push(1.0);
@@ -473,17 +473,17 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
       colors.push(0.2);
 
       colors.push(speeds[i + 1]);
-      colors.push(0.2);
-      colors.push(0.2);
+      colors.push(0.0);
+      colors.push(0.0);
 
       colors.push(speeds[i]);
-      colors.push(0.2);
-      colors.push(0.2);
+      colors.push(0.0);
+      colors.push(0.0);
 
       //Face 2
       colors.push(speeds[i]);
-      colors.push(0.2);
-      colors.push(0.2);
+      colors.push(0.0);
+      colors.push(0.0);
 
       colors.push(0.2);
       colors.push(1.0);
@@ -498,34 +498,21 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
       colors.push(0.2);
 
       colors.push(speeds[i]);
-      colors.push(0.2);
-      colors.push(0.2);
+      colors.push(0.0);
+      colors.push(0.0);
 
       colors.push(speeds[i + 1]);
-      colors.push(0.2);
-      colors.push(0.2);
+      colors.push(0.0);
+      colors.push(0.0);
     }
 
     // itemSize = 3 because there are 3 values (components) per vertex
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
-    geometry.computeBoundingSphere();
-    console.log(BufferGeometryUtils);
-    geometry = BufferGeometryUtils.toCreasedNormals(geometry);
-    /*
-    geometry.deleteAttribute('normal');
-    geometry.deleteAttribute('uv');
-
-    geometry.computeBoundingSphere();
-
-    geometry = BufferGeometryUtils.mergeVertices(geometry, 0.1);
-    geometry.computeVertexNormals();
-    */
-
     // create material
     const material = new THREE.MeshBasicMaterial({
-      vertexColors: THREE.VertexColors,
+      vertexColors: true,
       transparent: true,
       opacity: 0.8
     });
