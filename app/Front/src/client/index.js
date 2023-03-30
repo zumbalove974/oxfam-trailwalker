@@ -223,20 +223,36 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     controller.threeViewer.controls.removeEventListener('change', scroll, true);
   }
 }
-/*
-function addObjects() {
-  //example to add an object to the scene
- 
-  let worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-  var geometry = new THREE.BoxBufferGeometry(10, 10, 10);
-  var material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
-  var cube = new THREE.Mesh(geometry, material); //a three js mesh needs a geometry and a material
-  cube.position.x = worldCoords[0];
-  cube.position.y = worldCoords[1];
-  cube.position.z = 0;
- 
-  controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
-}*/
+
+export function addCPs() {
+  // Coordinates of the 10 points
+  const points = [
+    [119217.3831, 6433404.488, "Départ"],
+    [124180.5423, 6410453.993, "PC3"],
+    [132238.2362, 6435533.093, "PC1"],
+    [105920.382, 6414143.439, "PC5"],
+    [102033.4436, 6428455.438, "PC6"],
+    [111821.8043, 6409726.207, "PC4"],
+    [119217.3831, 6433404.488, "Arrivé"],
+    [133515.4635, 6422798.163, "PC2"],
+    [122185.2528, 6434184.187, "PC8"],
+    [105412.5035, 6430485.632, "PC7"]
+  ];
+  console.log("points", points)
+
+  points.forEach((point) => {
+    console.log("points", points);
+    let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+    let geometry = new THREE.CircleGeometry(10, 32);
+    let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+    let circle = new THREE.Mesh(geometry, material);
+    circle.position.x = worldCoords[0];
+    circle.position.y = worldCoords[1];
+    circle.position.z = 0;
+    controller.threeViewer.scene.add(circle);
+
+  });
+}
 
 export const addItineraire = async function addItineraire(deviceNumber) {
 
