@@ -223,7 +223,20 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     controller.threeViewer.controls.removeEventListener('change', scroll, true);
   }
 }
-
+/*
+function addObjects() {
+  //example to add an object to the scene
+ 
+  let worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+  var geometry = new THREE.BoxBufferGeometry(10, 10, 10);
+  var material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+  var cube = new THREE.Mesh(geometry, material); //a three js mesh needs a geometry and a material
+  cube.position.x = worldCoords[0];
+  cube.position.y = worldCoords[1];
+  cube.position.z = 0;
+ 
+  controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
+}*/
 export function addCPs() {
   // Coordinates of the 10 points
   const points = [
