@@ -3,21 +3,42 @@
 
   <Accordion :activeIndex="0" class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
-      <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
-      <div class="flex-auto">
-        <label for="integeronly" class="font-bold block mb-2"> De </label>
-        <InputNumber placeholder="First device" v-model="deviceNumber" inputId="integeronly" />
-        <label for="integeronly" class="font-bold block mb-2"> à </label>
-        <InputNumber placeholder="Last device" v-model="deviceNumber" inputId="integeronly" />
+      <div class="flexColumn">
+        <div class="flexRow evenly upSize spaceDown">
+          <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+          <div class="card flex justify-content-center">
+            <Button label="Ajouter" />
+          </div>
+        </div>
+
+        <div class="flexRow evenly upSize">
+          <div>
+            <label for="integeronly" class="font-bold block mb-2 spaceRight"> De </label>
+            <InputNumber placeholder="First device" v-model="deviceNumber" inputId="integeronly" />
+          </div>
+          <div>
+            <label for="integeronly" class="font-bold block mb-2 spaceRight"> à </label>
+            <InputNumber placeholder="Last device" v-model="deviceNumber" inputId="integeronly" />
+          </div>
+        </div>
       </div>
+    </AccordionTab>
+  </Accordion>
+
+  <Accordion :activeIndex="0" class="onglet left">
+    <AccordionTab>
+
+      <DataTable :value="devices" tableStyle="min-width: 10rem">
+        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
+      </DataTable>
     </AccordionTab>
   </Accordion>
 
   <div class="onglet right">
     <div class="card">
       <div :style="{ position: 'relative', height: '350px' }">
-        <SpeedDial :model="items" direction="down" class="right-0 bottom-0" buttonClass="p-button-help"
-          :tooltipOptions="{ position: 'left' }" />
+        <SpeedDial id="test" ariaLabel="test" showIcon="pi pi-sliders-h" hideIcon="pi pi-times" :model="items"
+          direction="down" class="right-0 bottom-0" buttonClass="p-button-help" :tooltipOptions="{ position: 'left' }" />
       </div>
     </div>
   </div>
@@ -38,7 +59,9 @@ import SpeedDial from 'primevue/speeddial';
 import InputNumber from 'primevue/inputnumber';
 import AccordionTab from 'primevue/accordiontab';
 import Accordion from 'primevue/accordion';
-
+import Button from 'primevue/button';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
 
 // Primevue css
 import "primevue/resources/themes/lara-light-indigo/theme.css";
@@ -54,7 +77,10 @@ export default {
     SpeedDial,
     InputNumber,
     AccordionTab,
-    Accordion
+    Accordion,
+    Button,
+    DataTable,
+    Column
   },
   data() {
     return {
@@ -64,32 +90,38 @@ export default {
       addItineraireSpeed3D: addItineraireSpeed3D,
       createDimensionEnvironment: createDimensionEnvironment,
       dimension: 2,
+      devices: null,
       options: [
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
       ],
       items: [
         {
-          label: 'Add',
-          icon: 'pi pi-pencil',
+          label: 'Trajectoire simple',
+          //icon: 'pi pi-pencil',
+          id: "test",
           command: () => {
             this.addLine();
           }
         },
         {
-          label: 'Update',
+          label: 'Épaisseur de la ligne',
           icon: 'pi pi-refresh',
           command: () => {
             this.addEpaisseur();
           }
         },
         {
-          label: 'Delete',
+          label: '2D+1 vitesses',
           icon: 'pi pi-trash',
           command: () => {
             this.addSpeed3D();
           }
         }
+      ],
+      columns: [
+        { field: 'id', header: 'ID' },
+        { field: 'vitesse', header: 'Vitesse moy.' }
       ]
     }
   },
@@ -155,14 +187,21 @@ body {
 }
 
 .up {
-  top: 50px;
+  top: 30px;
   left: 50%;
   transform: translate(-50%);
+  width: 350px;
 }
 
 .right {
-  right: 50px;
-  top: 50px;
+  right: 100px;
+  top: 30px;
+}
+
+.left {
+  left: 30px;
+  top: 30px;
+  height: 90vh;
 }
 
 #dimensionBtn {
@@ -174,5 +213,43 @@ body {
 
 .font-bold {
   font-weight: bold;
+  font-size: larger;
+}
+
+#integeronly {
+  width: 100px;
+  height: 45px
+}
+
+.p-accordion-content {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.evenly {
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.upSize {
+  width: 350px;
+}
+
+.spaceUp {
+  margin-top: 20px;
+}
+
+.spaceDown {
+  margin-bottom: 20px;
+}
+
+.spaceRight {
+  margin-right: 10px;
+}
+
+#test_0 {
+  background-color: aliceblue;
+  color: aliceblue;
+  background: aliceblue;
 }
 </style>
