@@ -377,9 +377,9 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
     // create geometry
     const geometry = new THREE.BufferGeometry();
 
-    geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
 
-    geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
     // create material
     const material = new THREE.MeshBasicMaterial({
