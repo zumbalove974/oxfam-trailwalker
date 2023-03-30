@@ -20,11 +20,12 @@
     "parcel-bundler": "^1.12.4",
     "proj4": "^2.6.3",
     "regenerator-runtime": "^0.13.7",
-    "three": "^0.124.0",
+    "three": "^0.149.0",
     "turf": "^3.0.14",
     "vue": "^3.2.13"
   },
   "devDependencies": {
+    "@types/three": "^0.148.1",
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
     "@vue/cli-plugin-babel": "~5.0.0",
