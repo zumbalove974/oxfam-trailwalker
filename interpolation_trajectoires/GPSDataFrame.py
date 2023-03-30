@@ -57,20 +57,18 @@ def deviceList():
     # closing the connection
     conn.close()
     # Let’s see if we loaded the df successfully
-    print(df)
-
     return df
 
 
 def deviceDF(tableName):
 
     query = """
-        SELECT "id", "speed", "timestamp", "device", "x", "y", "alt" 
+        SELECT "timestamp","x", "y" 
         FROM public."{table_name}" ORDER BY "timestamp"
         """.format(table_name=tableName)
     # creating a list with columns names to pass into the function
-    column_names = ["id", "speed", "timestamp",
-                    "device", "x", "y", "alt"]
+    column_names = ["timestamp",
+                    "x", "y"]
     # opening the connection
     conn = connect()
     # loading our dataframe
@@ -78,8 +76,6 @@ def deviceDF(tableName):
     # closing the connection
     conn.close()
     # Let’s see if we loaded the df successfully
-    print(df)
-
     return df
 
 def df_to_sql(df, table_name):
