@@ -18,7 +18,7 @@ router.get('/:deviceNumber', function (req, res, next) {
     const connectDb = async () => {
         try {
 
-            const response = await pool.query(`SELECT * FROM public."Interpolation_${req.params.deviceNumber}" ORDER BY "timestamp"`);
+            const response = await pool.query(`SELECT * FROM public."Interpolation_${req.params.deviceNumber}" ORDER BY "index"`);
 
             console.log(response);
 

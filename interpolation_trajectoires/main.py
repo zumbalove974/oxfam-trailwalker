@@ -1,7 +1,7 @@
 import GPSDataFrame
 import Interpolation
 
-reference_device = 'Device_3883'
+reference_device = 'Device_3611'
 
 def main():
     

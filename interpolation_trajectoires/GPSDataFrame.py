@@ -83,5 +83,9 @@ def df_to_sql(df, table_name):
     engine = create_engine(
         'postgresql://postgres_user:postgres_password@localhost:6500/postgres_user'
         )
-    df.to_sql(table_name, con=engine, index=False, method='multi')
+    df.to_sql(
+            table_name,
+            con=engine,
+            method='multi', 
+            if_exists='replace')
     engine.dispose()
