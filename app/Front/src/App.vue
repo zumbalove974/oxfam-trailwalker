@@ -1,57 +1,63 @@
 <template>
   <div id="map" class="map"></div>
 
-  <Accordion :activeIndex="0" class="onglet up">
+  <Toast />
+
+  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners" :activeIndex="0" class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown">
           <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
           <div class="card flex justify-content-center">
-            <Button label="Ajouter" />
+            <Button id="addTeamBtn" label="Ajouter" @click="addDevice" />
           </div>
         </div>
 
         <div class="flexRow evenly upSize">
           <div>
             <label for="integeronly" class="font-bold block mb-2 spaceRight"> De </label>
-            <InputNumber placeholder="First device" v-model="deviceNumber" inputId="integeronly" />
+            <InputNumber placeholder="First device" v-model="deviceNumberFrom" inputId="integeronly" />
           </div>
           <div>
             <label for="integeronly" class="font-bold block mb-2 spaceRight"> à </label>
-            <InputNumber placeholder="Last device" v-model="deviceNumber" inputId="integeronly" />
+            <InputNumber placeholder="Last device" v-model="deviceNumberTo" inputId="integeronly" />
           </div>
         </div>
       </div>
     </AccordionTab>
   </Accordion>
 
-  <Accordion :activeIndex="0" class="onglet left">
+  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners" expandIcon="pi pi-ellipsis-h"
+    collapseIcon="pi pi-ellipsis-v" class="onglet left">
     <AccordionTab>
-
-      <DataTable :value="devices" tableStyle="min-width: 10rem">
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
+      <DataTable scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
+        :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
+        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
+          headerStyle="background-color: #A855F7; color: white" :sortable=true></Column>
       </DataTable>
     </AccordionTab>
   </Accordion>
 
-  <div class="onglet right">
+  <div @pointerover="removeEventListeners" @pointerleave="addEventListeners" class="onglet right">
     <div class="card">
       <div :style="{ position: 'relative', height: '350px' }">
-        <SpeedDial id="test" ariaLabel="test" showIcon="pi pi-sliders-h" hideIcon="pi pi-times" :model="items"
-          direction="down" class="right-0 bottom-0" buttonClass="p-button-help" :tooltipOptions="{ position: 'left' }" />
+        <SpeedDial id="speedial" showIcon="pi pi-sliders-h" hideIcon="pi pi-times" :model="items"
+          buttonClass="p-button-help" direction="down" :tooltipOptions="{ position: 'left' }" mask
+          :style="{ right: 0, top: 0 }" />
       </div>
     </div>
   </div>
 
-  <div id="dimensionBtn" class="card flex justify-content-center">
+  <div @pointerover="removeEventListeners" @pointerleave="addEventListeners" id="dimensionBtn"
+    class="card flex justify-content-center">
     <SelectButton @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
 </template>
 
-<script>
-import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, createDimensionEnvironment } from './client/index.js'
 
+<script>
+import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, createDimensionEnvironment, removeEventListeners, addEventListeners } from './client/index.js'
 
 // Primevue components
 import SelectButton from 'primevue/selectbutton';
@@ -62,11 +68,15 @@ import Accordion from 'primevue/accordion';
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import Toast from 'primevue/toast';
 
 // Primevue css
 import "primevue/resources/themes/lara-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
+
+import { useToast } from "primevue/usetoast";
+//import { preventDefault } from 'ol/events/Event';
 
 
 export default {
@@ -80,7 +90,8 @@ export default {
     Accordion,
     Button,
     DataTable,
-    Column
+    Column,
+    Toast
   },
   data() {
     return {
@@ -89,8 +100,15 @@ export default {
       addItineraireEpaisseur: addItineraireEpaisseur,
       addItineraireSpeed3D: addItineraireSpeed3D,
       createDimensionEnvironment: createDimensionEnvironment,
+      removeEventListeners: removeEventListeners,
+      addEventListeners: addEventListeners,
       dimension: 2,
-      devices: null,
+      toast: null,
+      devices: [],
+      devicesTab: [],
+      deviceNumber: null,
+      deviceNumberFrom: null,
+      deviceNumberTo: null,
       options: [
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
@@ -98,23 +116,22 @@ export default {
       items: [
         {
           label: 'Trajectoire simple',
-          //icon: 'pi pi-pencil',
-          id: "test",
           command: () => {
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoir de base est affichée", life: 10000 });
             this.addLine();
           }
         },
         {
           label: 'Épaisseur de la ligne',
-          icon: 'pi pi-refresh',
           command: () => {
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
             this.addEpaisseur();
           }
         },
         {
           label: '2D+1 vitesses',
-          icon: 'pi pi-trash',
           command: () => {
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
             this.addSpeed3D();
           }
         }
@@ -126,25 +143,60 @@ export default {
     }
   },
   async mounted() {
+    this.toast = useToast();
+
     this.init();
     createDimensionEnvironment(this.dimension);
     //this.result = await this.getAllLiveData();
+
+    // Modification du style des bouton du speed dial 
+    // On y a pas accès autrement que par le DOM
+    document.getElementById("speedial_0").children[0].innerHTML = "1";
+    document.getElementById("speedial_1").children[0].innerHTML = "2";
+    document.getElementById("speedial_2").children[0].innerHTML = "3";
+
+    document.getElementById("speedial_1").children[0].style = "background-color: green";
+    document.getElementById("speedial_2").children[0].style = "background-color: blue";
   },
   methods: {
     addLine() {
-      this.addItineraire(this.deviceNumber);
+      this.addItineraire(this.devices);
     },
     addEpaisseur() {
-      this.addItineraireEpaisseur(this.deviceNumber);
+      this.addItineraireEpaisseur(this.devices);
     },
     addSpeed3D() {
-      this.addItineraireSpeed3D(this.deviceNumber, this.dimension);
+      this.addItineraireSpeed3D(this.devices, this.dimension);
     },
     changerDeDimension() {
       createDimensionEnvironment(this.dimension.value);
+    },
+    addDevice() {
+      if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
+        if (this.deviceNumber) {
+          if (!this.devices.includes(this.deviceNumber)) {
+            this.devices.push(this.deviceNumber);
+            this.devicesTab.push({ id: this.deviceNumber, vitesse: 10 });
+          }
+        }
+
+        if (this.deviceNumberFrom && this.deviceNumberTo) {
+          if (this.deviceNumberFrom < this.deviceNumberTo) {
+            for (let i = this.deviceNumberFrom; i <= this.deviceNumberTo; i++) {
+              if (!this.devices.includes(i)) {
+                this.devices.push(i);
+                this.devicesTab.push({ id: i, vitesse: 10 });
+              }
+            }
+          } else {
+            this.toast.add({ severity: 'warn', summary: 'Attention', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
+          }
+        }
+      } else {
+        this.toast.add({ severity: 'warn', summary: 'Attention', detail: "Vous n'avez rien écris", life: 2000 });
+      }
     }
   }
-
 }
 </script>
 
@@ -194,7 +246,7 @@ body {
 }
 
 .right {
-  right: 100px;
+  right: 30px;
   top: 30px;
 }
 
@@ -202,6 +254,7 @@ body {
   left: 30px;
   top: 30px;
   height: 90vh;
+  max-height: 90vh;
 }
 
 #dimensionBtn {
@@ -247,9 +300,7 @@ body {
   margin-right: 10px;
 }
 
-#test_0 {
-  background-color: aliceblue;
-  color: aliceblue;
-  background: aliceblue;
+#addTeamBtn {
+  background-color: #A855F7;
 }
 </style>
