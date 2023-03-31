@@ -1,5 +1,6 @@
 import GPSDataFrame
 import Interpolation
+import tests
 
 reference_device = 'Device_3611'
 
@@ -25,4 +26,5 @@ def main():
     
     return 0
 
-main()
+if tests.main_test():
+    main()

@@ -10,7 +10,7 @@ def dist(x1, y1, x2, y2):
 def moyennageDF(df_origin):
     
     df_rolled = df_origin.copy()
-    df_result = df_rolled.rolling('4min', on="timestamp", center=True).mean()
+    df_result = df_rolled.rolling('5min', on="timestamp", center=True).mean()
     
     df_result.drop_duplicates(
             subset = "timestamp",
