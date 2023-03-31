@@ -34,6 +34,7 @@ const paramsCovid = {
 
 let visu_meshes = [];
 let visu_function;
+let devices;
 let device;
 let line;
 let line3d;
@@ -127,7 +128,7 @@ function clickUp() {
 
 
   if (device && visu_function)
-    visu_function(device);
+    visu_function(devices);
 
 }
 
@@ -184,9 +185,26 @@ function scroll() {
       controller.threeViewer.scene.remove(visu_meshes.pop());
     }
 
+    console.log("uuuuuuuuuuuuuu", visu_function)
     if (device && visu_function)
-      visu_function(device);
+      visu_function(devices);
   }
+}
+
+export const addEventListeners = function addEventListeners() {
+  /* On désactive l'orbit control lors du click (drag) */
+  document.addEventListener("pointerup", clickUp, true);
+  document.addEventListener("pointerdown", clickDown, true);
+  document.addEventListener("pointermove", clickMove, true);
+  /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
+  controller.threeViewer.controls.addEventListener('change', scroll, true);
+}
+
+export const removeEventListeners = function removeEventListeners() {
+  document.removeEventListener("pointerup", clickUp, true);
+  document.removeEventListener("pointerdown", clickDown, true);
+  document.removeEventListener("pointermove", clickMove, true);
+  controller.threeViewer.controls.removeEventListener('change', scroll, true);
 }
 
 export const createDimensionEnvironment = function createDimensionEnvironment(dimensionNb) {
@@ -205,22 +223,14 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 
     controller.threeViewer.controls.enabled = true;
 
-    /* On désactive l'orbit control lors du click (drag) */
-    document.addEventListener("pointerup", clickUp, true);
-    document.addEventListener("pointerdown", clickDown, true);
-    document.addEventListener("pointermove", clickMove, true);
-    /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
-    controller.threeViewer.controls.addEventListener('change', scroll, true);
+    addEventListeners();
 
     controller.threeViewer.scene.remove(line3d);
     controller.threeViewer.scene.remove(mesh);
   } else {
     console.log("___dimension 3___");
 
-    document.removeEventListener("pointerup", clickUp, true);
-    document.removeEventListener("pointerdown", clickDown, true);
-    document.removeEventListener("pointermove", clickMove, true);
-    controller.threeViewer.controls.removeEventListener('change', scroll, true);
+    removeEventListeners();
   }
 }
 /*
@@ -238,12 +248,13 @@ function addObjects() {
   controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
 }*/
 
-export const addItineraire = async function addItineraire(deviceNumber) {
+export const addItineraire = async function addItineraire(deviceNumbers) {
 
-  device = deviceNumber;
+  devices = deviceNumbers;
+  device = devices[0]; //////temporaire
   visu_function = addItineraire;
 
-  const coords = await getLiveDataDevice(deviceNumber);
+  const coords = await getLiveDataDevice(device);
 
   const material = new THREE.LineBasicMaterial({
     color: 0xff0000
@@ -271,9 +282,11 @@ export const addItineraire = async function addItineraire(deviceNumber) {
   controller.threeViewer.scene.add(visu_mesh);
 }
 
-export const addItineraireEpaisseur = async function addItineraireEpaisseur(deviceNumber) {
+export const addItineraireEpaisseur = async function addItineraireEpaisseur(deviceNumbers) {
+  devices = deviceNumbers;
+  device = devices[0]; //////temporaire
 
-  const trace = await getLiveDataDevice(deviceNumber);
+  const trace = await getLiveDataDevice(device);
   visu_function = addItineraireEpaisseur;
 
   const material = new THREE.MeshBasicMaterial({
@@ -338,12 +351,13 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
 }
 
 
-export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
+export const addItineraireSpeed3D = async function addSpeed3D(deviceNumbers) {
 
-  device = deviceNumber;
+  devices = deviceNumbers;
+  device = devices[0]; //////temporaire
   visu_function = addItineraireSpeed3D;
 
-  const data = await getLiveDataDevice(deviceNumber);
+  const data = await getLiveDataDevice(device);
 
   const points = [];
   const colors = [];
@@ -377,9 +391,9 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumber) {
     // create geometry
     const geometry = new THREE.BufferGeometry();
 
-    geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
 
-    geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
     // create material
     const material = new THREE.MeshBasicMaterial({
