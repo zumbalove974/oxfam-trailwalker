@@ -4,11 +4,12 @@
   <button @click="addLine()">Add line</button>
   <button @click="addEpaisseur()">Add epaisseur</button>
   <button @click="addSpeed3D()">Add speed 2D+1</button>
+  <button @click="addCPs()">Add control points</button>
   <button @click="changerDeDimension()">{{ dimension }}D</button>
 </template>
 
 <script>
-import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, createDimensionEnvironment } from './client/index.js'
+import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, createDimensionEnvironment, addCPs } from './client/index.js'
 //import { getAllLiveData } from './client/bddConnexion.js'
 
 
@@ -24,6 +25,7 @@ export default {
       addItineraireEpaisseur: addItineraireEpaisseur,
       addItineraireSpeed3D: addItineraireSpeed3D,
       createDimensionEnvironment: createDimensionEnvironment,
+      addCPs: addCPs,
       dimension: 2
     }
   },
@@ -42,6 +44,7 @@ export default {
     addSpeed3D() {
       this.addItineraireSpeed3D(this.deviceNumber, this.dimension);
     },
+
     changerDeDimension() {
       if (this.dimension == 2) {
         this.dimension = 3;
