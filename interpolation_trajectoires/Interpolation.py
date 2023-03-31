@@ -24,24 +24,24 @@ def moyennageDF(df_origin):
 
 def buildReference(df):
     
-    df_copy = df.copy().drop(
-            columns=['timestamp'])
+    df_copy = df.copy()#.drop(
+    #        columns=['timestamp'])
     
     diff = df_copy.diff()
     mask = (diff['x'].pow(2)+diff['y'].pow(2)) < 1000
     diff_to_divide = diff.mask(mask).dropna()
       
-    df_1 = pd.DataFrame()
-    df_1['x'] = df_copy['x'] - diff_to_divide['x']/3
-    df_1['y'] = df_copy['y'] - diff_to_divide['y']/3
-    df_2 = pd.DataFrame()
-    df_2['x'] = df_copy['x'] - diff_to_divide['x']*2/3
-    df_2['y'] = df_copy['y'] - diff_to_divide['y']*2/3
-         
-    return pd.concat([df_copy, df_1, df_2]) \
-        .dropna() \
+    df_1 = df.copy()
+    df_1['x'] = df_copy['x'] - diff_to_divide['x']*2/3
+    df_1['y'] = df_copy['y'] - diff_to_divide['y']*2/3
+    df_2 = df.copy()
+    df_2['x'] = df_copy['x'] - diff_to_divide['x']/3
+    df_2['y'] = df_copy['y'] - diff_to_divide['y']/3
+             
+    return pd.concat([df_1.dropna(), df_2.dropna(), df_copy]) \
+        .sort_values(by=['timestamp']) \
         .reset_index() \
-        .drop(columns=['index'])
+        .drop(columns=['index', 'timestamp'])
 
 
 def interpolationCoord(x, y, df):
@@ -66,6 +66,8 @@ def interpolationDF(df_traj, df_ref):
         df_result['speed'][i] = df_traj['speed'][idxmin]
         df_result['timestamp'][i] = df_traj['timestamp'][idxmin]
         df_result['interpolation_error'][i] = mini
+        df_result['x_GPS'] = df_traj['x'][idxmin]
+        df_result['y_GPS'] = df_traj['y'][idxmin]
     
     return df_result
 
@@ -74,7 +76,7 @@ def calculateSpeeds(df_moy):
     df_result = df_moy.copy()
     index_list = list(df_result.index.values)
     
-    df_result.insert(0, 'speed', 0)
+    df_result['speed'] = np.nan
     
     df_result['speed'][index_list[0]] = 0
     df_result['speed'][index_list[len(index_list)-1]] = 0
