@@ -6,8 +6,9 @@
     "scripts": {
         "test": "echo 'test_integration'"
     },
-    "dependencies": {},
-    "devDependencies": {},
+    "devDependencies": {
+        "jest": "^29.5.0"
+    },
     "eslintConfig": {
         "root": true,
         "env": {
