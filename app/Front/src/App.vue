@@ -52,11 +52,12 @@
     <SelectButton @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
+
 </template>
 
 
 <script>
-import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, createDimensionEnvironment, removeEventListeners, addEventListeners } from './client/index.js'
+import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from './client/index.js'
 
 // Primevue components
 import SelectButton from 'primevue/selectbutton';
@@ -76,6 +77,7 @@ import "primeicons/primeicons.css";
 
 import { useToast } from "primevue/usetoast";
 //import { preventDefault } from 'ol/events/Event';
+
 
 
 export default {
@@ -133,12 +135,20 @@ export default {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
             this.addSpeed3D();
           }
+        },
+        {
+          label: 'Points de contrôle',
+          command: () => {
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
+            this.addCPs();
+          }
         }
       ],
       columns: [
         { field: 'id', header: 'ID' },
         { field: 'vitesse', header: 'Vitesse moy.' }
-      ]
+      ],
+      addCPs: addCPs,
     }
   },
   async mounted() {
@@ -167,6 +177,7 @@ export default {
     addSpeed3D() {
       this.addItineraireSpeed3D(this.devices, this.dimension);
     },
+
     changerDeDimension() {
       createDimensionEnvironment(this.dimension.value);
     },
