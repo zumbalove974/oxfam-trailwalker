@@ -614,19 +614,66 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
   const points = [];
   const colors = [];
-  let speeds = [];
+  let speedsData = [];
+  let speedsDataSorted = [];
 
   for (let i = 0; i < data.length; i++) {
-    speeds.push(data[i].speed);
+    speedsData.push(data[i].speed);
+    speedsDataSorted.push(data[i].speed);
   }
 
+  /** */
+  const asc = arr => arr.sort((a, b) => a - b);
+
+  const quantile = (arr, q) => {
+    const sorted = asc(arr);
+    const pos = (sorted.length - 1) * q;
+    const base = Math.floor(pos);
+    const rest = pos - base;
+    if (sorted[base + 1] !== undefined) {
+      return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+    } else {
+      return sorted[base];
+    }
+  };
+
+  const q25 = arr => quantile(arr, .25);
+
+  const q50 = arr => quantile(arr, .50);
+
+  const q75 = arr => quantile(arr, .75);
+
+  const min = Math.min(...speedsDataSorted);
+  const q1 = q25(speedsDataSorted);
+  const q2 = q50(speedsDataSorted);
+  const q3 = q75(speedsDataSorted);
+  const max = Math.max(...speedsDataSorted);
+  /** */
+  let speeds = [];
+
+  for (let i = 0; i < speedsData.length; i++) {
+    if (speedsData[i] < q1) {
+      speeds.push((speedsData[i] - min) / (4 * (q1 - min)));
+    } else if (speedsData[i] < q2) {
+      speeds.push((speedsData[i] - q1) / (4 * (q2 - q1)) + 0.25);
+    } else if (speedsData[i] < q3) {
+      speeds.push((speedsData[i] - q2) / (4 * (q3 - q2)) + 0.5);
+    } else {
+      speeds.push((speedsData[i] - q3) / (4 * (max - q3)) + 0.75);
+    }
+  }
+
+  console.log("__speeds__");
+  console.log(speeds);
+
+  /*
   let min = Math.min(...speeds);
   let max = Math.max(...speeds);
 
-  /* Normalisation des vitesses pour les utiliser dans les couleurs */
+  /* Normalisation des vitesses pour les utiliser dans les couleurs /
   for (let i = 0; i < speeds.length; i++) {
     speeds[i] = (speeds[i] - min) / (max - min);
-  }
+  }*/
 
   if (dimension == 2) {
     for (let i = 0; i < data.length; i++) {
@@ -667,7 +714,7 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
     // vertices because each vertex needs to appear once per triangle.
     let vertices = [];
     let colors = [];
-    const wallZ = 50;
+    const wallZ = 20;
 
     for (let i = 0; i < (data.length - 1); i++) {
       //Face 1
@@ -724,52 +771,52 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
     for (let i = 0; i < (data.length - 1); i++) {
       // Face 1
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
-
-      colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
-
-      colors.push(speeds[i + 1]);
-      colors.push(0.0);
-      colors.push(0.0);
-
-      colors.push(speeds[i + 1]);
-      colors.push(0.0);
-      colors.push(0.0);
-
-      colors.push(speeds[i + 1]);
-      colors.push(0.0);
+      colors.push(1.0 - speeds[i]);
       colors.push(0.0);
 
       colors.push(speeds[i]);
+      colors.push(1.0 - speeds[i]);
       colors.push(0.0);
+
+      colors.push(speeds[i + 1]);
+      colors.push(1.0 - speeds[i + 1]);
+      colors.push(0.0);
+
+      colors.push(speeds[i + 1]);
+      colors.push(1.0 - speeds[i + 1]);
+      colors.push(0.0);
+
+      colors.push(speeds[i + 1]);
+      colors.push(1.0 - speeds[i + 1]);
+      colors.push(0.0);
+
+      colors.push(speeds[i]);
+      colors.push(1.0 - speeds[i]);
       colors.push(0.0);
 
       //Face 2
       colors.push(speeds[i]);
-      colors.push(0.0);
+      colors.push(1.0 - speeds[i]);
       colors.push(0.0);
 
       colors.push(speeds[i + 1]);
-      colors.push(0.0);
+      colors.push(1.0 - speeds[i + 1]);
       colors.push(0.0);
 
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
-
-      colors.push(speeds[i + 1]);
-      colors.push(0.0);
+      colors.push(1.0 - speeds[i]);
       colors.push(0.0);
 
       colors.push(speeds[i + 1]);
-      colors.push(0.0);
+      colors.push(1.0 - speeds[i + 1]);
       colors.push(0.0);
 
       colors.push(speeds[i]);
+      colors.push(1.0 - speeds[i]);
       colors.push(0.0);
+
+      colors.push(speeds[i + 1]);
+      colors.push(1.0 - speeds[i + 1]);
       colors.push(0.0);
     }
 

@@ -100,6 +100,7 @@ export default {
       addItineraireEpaisseur: addItineraireEpaisseur,
       addItineraireSpeed3D: addItineraireSpeed3D,
       addItineraireSpeedWall: addItineraireSpeedWall,
+      addCPs: addCPs,
       createDimensionEnvironment: createDimensionEnvironment,
       removeEventListeners: removeEventListeners,
       addEventListeners: addEventListeners,
@@ -119,21 +120,21 @@ export default {
           label: 'Trajectoire simple',
           command: () => {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire de base est affichée", life: 10000 });
-            this.addLine();
+            this.addItineraire(this.devices);
           }
         },
         {
           label: 'Épaisseur de la ligne',
           command: () => {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
-            this.addEpaisseur();
+            this.addItineraireEpaisseur(this.devices);
           }
         },
         {
           label: '2D+1 vitesses',
           command: () => {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
-            this.addSpeed3D();
+            this.addItineraireSpeed3D(this.devices, this.dimension);
           }
         },
         {
@@ -147,15 +148,14 @@ export default {
           label: 'Visualisation du mur',
           command: () => {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
-            this.addItineraireSpeedWall();
+            this.addItineraireSpeedWall(this.devices);
           }
         }
       ],
       columns: [
         { field: 'id', header: 'ID' },
         { field: 'vitesse', header: 'Vitesse moy.' }
-      ],
-      addCPs: addCPs,
+      ]
     }
   },
   async mounted() {
@@ -180,16 +180,6 @@ export default {
     document.getElementById("speedial_4").children[0].style = "background-color: red";
   },
   methods: {
-    addLine() {
-      this.addItineraire(this.devices);
-    },
-    addEpaisseur() {
-      this.addItineraireEpaisseur(this.devices);
-    },
-    addSpeed3D() {
-      this.addItineraireSpeed3D(this.devices, this.dimension);
-    },
-
     changerDeDimension() {
       createDimensionEnvironment(this.dimension.value);
     },
