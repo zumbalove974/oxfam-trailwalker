@@ -282,12 +282,7 @@ function addCursor() {
   controller.threeViewer.scene.add(traitHorizontal);
 }
 
-export const addItineraire = async function addItineraire(deviceNumbers) {
-
-  devices = deviceNumbers;
-  device = devices[0]; //////temporaire
-
-export function addCPs() {
+export const addCPs = function addCPs() {
   // Coordinates of the 10 points
   const points = [
     [119217.3831, 6433404.488, "Départ"],
@@ -317,6 +312,10 @@ export function addCPs() {
   });
 }
 
+export const addItineraire = async function addItineraire(deviceNumbers) {
+
+  devices = deviceNumbers;
+  device = devices[0]; //////temporaire
   visu_function = addItineraire;
 
   const coords = await getLiveDataDevice(device);
