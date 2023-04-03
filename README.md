@@ -14,6 +14,11 @@ cd oxfam-trailwalker
 ```
 
 ## Utilisation
+Si on ajoute une nouvelle librairie ou bibliothèque, on re-build le projet avec :
+```cmd
+sudo docker compose build --no-cache
+```
+
 
 Lancer le projet avec 
 ```cmd
