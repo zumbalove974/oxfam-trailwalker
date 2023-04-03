@@ -241,7 +241,7 @@ export async function addCPs() {
   // Coordinates of the 10 points
   const points = await getControlPoints();
   points.forEach((point) => {
-    console.log("points", points);
+    console.log("points hhhh", points);
     let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
     let geometry = new THREE.CircleGeometry(10, 32);
     let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });

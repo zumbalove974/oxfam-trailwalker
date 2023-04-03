@@ -1,7 +1,7 @@
 var express = require('express');
-//var router = express.Router();
-var app = express();
-const port = 5500;
+var router = express.Router();
+//const port = 5500;
+console.log('hhh')
 
 const controlPoints = {
     "point1": { "x": 119217.3831, "y": 6433404.488, "name": "Départ" },
@@ -15,10 +15,8 @@ const controlPoints = {
     "point9": { "x": 122185.2528, "y": 6434184.187, "name": "PC8" },
     "point10": { "x": 105412.5035, "y": 6430485.632, "name": "PC7" }
 };
-console.log(controlPoints)
+console.log(controlPoints, 'hhhh')
 router.get('/controlPoints', (req, res) => {
     res.json(controlPoints);
 });
-app.listen(port);
-//router.listen(port);
-//module.exports = router;
+module.exports = router;
