@@ -6,7 +6,7 @@ var logger = require('morgan');
 var cors = require('cors');
 
 var indexRouter = require('./routes/index');
-var testRouter = require('./routes/index');
+var controlPointsRouter = require('./routes/controlPoints');
 var deviceRouter = require('./routes/device');
 
 var app = express();
@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/device', deviceRouter);
-app.use('/controlPoints', testRouter);
+app.use('/controlPoints', controlPointsRouter);
 
 
 

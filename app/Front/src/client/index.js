@@ -8,7 +8,7 @@ import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
 import { getLiveDataDevice } from "./bddConnexion";
-
+import { getControlPoints } from "./bddConnexion";
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
 //import covidData from "../../data/covid_data.json";
@@ -237,22 +237,9 @@ function addObjects() {
  
   controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
 }*/
-export function addCPs() {
+export async function addCPs() {
   // Coordinates of the 10 points
-  const points = [
-    [119217.3831, 6433404.488, "Départ"],
-    [124180.5423, 6410453.993, "PC3"],
-    [132238.2362, 6435533.093, "PC1"],
-    [105920.382, 6414143.439, "PC5"],
-    [102033.4436, 6428455.438, "PC6"],
-    [111821.8043, 6409726.207, "PC4"],
-    [119217.3831, 6433404.488, "Arrivé"],
-    [133515.4635, 6422798.163, "PC2"],
-    [122185.2528, 6434184.187, "PC8"],
-    [105412.5035, 6430485.632, "PC7"]
-  ];
-  console.log("points", points)
-
+  const points = await getControlPoints();
   points.forEach((point) => {
     console.log("points", points);
     let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
@@ -263,7 +250,6 @@ export function addCPs() {
     circle.position.y = worldCoords[1];
     circle.position.z = 0;
     controller.threeViewer.scene.add(circle);
-
   });
 }
 
