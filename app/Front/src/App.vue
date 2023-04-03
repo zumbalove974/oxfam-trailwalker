@@ -3,7 +3,8 @@
 
   <Toast position="bottom-right" />
 
-  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners" :activeIndex="0" class="onglet up">
+  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners ? dimension : 2" :activeIndex="0"
+    class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown">
