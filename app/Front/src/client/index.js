@@ -39,6 +39,7 @@ let device;
 let line;
 let line3d;
 let mesh;
+let wall;
 let dimension;
 
 const paramsWind = {
@@ -126,6 +127,8 @@ function clickUp() {
     controller.threeViewer.scene.remove(visu_meshes.pop());
   }
 
+  console.log("____visu_function____");
+  console.log(visu_function);
 
   if (device && visu_function)
     visu_function(devices);
@@ -239,7 +242,6 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     controller.threeViewer.controls.enabled = false;
 
     controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
-    console.log(controller.threeViewer.perspectiveCamera.rotation);
     controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
     controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
 
@@ -247,7 +249,7 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 
     addEventListeners();
 
-    controller.threeViewer.scene.remove(line3d);
+    controller.threeViewer.scene.remove(wall);
     controller.threeViewer.scene.remove(mesh);
   } else {
     console.log("___dimension 3___");
@@ -296,10 +298,9 @@ export const addCPs = function addCPs() {
     [122185.2528, 6434184.187, "PC8"],
     [105412.5035, 6430485.632, "PC7"]
   ];
-  console.log("points", points)
 
   points.forEach((point) => {
-    console.log("points", points);
+    //console.log("points", points);
     let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
     let geometry = new THREE.CircleGeometry(10, 32);
     let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
@@ -339,10 +340,6 @@ export const addItineraire = async function addItineraire(deviceNumbers) {
   let visu_mesh = new THREE.Line(geometry, material);
   visu_meshes.push(visu_mesh);
 
-  // controller.threeViewer.currentCamera.position.set(coords[0].y, coords[0].x, 11)
-  // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
-  // controller.threeViewer.currentCamera.updateProjectionMatrix()
-
   controller.threeViewer.scene.add(visu_mesh);
 }
 
@@ -351,7 +348,6 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
   device = devices[0]; //////temporaire
 
   const trace = await getLiveDataDevice(device);
-  visu_function = addItineraireEpaisseur;
 
   const material = new THREE.MeshBasicMaterial({
     color: "blue"
@@ -411,11 +407,13 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
   visu_meshes.push(visu_mesh)
   controller.threeViewer.scene.add(visu_mesh);
 
-  //addItineraire(deviceNumber);
+  addItineraire(deviceNumbers);
+
+  visu_function = addItineraireEpaisseur;
 }
 
 
-export const addItineraireSpeed3D = async function addSpeed3D(deviceNumbers) {
+export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNumbers) {
 
   devices = deviceNumbers;
   device = devices[0]; //////temporaire
@@ -439,6 +437,9 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumbers) {
     speeds[i] = (speeds[i] - min) / (max - min);
   }
 
+  console.log("speeds");
+  console.log(speeds);
+
   if (dimension == 2) {
     for (let i = 0; i < data.length; i++) {
       points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -448,7 +449,7 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumbers) {
 
     for (let i = 0; i < data.length; i++) {
       colors.push(speeds[i]);
-      colors.push(1 - speeds[i]);
+      colors.push(1.0 - speeds[i]);
       colors.push(0.2);
     }
 
@@ -456,7 +457,6 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumbers) {
     const geometry = new THREE.BufferGeometry();
 
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
-
     geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
     // create material
@@ -468,6 +468,11 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumbers) {
 
     line3d = new THREE.Line(geometry, material);
     line3d.computeLineDistances();
+
+    visu_meshes.push(line3d);
+
+    console.log("_dfudf_dfu_d____")
+    console.log(line3d)
 
     // add line to scene so it can be rendered
     controller.threeViewer.scene.add(line3d);
@@ -597,7 +602,7 @@ export const addItineraireSpeed3D = async function addSpeed3D(deviceNumbers) {
 
     mesh = new THREE.Mesh(geometry, material);
 
-    console.log("-------------", geometry)
+    visu_meshes.push(mesh);
 
     controller.threeViewer.scene.add(mesh);
   }
@@ -662,9 +667,6 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       speeds.push((speedsData[i] - q3) / (4 * (max - q3)) + 0.75);
     }
   }
-
-  console.log("__speeds__");
-  console.log(speeds);
 
   /*
   let min = Math.min(...speeds);
@@ -831,10 +833,10 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       opacity: 0.8
     });
 
-    mesh = new THREE.Mesh(geometry, material);
+    wall = new THREE.Mesh(geometry, material);
 
-    console.log("-------------", geometry)
+    visu_meshes.push(wall);
 
-    controller.threeViewer.scene.add(mesh);
+    controller.threeViewer.scene.add(wall);
   }
 }
