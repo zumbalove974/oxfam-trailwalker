@@ -1,7 +1,7 @@
 <template>
   <div id="map" class="map"></div>
 
-  <Toast />
+  <Toast position="bottom-right" />
 
   <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners" :activeIndex="0" class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
@@ -118,7 +118,7 @@ export default {
         {
           label: 'Trajectoire simple',
           command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoir de base est affichée", life: 10000 });
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire de base est affichée", life: 10000 });
             this.addLine();
           }
         },
