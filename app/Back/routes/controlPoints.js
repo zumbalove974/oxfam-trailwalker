@@ -20,5 +20,3 @@ router.get('/controlPoints', (req, res) => {
 });
 router.listen(port);
 module.exports = router;
-
-
