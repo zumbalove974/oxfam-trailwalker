@@ -66,7 +66,7 @@ export const init = async function init() {
     false
   );
 
-  //addObjects();
+  addCursor();
 }
 
 const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
@@ -185,12 +185,31 @@ function scroll() {
       controller.threeViewer.scene.remove(visu_meshes.pop());
     }
 
-    console.log("uuuuuuuuuuuuuu", visu_function)
     if (device && visu_function)
       visu_function(devices);
   }
 }
 
+/* Lorsqu'on est en 3D l'utilisateur peut déplacer la caméra avec les flèches directionnelles */
+function onKeyDown(event) {
+  event.preventDefault();
+  switch (event.key) {
+    case 'ArrowUp':
+      controller.threeViewer.perspectiveCamera.position.y += 10;
+      break;
+    case 'ArrowDown':
+      controller.threeViewer.perspectiveCamera.position.y -= 10;
+      break;
+    case 'ArrowRight':
+      controller.threeViewer.perspectiveCamera.position.x += 10;
+      break;
+    case 'ArrowLeft':
+      controller.threeViewer.perspectiveCamera.position.x -= 10;
+      break;
+  }
+}
+
+/* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
 export const addEventListeners = function addEventListeners() {
   /* On désactive l'orbit control lors du click (drag) */
   document.addEventListener("pointerup", clickUp, true);
@@ -200,6 +219,7 @@ export const addEventListeners = function addEventListeners() {
   controller.threeViewer.controls.addEventListener('change', scroll, true);
 }
 
+/* Supprime les évènements du scroll et du drag lorsqu'on passe en 3D */
 export const removeEventListeners = function removeEventListeners() {
   document.removeEventListener("pointerup", clickUp, true);
   document.removeEventListener("pointerdown", clickDown, true);
@@ -213,6 +233,8 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 
   if (dimension == 2) {
     console.log("___dimension 2___");
+
+    window.removeEventListener('keydown', onKeyDown, false);
 
     controller.threeViewer.controls.enabled = false;
 
@@ -230,23 +252,35 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
   } else {
     console.log("___dimension 3___");
 
+    window.addEventListener('keydown', onKeyDown, false);
+
     removeEventListeners();
   }
 }
-/*
-function addObjects() {
-  //example to add an object to the scene
- 
-  let worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-  var geometry = new THREE.BoxBufferGeometry(10, 10, 10);
-  var material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
-  var cube = new THREE.Mesh(geometry, material); //a three js mesh needs a geometry and a material
-  cube.position.x = worldCoords[0];
-  cube.position.y = worldCoords[1];
-  cube.position.z = 0;
- 
-  controller.threeViewer.scene.add(cube); //all objects have to be added to the threejs scene
-}*/
+
+/* Ajoute un curseur au centre de la scene */
+function addCursor() {
+
+  const worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+
+  const geometryVertical = new THREE.BoxBufferGeometry(2, 10, 1);
+  const geometryHorizontal = new THREE.BoxBufferGeometry(10, 2, 1);
+
+  const material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+  const traitVertical = new THREE.Mesh(geometryVertical, material); //a three js mesh needs a geometry and a material
+  const traitHorizontal = new THREE.Mesh(geometryHorizontal, material); //a three js mesh needs a geometry and a material
+
+  traitVertical.position.x = worldCoords[0];
+  traitVertical.position.y = worldCoords[1];
+  traitVertical.position.z = 0;
+
+  traitHorizontal.position.x = worldCoords[0];
+  traitHorizontal.position.y = worldCoords[1];
+  traitHorizontal.position.z = 0;
+
+  controller.threeViewer.scene.add(traitVertical);
+  controller.threeViewer.scene.add(traitHorizontal);
+}
 
 export const addItineraire = async function addItineraire(deviceNumbers) {
 

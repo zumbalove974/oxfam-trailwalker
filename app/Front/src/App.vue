@@ -48,8 +48,7 @@
     </div>
   </div>
 
-  <div @pointerover="removeEventListeners" @pointerleave="addEventListeners" id="dimensionBtn"
-    class="card flex justify-content-center">
+  <div id="dimensionBtn" class="card flex justify-content-center">
     <SelectButton @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
@@ -302,5 +301,9 @@ body {
 
 #addTeamBtn {
   background-color: #A855F7;
+}
+
+.p-button.p-component.p-highlight {
+  background-color: #A855F7 !important;
 }
 </style>
