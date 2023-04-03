@@ -25,3 +25,17 @@ export const getLiveDataDevice = async function getLiveDataDevice(deviceNumber) 
             return response;
         })
 }
+
+export const getControlPoints = async function getPoints() {
+    return fetch(`http://localhost:5500/controlPoints`, {
+        method: 'GET'
+    })
+        .then(response => response.json())
+        .then(response => {
+
+            console.log("getControlPoints.response");
+            console.log(response);
+
+            return response;
+        })
+}
