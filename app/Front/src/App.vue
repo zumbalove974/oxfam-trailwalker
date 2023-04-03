@@ -1,7 +1,7 @@
 <template>
   <div id="map" class="map"></div>
 
-  <Toast />
+  <Toast position="bottom-right" />
 
   <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners" :activeIndex="0" class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
@@ -52,7 +52,6 @@
     <SelectButton @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
-
 </template>
 
 
@@ -118,7 +117,7 @@ export default {
         {
           label: 'Trajectoire simple',
           command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoir de base est affichée", life: 10000 });
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire de base est affichée", life: 10000 });
             this.addLine();
           }
         },
@@ -163,9 +162,12 @@ export default {
     document.getElementById("speedial_0").children[0].innerHTML = "1";
     document.getElementById("speedial_1").children[0].innerHTML = "2";
     document.getElementById("speedial_2").children[0].innerHTML = "3";
+    document.getElementById("speedial_3").children[0].innerHTML = "4";
+
 
     document.getElementById("speedial_1").children[0].style = "background-color: green";
-    document.getElementById("speedial_2").children[0].style = "background-color: blue";
+    document.getElementById("speedial_2").children[0].style = "background-color: cyan";
+    document.getElementById("speedial_3").children[0].style = "background-color: blue";
   },
   methods: {
     addLine() {
