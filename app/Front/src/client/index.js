@@ -9,6 +9,8 @@ import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
 import { getLiveDataDevice } from "./bddConnexion";
 
+import { calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
+
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
 //import covidData from "../../data/covid_data.json";
@@ -412,6 +414,43 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
   visu_function = addItineraireEpaisseur;
 }
 
+function createPoints2D(data) {
+  const points = [];
+
+  for (let i = 0; i < data.length; i++) {
+    points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+    points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+    points.push(0);
+  }
+
+  return points;
+}
+
+function createColors2D(speeds) {
+  const colors = [];
+
+  for (let i = 0; i < speeds.length; i++) {
+    colors.push(speeds[i]);
+    colors.push(1.0 - speeds[i]);
+    colors.push(0.2);
+  }
+
+  return colors;
+}
+
+function createLineColor(points, colors) {
+  const geometry = new THREE.BufferGeometry();
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+
+  // create material
+  const material = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+  });
+
+  return new THREE.Line(geometry, material);
+}
 
 export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNumbers) {
 
@@ -421,8 +460,6 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
 
   const data = await getLiveDataDevice(device);
 
-  const points = [];
-  const colors = [];
   let speeds = [];
 
   for (let i = 0; i < data.length; i++) {
@@ -437,42 +474,16 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
     speeds[i] = (speeds[i] - min) / (max - min);
   }
 
-  console.log("speeds");
-  console.log(speeds);
-
   if (dimension == 2) {
-    for (let i = 0; i < data.length; i++) {
-      points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-      points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-      points.push(0);
-    }
+    const points = createPoints2D(data);
+    const colors = createColors2D(speeds);
 
-    for (let i = 0; i < data.length; i++) {
-      colors.push(speeds[i]);
-      colors.push(1.0 - speeds[i]);
-      colors.push(0.2);
-    }
-
-    // create geometry
-    const geometry = new THREE.BufferGeometry();
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
-
-    // create material
-    const material = new THREE.MeshBasicMaterial({
-      vertexColors: THREE.VertexColors
-    });
+    line3d = createLineColor(points, colors);
+    line3d.computeLineDistances();
 
     controller.threeViewer.scene.remove(line);
 
-    line3d = new THREE.Line(geometry, material);
-    line3d.computeLineDistances();
-
     visu_meshes.push(line3d);
-
-    console.log("_dfudf_dfu_d____")
-    console.log(line3d)
 
     // add line to scene so it can be rendered
     controller.threeViewer.scene.add(line3d);
@@ -617,8 +628,8 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
   const data = await getLiveDataDevice(device);
 
-  const points = [];
-  const colors = [];
+  let points = [];
+  let colors = [];
   let speedsData = [];
   let speedsDataSorted = [];
 
@@ -627,33 +638,16 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
     speedsDataSorted.push(data[i].speed);
   }
 
-  /** */
-  const asc = arr => arr.sort((a, b) => a - b);
-
-  const quantile = (arr, q) => {
-    const sorted = asc(arr);
-    const pos = (sorted.length - 1) * q;
-    const base = Math.floor(pos);
-    const rest = pos - base;
-    if (sorted[base + 1] !== undefined) {
-      return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
-    } else {
-      return sorted[base];
-    }
-  };
-
-  const q25 = arr => quantile(arr, .25);
-
-  const q50 = arr => quantile(arr, .50);
-
-  const q75 = arr => quantile(arr, .75);
-
   const min = Math.min(...speedsDataSorted);
-  const q1 = q25(speedsDataSorted);
-  const q2 = q50(speedsDataSorted);
-  const q3 = q75(speedsDataSorted);
+  const q1 = calculerPremierQuartile(speedsDataSorted);
+  const q2 = calculerMedian(speedsDataSorted);
+  const q3 = calculerTroisiemeQuartile(speedsDataSorted);
   const max = Math.max(...speedsDataSorted);
-  /** */
+
+  console.log(q1);
+  console.log(q2);
+  console.log(q3);
+
   let speeds = [];
 
   for (let i = 0; i < speedsData.length; i++) {
@@ -678,34 +672,15 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
   }*/
 
   if (dimension == 2) {
-    for (let i = 0; i < data.length; i++) {
-      points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-      points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-      points.push(0);
-    }
+    points = createPoints2D(data);
+    colors = createColors2D(speeds);
 
-    for (let i = 0; i < data.length; i++) {
-      colors.push(speeds[i]);
-      colors.push(1 - speeds[i]);
-      colors.push(0.2);
-    }
-
-    // create geometry
-    const geometry = new THREE.BufferGeometry();
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
-
-    geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
-
-    // create material
-    const material = new THREE.MeshBasicMaterial({
-      vertexColors: THREE.VertexColors
-    });
+    line3d = createLineColor(points, colors);
+    line3d.computeLineDistances();
 
     controller.threeViewer.scene.remove(line);
 
-    line3d = new THREE.Line(geometry, material);
-    line3d.computeLineDistances();
+    visu_meshes.push(line3d);
 
     // add line to scene so it can be rendered
     controller.threeViewer.scene.add(line3d);
