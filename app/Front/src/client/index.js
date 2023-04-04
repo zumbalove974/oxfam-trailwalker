@@ -173,19 +173,12 @@ function scroll() {
       zoom += zoomPas;
     } else if (changeZ > cameraZ) {
       zoom -= zoomPas;
-
-      controller.olViewer.map.getView().setZoom(Math.round(zoom));
-      controller.threeViewer.perspectiveCamera.position.z = cameraZ;
-      controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
     }
 
     controller.olViewer.map.getView().setZoom(Math.round(zoom));
     controller.threeViewer.perspectiveCamera.position.z = cameraZ;
     controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
 
-    controller.threeViewer.scene.remove(line);
-    controller.threeViewer.scene.remove(line3d);
-    controller.threeViewer.scene.remove(mesh);
     while (visu_meshes.length > 0) {
       controller.threeViewer.scene.remove(visu_meshes.pop());
     }
@@ -216,6 +209,7 @@ function onKeyDown(event) {
 
 /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
 export const addEventListeners = function addEventListeners() {
+  console.log("__addeventlisteners__")
   /* On désactive l'orbit control lors du click (drag) */
   document.addEventListener("pointerup", clickUp, true);
   document.addEventListener("pointerdown", clickDown, true);
@@ -226,6 +220,7 @@ export const addEventListeners = function addEventListeners() {
 
 /* Supprime les évènements du scroll et du drag lorsqu'on passe en 3D */
 export const removeEventListeners = function removeEventListeners() {
+  console.log("__removeeventlisteners__")
   document.removeEventListener("pointerup", clickUp, true);
   document.removeEventListener("pointerdown", clickDown, true);
   document.removeEventListener("pointermove", clickMove, true);
@@ -253,6 +248,9 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 
     controller.threeViewer.scene.remove(wall);
     controller.threeViewer.scene.remove(mesh);
+
+    if (device && visu_function)
+      visu_function(devices);
   } else {
     console.log("___dimension 3___");
 
@@ -330,7 +328,6 @@ export const addItineraire = async function addItineraire(deviceNumbers) {
   const points = [];
 
   for (let i = 0; i < coords.length; i++) {
-
     points.push(new THREE.Vector3(
       controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
       controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
@@ -448,6 +445,7 @@ function createLineColor(points, colors) {
   const material = new THREE.MeshBasicMaterial({
     vertexColors: true,
   });
+
 
   return new THREE.Line(geometry, material);
 }

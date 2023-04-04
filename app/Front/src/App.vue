@@ -3,8 +3,8 @@
 
   <Toast position="bottom-right" />
 
-  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners ? dimension : 2" :activeIndex="0"
-    class="onglet up">
+  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    :activeIndex="0" class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown">
@@ -28,7 +28,7 @@
     </AccordionTab>
   </Accordion>
 
-  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners ? dimension : 2"
+  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
       <DataTable scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
@@ -39,7 +39,8 @@
     </AccordionTab>
   </Accordion>
 
-  <div @pointerover="removeEventListeners" @pointerleave="addEventListeners ? dimension : 2" class="onglet right">
+  <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    class="onglet right">
     <div class="card">
       <div :style="{ position: 'relative', height: '350px' }">
         <SpeedDial id="speedial" showIcon="pi pi-sliders-h" hideIcon="pi pi-times" :model="items"
@@ -183,7 +184,8 @@ export default {
   },
   methods: {
     changerDeDimension() {
-      createDimensionEnvironment(this.dimension.value);
+      this.dimension = this.dimension.value;
+      createDimensionEnvironment(this.dimension);
     },
     addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
