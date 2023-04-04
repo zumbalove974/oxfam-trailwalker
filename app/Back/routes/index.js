@@ -23,7 +23,7 @@ router.get('/', function (req, res, next) {
 
       let promise_array = [];
       info_schema.rows.forEach(async table => {
-        promise_array.push(pool.query(`SELECT * FROM public."${table.table_name}" ORDER BY "timestamp"`));
+        promise_array.push(pool.query(`SELECT * FROM public."${table.table_name}" ORDER BY "index"`));
       })
 
       let return_array = [];
