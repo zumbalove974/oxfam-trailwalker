@@ -36,8 +36,9 @@ const paramsCovid = {
 
 let visu_meshes = [];
 let visu_function;
-let devices;
+let devices = [];
 let device;
+let GPSvisu_mesh;
 let line;
 let line3d;
 let mesh;
@@ -70,6 +71,7 @@ export const init = async function init() {
   );
 
   addCursor();
+  addItnieraireReference();
 }
 
 const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
@@ -126,11 +128,10 @@ function clickUp() {
     controller.threeViewer.scene.remove(visu_meshes.pop());
   }
 
-  console.log("____visu_function____");
-  console.log(visu_function);
-
   if (devices.length && visu_function)
     visu_function(devices);
+  else
+    addItnieraireReference();
 
 }
 
@@ -159,7 +160,6 @@ function clickMove(event) {
 }
 
 function scroll() {
-  console.log("__scroll__");
 
   const changeZ = controller.threeViewer.perspectiveCamera.position.z;
 
@@ -206,7 +206,6 @@ function onKeyDown(event) {
 
 /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
 export const addEventListeners = function addEventListeners() {
-  console.log("__addeventlisteners__")
   /* On désactive l'orbit control lors du click (drag) */
   document.addEventListener("pointerup", clickUp, true);
   document.addEventListener("pointerdown", clickDown, true);
@@ -217,7 +216,6 @@ export const addEventListeners = function addEventListeners() {
 
 /* Supprime les évènements du scroll et du drag lorsqu'on passe en 3D */
 export const removeEventListeners = function removeEventListeners() {
-  console.log("__removeeventlisteners__")
   document.removeEventListener("pointerup", clickUp, true);
   document.removeEventListener("pointerdown", clickDown, true);
   document.removeEventListener("pointermove", clickMove, true);
@@ -310,6 +308,34 @@ export const addCPs = function addCPs() {
   });
 }
 
+async function addItnieraireReference() {
+
+  const coords = await getLiveDataDevice(3843);
+
+  const GPSmaterial = new THREE.LineBasicMaterial({
+    color: 0xff0000
+  });
+
+  const GPSpoints = [];
+
+  for (let i = 0; i < coords.length; i++) {
+
+    GPSpoints.push(new THREE.Vector3(
+      controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
+      controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
+      0));
+  }
+
+  //console.log("GPSpoints", GPSpoints)
+
+  const GPSgeometry = new THREE.BufferGeometry().setFromPoints(GPSpoints);
+
+  GPSvisu_mesh = new THREE.Line(GPSgeometry, GPSmaterial);
+  visu_meshes.push(GPSvisu_mesh);
+
+  controller.threeViewer.scene.add(GPSvisu_mesh);
+}
+
 export const addItineraire = function addItineraire(deviceNumbers) {
 
   devices = deviceNumbers;
@@ -339,35 +365,6 @@ export const addItineraire = function addItineraire(deviceNumbers) {
 
     controller.threeViewer.scene.add(visu_mesh);
   })
-
-  const GPSmaterial = new THREE.LineBasicMaterial({
-    color: 0x000000
-  });
-
-  const GPSpoints = [];
-
-  for (let i = 0; i < coords.length; i++) {
-
-    GPSpoints.push(new THREE.Vector3(
-      controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[0],
-      controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[1],
-      0));
-  }
-
-  console.log("GPSpoints", GPSpoints)
-
-  const GPSgeometry = new THREE.BufferGeometry().setFromPoints(GPSpoints);
-
-  let GPSvisu_mesh = new THREE.Line(GPSgeometry, GPSmaterial);
-  visu_meshes.push(GPSvisu_mesh);
-
-  // controller.threeViewer.currentCamera.position.set(coords[0].y, coords[0].x, 11)
-  // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
-  // controller.threeViewer.currentCamera.updateProjectionMatrix()
-
-  controller.threeViewer.scene.add(visu_mesh);
-  controller.threeViewer.scene.add(GPSvisu_mesh);
-
 }
 
 export const addItineraireEpaisseur = function addItineraireEpaisseur(deviceNumbers) {
