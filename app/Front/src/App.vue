@@ -3,7 +3,8 @@
 
   <Toast position="bottom-right" />
 
-  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners" :activeIndex="0" class="onglet up">
+  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners ? dimension : 2" :activeIndex="0"
+    class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown">
@@ -56,7 +57,7 @@
 
 
 <script>
-import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from './client/index.js'
+import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from './client/index.js'
 
 // Primevue components
 import SelectButton from 'primevue/selectbutton';
@@ -99,6 +100,8 @@ export default {
       addItineraire: addItineraire,
       addItineraireEpaisseur: addItineraireEpaisseur,
       addItineraireSpeed3D: addItineraireSpeed3D,
+      addItineraireSpeedWall: addItineraireSpeedWall,
+      addCPs: addCPs,
       createDimensionEnvironment: createDimensionEnvironment,
       removeEventListeners: removeEventListeners,
       addEventListeners: addEventListeners,
@@ -118,21 +121,21 @@ export default {
           label: 'Trajectoire simple',
           command: () => {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire de base est affichée", life: 10000 });
-            this.addLine();
+            this.addItineraire(this.devices);
           }
         },
         {
           label: 'Épaisseur de la ligne',
           command: () => {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
-            this.addEpaisseur();
+            this.addItineraireEpaisseur(this.devices);
           }
         },
         {
           label: '2D+1 vitesses',
           command: () => {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
-            this.addSpeed3D();
+            this.addItineraireSpeed3D(this.devices, this.dimension);
           }
         },
         {
@@ -141,13 +144,19 @@ export default {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
             this.addCPs();
           }
+        },
+        {
+          label: 'Visualisation du mur',
+          command: () => {
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
+            this.addItineraireSpeedWall(this.devices);
+          }
         }
       ],
       columns: [
         { field: 'id', header: 'ID' },
         { field: 'vitesse', header: 'Vitesse moy.' }
-      ],
-      addCPs: addCPs,
+      ]
     }
   },
   async mounted() {
@@ -163,23 +172,15 @@ export default {
     document.getElementById("speedial_1").children[0].innerHTML = "2";
     document.getElementById("speedial_2").children[0].innerHTML = "3";
     document.getElementById("speedial_3").children[0].innerHTML = "4";
+    document.getElementById("speedial_4").children[0].innerHTML = "5";
 
 
     document.getElementById("speedial_1").children[0].style = "background-color: green";
     document.getElementById("speedial_2").children[0].style = "background-color: cyan";
     document.getElementById("speedial_3").children[0].style = "background-color: blue";
+    document.getElementById("speedial_4").children[0].style = "background-color: red";
   },
   methods: {
-    addLine() {
-      this.addItineraire(this.devices);
-    },
-    addEpaisseur() {
-      this.addItineraireEpaisseur(this.devices);
-    },
-    addSpeed3D() {
-      this.addItineraireSpeed3D(this.devices, this.dimension);
-    },
-
     changerDeDimension() {
       createDimensionEnvironment(this.dimension.value);
     },
