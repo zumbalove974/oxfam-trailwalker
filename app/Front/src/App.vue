@@ -31,10 +31,11 @@
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
-      <DataTable scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
-        :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
-        <Column selectionMode="multiple" v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
-          headerStyle="background-color: #A855F7; color: white" :sortable=true></Column>
+      <DataTable v-model:selection="selectedProduct" scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true
+        :row-hover=true :scrollable=true :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
+        <Column v-for="col of columns" :selection-mode="col.multiple" :headerStyle="col.headerStyle" :key="col.field"
+          :field="col.field" :header="col.header" :sortable="col.isSortable">
+        </Column>
       </DataTable>
     </AccordionTab>
   </Accordion>
@@ -156,9 +157,11 @@ export default {
         }
       ],
       columns: [
-        { field: 'id', header: 'ID' },
-        { field: 'vitesse', header: 'Vitesse moy.' }
-      ]
+        { multiple: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
+        { multiple: null, field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
+        { multiple: null, field: 'vitesse', header: 'Vitesse moy.', headerStyle: "background-color: #A855F7; color: white", isSortable: true }
+      ],
+      selectedProduct: null
     }
   },
   async mounted() {
