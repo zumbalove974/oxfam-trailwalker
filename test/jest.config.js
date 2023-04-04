@@ -5,7 +5,7 @@
 
 module.exports = {
   rootDir: '../',
-  // All imported modules in your tests should be mocked automatically
+  // All imported modules in your tests should be mocked automaticallymodule.exports = {presets: ['@babel/preset-env']}
   automock: false,
   // Set up Jest to run tests in a Node.js environment
   testEnvironment: 'node',
@@ -84,11 +84,11 @@ module.exports = {
 
   // An array of directory names to be searched recursively up from the requiring module's location
   moduleDirectories: [
-    "node_modules"
+    "node_modules", "Back", "test"
   ],
 
   // An array of file extensions your modules use
-  moduleFileExtensions: ['vue', 'js', 'json'],
+  moduleFileExtensions: ['vue', 'js', 'jsx', 'json'],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
@@ -175,12 +175,12 @@ module.exports = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    '^.+\\.vue$': 'vue-jest',
-    '^.+\\.js$': 'babel-jest'
+    '^.+\\.vue$': '<rootDir>/test/node_modules/vue-jest',
+    '^.+\\.(js|jsx)$': '<rootDir>/test/node_modules/babel-jest'
   },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: [
-    "\\\\node_modules\\\\"
+    "<rootDir>/test/node_modules"
   ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
