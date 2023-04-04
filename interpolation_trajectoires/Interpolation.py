@@ -75,6 +75,11 @@ def interpolationDF(df_traj, df_ref):
     
     return df_result
 
+
+def validateInterpolation(df_ip, error_max):
+    return df_ip['interpolation_error'] < error_max
+
+
 def calculateSpeeds(df_moy):
     
     df_result = df_moy.copy()
