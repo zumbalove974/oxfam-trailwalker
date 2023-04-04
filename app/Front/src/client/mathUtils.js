@@ -1,4 +1,4 @@
-function asc(arr) {
+export const asc = function asc(arr) {
     return arr.sort((a, b) => a - b);
 }
 
