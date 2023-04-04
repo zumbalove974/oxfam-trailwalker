@@ -18,16 +18,19 @@
     "ol": "^7.3.0",
     "ol-mapbox-style": "^9.4.0",
     "parcel-bundler": "^1.12.4",
+    "primeicons": "^6.0.1",
+    "primevue": "^3.26.1",
     "proj4": "^2.6.3",
     "regenerator-runtime": "^0.13.7",
     "three": "^0.149.0",
     "turf": "^3.0.14",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
-    "@types/three": "^0.148.1",
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@types/three": "^0.148.1",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
