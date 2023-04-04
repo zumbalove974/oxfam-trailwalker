@@ -31,10 +31,11 @@
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
-      <DataTable v-model:selection="selectedProduct" scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true
-        :row-hover=true :scrollable=true :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
-        <Column v-for="col of columns" :selection-mode="col.multiple" :headerStyle="col.headerStyle" :key="col.field"
-          :field="col.field" :header="col.header" :sortable="col.isSortable">
+      <DataTable v-model:selection="selectedProduct" @rowSelect="onRowSelect" @rowUnselect="onRowUnselect"
+        scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
+        :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
+        <Column :selected=true v-for="col of columns" :selection-mode="col.selectionMode" :headerStyle="col.headerStyle"
+          :key="col.field" :field="col.field" :header="col.header" :sortable="col.isSortable">
         </Column>
       </DataTable>
     </AccordionTab>
@@ -157,9 +158,9 @@ export default {
         }
       ],
       columns: [
-        { multiple: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
-        { multiple: null, field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
-        { multiple: null, field: 'vitesse', header: 'Vitesse moy.', headerStyle: "background-color: #A855F7; color: white", isSortable: true }
+        { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
+        { field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
+        { field: 'vitesse', header: 'Vitesse moy.', headerStyle: "background-color: #A855F7; color: white", isSortable: true }
       ],
       selectedProduct: null
     }
@@ -190,11 +191,19 @@ export default {
       this.dimension = this.dimension.value;
       createDimensionEnvironment(this.dimension);
     },
+    getValuesFromDevicesTab() {
+      let res = [];
+      this.devicesTab.forEach(device => {
+        res.push(device.id);
+      })
+
+      return res;
+    },
     addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
         if (this.deviceNumber) {
-          if (!this.devices.includes(this.deviceNumber)) {
-            this.devices.push(this.deviceNumber);
+          const ids = this.getValuesFromDevicesTab();
+          if (!ids.includes(this.deviceNumber)) {
             this.devicesTab.push({ id: this.deviceNumber, vitesse: 10 });
             this.tabOpen = 0;
           }
@@ -203,8 +212,8 @@ export default {
         if (this.deviceNumberFrom && this.deviceNumberTo) {
           if (this.deviceNumberFrom < this.deviceNumberTo) {
             for (let i = this.deviceNumberFrom; i <= this.deviceNumberTo; i++) {
-              if (!this.devices.includes(i)) {
-                this.devices.push(i);
+              const ids = this.getValuesFromDevicesTab();
+              if (!ids.includes(i)) {
                 this.devicesTab.push({ id: i, vitesse: 10 });
                 this.tabOpen = 0;
               }
@@ -216,6 +225,16 @@ export default {
       } else {
         this.toast.add({ severity: 'warn', summary: 'Attention', detail: "Vous n'avez rien écris", life: 2000 });
       }
+    },
+    onRowSelect(event) {
+      this.devices.push(event.data.id);
+      console.log(this.devices)
+    },
+    onRowUnselect(event) {
+      this.devices = this.devices.filter(function (item) {
+        return item !== event.data.id;
+      })
+      console.log(this.devices)
     }
   }
 }
