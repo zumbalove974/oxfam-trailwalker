@@ -663,9 +663,7 @@ async function getMoyenneDevice(devices) {
   let moyennesDict = {};
 
   for (let i = 0; i < devices.length; i++) {
-    console.log("getVitesseMoyenne", getVitesseMoyenne(devices[i]))
     let moyenne = await getVitesseMoyenne(devices[i]);
-    console.log("gggg", moyenne)
 
     moyennes.push(moyenne);
     moyennesDict[moyenne] = devices[i];
@@ -891,6 +889,23 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       visu_meshes.push(wall);
 
       controller.threeViewer.scene.add(wall);
+
+      /* Création des sphères pour la simulation */
+      const geometrySphere = new THREE.SphereGeometry(7, 32, 16);
+      const materialSphere = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+      const sphere = new THREE.Mesh(geometrySphere, materialSphere);
+
+      sphere.position.x = controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[0];
+      sphere.position.y = controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[1];
+      sphere.position.z = (wallZbottom + wallZtop) / 2;
+
+      console.log("____ ", sphere.position);
+      controller.threeViewer.scene.add(sphere);
+
+      controller.threeViewer.shperes.push({ mesh: sphere, data: data });
+      controller.threeViewer.animeTrailer = true;
+      controller.threeViewer.state.clock.start();
+
     }
 
     indexVisu++;
