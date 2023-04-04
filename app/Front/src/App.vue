@@ -33,7 +33,7 @@
     <AccordionTab>
       <DataTable scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
         :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
+        <Column selectionMode="multiple" v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
           headerStyle="background-color: #A855F7; color: white" :sortable=true></Column>
       </DataTable>
     </AccordionTab>
