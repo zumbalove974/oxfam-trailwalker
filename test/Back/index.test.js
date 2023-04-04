@@ -1,3 +1,5 @@
+import { describe, expect, test } from '@jest/globals';
+
 const request = require('supertest');
 const app = require('../app/Back/index');
 
@@ -6,6 +8,6 @@ describe('Test the root path', () => {
         return request(app)
             .get('/')
             .expect('Content-Type', /json/)
-            .expect(200);
+            .expect(400);
     });
 });

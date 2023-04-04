@@ -4,6 +4,5 @@ WORKDIR /usr/src/test
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm install --save-dev istanbul
 RUN npm run test --coverage
 CMD [ "npm", "start" ]
