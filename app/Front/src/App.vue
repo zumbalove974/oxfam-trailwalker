@@ -28,8 +28,8 @@
     </AccordionTab>
   </Accordion>
 
-  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners" expandIcon="pi pi-ellipsis-h"
-    collapseIcon="pi pi-ellipsis-v" class="onglet left">
+  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners ? dimension : 2"
+    expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
       <DataTable scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
         :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
@@ -39,7 +39,7 @@
     </AccordionTab>
   </Accordion>
 
-  <div @pointerover="removeEventListeners" @pointerleave="addEventListeners" class="onglet right">
+  <div @pointerover="removeEventListeners" @pointerleave="addEventListeners ? dimension : 2" class="onglet right">
     <div class="card">
       <div :style="{ position: 'relative', height: '350px' }">
         <SpeedDial id="speedial" showIcon="pi pi-sliders-h" hideIcon="pi pi-times" :model="items"
@@ -107,6 +107,7 @@ export default {
       addEventListeners: addEventListeners,
       dimension: 2,
       toast: null,
+      tabOpen: 1,
       devices: [],
       devicesTab: [],
       deviceNumber: null,
@@ -190,6 +191,7 @@ export default {
           if (!this.devices.includes(this.deviceNumber)) {
             this.devices.push(this.deviceNumber);
             this.devicesTab.push({ id: this.deviceNumber, vitesse: 10 });
+            this.tabOpen = 0;
           }
         }
 
@@ -199,6 +201,7 @@ export default {
               if (!this.devices.includes(i)) {
                 this.devices.push(i);
                 this.devicesTab.push({ id: i, vitesse: 10 });
+                this.tabOpen = 0;
               }
             }
           } else {
