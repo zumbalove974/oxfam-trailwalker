@@ -339,6 +339,35 @@ export const addItineraire = function addItineraire(deviceNumbers) {
 
     controller.threeViewer.scene.add(visu_mesh);
   })
+
+  const GPSmaterial = new THREE.LineBasicMaterial({
+    color: 0x000000
+  });
+
+  const GPSpoints = [];
+
+  for (let i = 0; i < coords.length; i++) {
+
+    GPSpoints.push(new THREE.Vector3(
+      controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[0],
+      controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[1],
+      0));
+  }
+
+  console.log("GPSpoints", GPSpoints)
+
+  const GPSgeometry = new THREE.BufferGeometry().setFromPoints(GPSpoints);
+
+  let GPSvisu_mesh = new THREE.Line(GPSgeometry, GPSmaterial);
+  visu_meshes.push(GPSvisu_mesh);
+
+  // controller.threeViewer.currentCamera.position.set(coords[0].y, coords[0].x, 11)
+  // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
+  // controller.threeViewer.currentCamera.updateProjectionMatrix()
+
+  controller.threeViewer.scene.add(visu_mesh);
+  controller.threeViewer.scene.add(GPSvisu_mesh);
+
 }
 
 export const addItineraireEpaisseur = function addItineraireEpaisseur(deviceNumbers) {
