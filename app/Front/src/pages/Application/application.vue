@@ -60,7 +60,7 @@
 
 
 <script>
-import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from './client/index.js'
+import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from '../../client/index.js'
 
 // Primevue components
 import SelectButton from 'primevue/selectbutton';
