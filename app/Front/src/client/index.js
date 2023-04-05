@@ -902,7 +902,7 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       console.log("____ ", sphere.position);
       controller.threeViewer.scene.add(sphere);
 
-      controller.threeViewer.shperes.push({ mesh: sphere, data: data });
+      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0 });
       controller.threeViewer.animeTrailer = true;
       controller.threeViewer.state.clock.start();
 

@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 //import { ZOOM_RES_L93 } from "./Utils";
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils";
+import { calculerDistance } from "./mathUtils.js";
+import { calculerTempsTimestamp } from "./bddUtils.js";
 
 export const mergedRender = "Merged";
 export const singleRender = "Single";
@@ -27,9 +29,8 @@ export class VTThreeViewer {
     this.doubleClick = this.doubleClick.bind(this);
     this.initThree(backgroundColor);
     this.addHemisphereLights2();
-    this.animeTrailer = false;
+    this.animeTrailer = false; // "animeTrailer" est un booléen qui permet de démarrer la course
     this.shperes = [];
-    this.indexTraj = 0;
     this.state = {
       clock: new THREE.Clock(),
       frame: 0,
@@ -37,6 +38,7 @@ export class VTThreeViewer {
       fps: 30,
       per: 0
     };
+    this.coeficientVitesseAnimation = 10;
   }
 
   initThree(backgroundColor) {
@@ -115,19 +117,27 @@ export class VTThreeViewer {
   animate() {
     this.renderer.render(this.scene, this.currentCamera);
 
-    console.log(this.state.frame)
-
     if (this.animeTrailer) {
       this.shperes.forEach(sphere => {
-        if (this.indexTraj < sphere.data.length) {
-          const secs = this.state.clock.getDelta();
-          this.state.per = this.state.frame / this.state.maxFrame;
-          this.state.frame += this.state.fps * secs;
-          this.state.frame %= this.state.maxFrame;
-          if (this.state.per > 1 / sphere.data[this.indexTraj].speed + 0.1) {
-            sphere.mesh.position.x = this.getWorldCoords([sphere.data[this.indexTraj].x, sphere.data[this.indexTraj].y])[0];
-            sphere.mesh.position.y = this.getWorldCoords([sphere.data[this.indexTraj].x, sphere.data[this.indexTraj].y])[1];
-            this.indexTraj++;
+        // On vérifie que les coureurs n'ont pas finis la course
+        if (sphere.indexTraj < sphere.data.length - 1) {
+          if (this.state.clock.getElapsedTime() > sphere.temps) {
+            let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
+            let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
+            let x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + 1].x, sphere.data[sphere.indexTraj + 1].y])[0];
+            let y1 = this.getWorldCoords([sphere.data[sphere.indexTraj + 1].x, sphere.data[sphere.indexTraj + 1].y])[1];
+
+            let distance = calculerDistance(x0, y0, x1, y1);
+            if (sphere.data[sphere.indexTraj].speed == 0)
+              sphere.temps += 
+            else
+              sphere.temps += (distance / (sphere.data[sphere.indexTraj].speed) / this.coeficientVitesseAnimation);
+
+            console.log(sphere.temps);
+
+            sphere.mesh.position.x = x0;
+            sphere.mesh.position.y = y0;
+            sphere.indexTraj++;
           }
         }
       })
