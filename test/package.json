@@ -4,7 +4,7 @@
     "private": true,
     "main": "index.js",
     "scripts": {
-        "test": "jest"
+        "test": "jest --bail"
     },
     "devDependencies": {
         "@babel/core": "^7.21.4",

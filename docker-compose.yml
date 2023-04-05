@@ -51,7 +51,12 @@ services:
         condition: service_healthy
       express-back:
         condition: service_healthy
-    command: npm run test
+    healthcheck:
+      test: [ "CMD", "npm", "run", "test" ]
+      interval: 120s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   express-back:
     build:
@@ -72,7 +77,7 @@ services:
           "--fail",
           "http://localhost:3000/inter/3883"
         ]
-      interval: 1s
+      interval: 5s
       timeout: 20s
       retries: 5
       start_period: 30s
