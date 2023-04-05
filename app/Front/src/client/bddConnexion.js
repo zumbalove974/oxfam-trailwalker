@@ -13,7 +13,7 @@ export const getAllLiveData = async function getAllLiveData() {
 }
 
 export const getLiveDataDevice = async function getLiveDataDevice(deviceNumber) {
-    return fetch(`http://localhost:5500/device/${deviceNumber}`, {
+    return fetch(`http://localhost:5500/inter/${deviceNumber}`, {
         method: 'GET'
     })
         .then(response => response.json())

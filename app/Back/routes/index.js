@@ -18,7 +18,7 @@ router.get('/', function (req, res, next) {
     try {
 
       const info_schema = await pool.query(
-        "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Device%';"
+        "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Interpolation%';"
       );
 
       let promise_array = [];
