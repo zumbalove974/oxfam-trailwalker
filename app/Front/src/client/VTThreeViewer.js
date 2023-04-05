@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 //import { ZOOM_RES_L93 } from "./Utils";
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils";
+//import { calculerDistance } from "./mathUtils.js";
+import { calculerTempsTimestamp } from "./bddUtils.js";
 
 export const mergedRender = "Merged";
 export const singleRender = "Single";
@@ -27,6 +29,16 @@ export class VTThreeViewer {
     this.doubleClick = this.doubleClick.bind(this);
     this.initThree(backgroundColor);
     this.addHemisphereLights2();
+    this.animeTrailer = false; // "animeTrailer" est un booléen qui permet de démarrer la course
+    this.shperes = [];
+    this.state = {
+      clock: new THREE.Clock(),
+      frame: 0,
+      maxFrame: 90,
+      fps: 30,
+      per: 0
+    };
+    this.coeficientVitesseAnimation = 1000;
   }
 
   initThree(backgroundColor) {
@@ -104,6 +116,46 @@ export class VTThreeViewer {
 
   animate() {
     this.renderer.render(this.scene, this.currentCamera);
+
+    if (this.animeTrailer) {
+      this.shperes.forEach(sphere => {
+        // On vérifie que les coureurs n'ont pas finis la course
+        if (sphere.indexTraj < sphere.data.length - 1) {
+
+          let temps = 0;
+          sphere.indexPoint = 1;
+
+          if (this.state.clock.getElapsedTime() > sphere.temps) {
+
+            let x1;
+            let y1;
+
+            while (temps == 0) {
+              console.log("__________________")
+              //let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
+              //let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
+              x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[0];
+              y1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[1];
+
+              //let distance = calculerDistance(x0, y0, x1, y1);
+              temps = calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp) - calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp);
+
+              console.log(temps)
+              console.log(calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp))
+              console.log(calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp))
+
+              sphere.indexPoint++;
+              sphere.indexTraj++;
+            }
+
+            sphere.mesh.position.x = x1;
+            sphere.mesh.position.y = y1;
+
+            sphere.temps += temps / this.coeficientVitesseAnimation;
+          }
+        }
+      })
+    }
   }
 
   enableOrbitControls() {

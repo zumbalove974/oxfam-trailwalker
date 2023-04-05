@@ -60,7 +60,7 @@
 
 
 <script>
-import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from './client/index.js'
+import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from './client/index.js'
 
 // Primevue components
 import SelectButton from 'primevue/selectbutton';
@@ -108,6 +108,7 @@ export default {
       createDimensionEnvironment: createDimensionEnvironment,
       removeEventListeners: removeEventListeners,
       addEventListeners: addEventListeners,
+      getVitesseMoyenne: getVitesseMoyenne,
       dimension: 2,
       toast: null,
       tabOpen: 1,
@@ -124,7 +125,7 @@ export default {
         {
           label: 'Trajectoire simple',
           command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire de base est affichée", life: 10000 });
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
             this.addItineraire(this.devices);
           }
         },
@@ -199,12 +200,19 @@ export default {
 
       return res;
     },
-    addDevice() {
+    convertToKmH(vitesse) {
+      return vitesse * 3.6
+    },
+    tronquer(nombre, decimal) {
+      return Math.round(nombre * (10 ** decimal)) / (10 ** decimal);
+    },
+    async addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
         if (this.deviceNumber) {
           const ids = this.getValuesFromDevicesTab();
           if (!ids.includes(this.deviceNumber)) {
-            this.devicesTab.push({ id: this.deviceNumber, vitesse: 10 });
+            const moyenne = await this.getVitesseMoyenne(this.deviceNumber);
+            this.devicesTab.push({ id: this.deviceNumber, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
             this.tabOpen = 0;
           }
         }
@@ -214,7 +222,8 @@ export default {
             for (let i = this.deviceNumberFrom; i <= this.deviceNumberTo; i++) {
               const ids = this.getValuesFromDevicesTab();
               if (!ids.includes(i)) {
-                this.devicesTab.push({ id: i, vitesse: 10 });
+                const moyenne = await this.getVitesseMoyenne(i);
+                this.devicesTab.push({ id: i, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
                 this.tabOpen = 0;
               }
             }
@@ -228,13 +237,11 @@ export default {
     },
     onRowSelect(event) {
       this.devices.push(event.data.id);
-      console.log(this.devices)
     },
     onRowUnselect(event) {
       this.devices = this.devices.filter(function (item) {
         return item !== event.data.id;
       })
-      console.log(this.devices)
     }
   }
 }

@@ -7,9 +7,10 @@ import { planStyle } from "./OLViewer"; //  planStyle, grisStyle,
 import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
-import { getLiveDataDevice } from "./bddConnexion";
-import { getControlPoints } from "./bddConnexion";
-import { calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
+import { getLiveDataDevice, getControlPoints } from "./bddConnexion";
+
+import { asc, calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
+
 
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
@@ -36,8 +37,9 @@ const paramsCovid = {
 
 let visu_meshes = [];
 let visu_function;
-let devices;
+let devices = [];
 let device;
+let GPSvisu_mesh;
 let line;
 let line3d;
 let mesh;
@@ -70,6 +72,7 @@ export const init = async function init() {
   );
 
   addCursor();
+  addItineraireReference();
 }
 
 const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
@@ -103,7 +106,6 @@ function clickUp() {
 
   raycaster.setFromCamera(pointer, controller.threeViewer.perspectiveCamera);
   let intersects = raycaster.intersectObjects(controller.threeViewer.planes.children);
-  console.log("intersects", intersects);
 
   if (intersects.length) {
     let x = intersects[0].point.x * controller.threeViewer.zoomFactor + controller.threeViewer.mapCenter[0];
@@ -116,7 +118,6 @@ function clickUp() {
   controller.threeViewer.controls.enabled = false;
 
   controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
-  console.log(controller.threeViewer.perspectiveCamera.rotation);
   controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
   controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
 
@@ -126,11 +127,10 @@ function clickUp() {
     controller.threeViewer.scene.remove(visu_meshes.pop());
   }
 
-  console.log("____visu_function____");
-  console.log(visu_function);
-
   if (devices.length && visu_function)
     visu_function(devices);
+  else
+    addItineraireReference();
 
 }
 
@@ -159,7 +159,6 @@ function clickMove(event) {
 }
 
 function scroll() {
-  console.log("__scroll__");
 
   const changeZ = controller.threeViewer.perspectiveCamera.position.z;
 
@@ -182,6 +181,8 @@ function scroll() {
 
     if (devices.length && visu_function)
       visu_function(devices);
+    else
+      addItineraireReference();
   }
 }
 
@@ -206,7 +207,6 @@ function onKeyDown(event) {
 
 /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
 export const addEventListeners = function addEventListeners() {
-  console.log("__addeventlisteners__")
   /* On désactive l'orbit control lors du click (drag) */
   document.addEventListener("pointerup", clickUp, true);
   document.addEventListener("pointerdown", clickDown, true);
@@ -217,7 +217,6 @@ export const addEventListeners = function addEventListeners() {
 
 /* Supprime les évènements du scroll et du drag lorsqu'on passe en 3D */
 export const removeEventListeners = function removeEventListeners() {
-  console.log("__removeeventlisteners__")
   document.removeEventListener("pointerup", clickUp, true);
   document.removeEventListener("pointerdown", clickDown, true);
   document.removeEventListener("pointermove", clickMove, true);
@@ -257,6 +256,17 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
   }
 }
 
+export const getVitesseMoyenne = async function getVitesseMoyenne(device) {
+  const data = await getLiveDataDevice(device);
+
+  let somme = 0;
+
+  data.forEach(point => {
+    somme += point.speed;
+  })
+
+  return somme / data.length;
+}
 
 export async function addCPs() {
   // Coordinates of the 10 points
@@ -299,6 +309,34 @@ function addCursor() {
 }
     
 
+async function addItineraireReference() {
+
+  const coords = await getLiveDataDevice(3843);
+
+  const GPSmaterial = new THREE.LineBasicMaterial({
+    color: 0xff0000
+  });
+
+  const GPSpoints = [];
+
+  for (let i = 0; i < coords.length; i++) {
+
+    GPSpoints.push(new THREE.Vector3(
+      controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
+      controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
+      0));
+  }
+
+  //console.log("GPSpoints", GPSpoints)
+
+  const GPSgeometry = new THREE.BufferGeometry().setFromPoints(GPSpoints);
+
+  GPSvisu_mesh = new THREE.Line(GPSgeometry, GPSmaterial);
+  visu_meshes.push(GPSvisu_mesh);
+
+  controller.threeViewer.scene.add(GPSvisu_mesh);
+}
+
 export const addItineraire = function addItineraire(deviceNumbers) {
 
   devices = deviceNumbers;
@@ -316,8 +354,8 @@ export const addItineraire = function addItineraire(deviceNumbers) {
 
     for (let i = 0; i < coords.length; i++) {
       points.push(new THREE.Vector3(
-        controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
-        controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
+        controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[0],
+        controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[1],
         0));
     }
 
@@ -328,35 +366,6 @@ export const addItineraire = function addItineraire(deviceNumbers) {
 
     controller.threeViewer.scene.add(visu_mesh);
   })
-
-  const GPSmaterial = new THREE.LineBasicMaterial({
-    color: 0x000000
-  });
-
-  const GPSpoints = [];
-
-  for (let i = 0; i < coords.length; i++) {
-
-    GPSpoints.push(new THREE.Vector3(
-      controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[0],
-      controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[1],
-      0));
-  }
-
-  console.log("GPSpoints", GPSpoints)
-
-  const GPSgeometry = new THREE.BufferGeometry().setFromPoints(GPSpoints);
-
-  let GPSvisu_mesh = new THREE.Line(GPSgeometry, GPSmaterial);
-  visu_meshes.push(GPSvisu_mesh);
-
-  // controller.threeViewer.currentCamera.position.set(coords[0].y, coords[0].x, 11)
-  // controller.threeViewer.currentCamera.lookAt(new THREE.Vector3(coords[0].y, coords[0].x, 0))
-  // controller.threeViewer.currentCamera.updateProjectionMatrix()
-
-  controller.threeViewer.scene.add(visu_mesh);
-  controller.threeViewer.scene.add(GPSvisu_mesh);
-
 }
 
 export const addItineraireEpaisseur = function addItineraireEpaisseur(deviceNumbers) {
@@ -430,13 +439,13 @@ export const addItineraireEpaisseur = function addItineraireEpaisseur(deviceNumb
   })
 }
 
-function createPoints2D(data) {
+function createPoints2D(data, z) {
   const points = [];
 
   for (let i = 0; i < data.length; i++) {
     points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
     points.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-    points.push(0);
+    points.push(z);
   }
 
   return points;
@@ -493,7 +502,7 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
     }
 
     if (dimension == 2) {
-      const points = createPoints2D(data);
+      const points = createPoints2D(data, 0);
       const colors = createColors2D(speeds);
 
       line3d = createLineColor(points, colors);
@@ -638,35 +647,65 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
   })
 }
 
+async function getMoyenneDevice(devices) {
+  let moyennes = [];
+  let moyennesDict = {};
+
+  for (let i = 0; i < devices.length; i++) {
+    let moyenne = await getVitesseMoyenne(devices[i]);
+
+    moyennes.push(moyenne);
+    moyennesDict[moyenne] = devices[i];
+  }
+
+  return [moyennes, moyennesDict];
+}
+
 
 export const addItineraireSpeedWall = async function addItineraireSpeedWall(deviceNumbers) {
 
+  let indexVisu = 0;
+
+  visu_function = addItineraireSpeedWall;
+
   devices = deviceNumbers;
-  //device = devices[0]; //////temporaire
+  let moyennes, moyennesDict;
+
+  let res = await getMoyenneDevice(devices);
+
+  moyennes = res[0];
+  moyennesDict = res[1];
+
+  const medianMoyennes = asc(moyennes)[Math.round(moyennes.length / 2)];
+  const deviceMedian = moyennesDict[medianMoyennes];
+
+  const dataMedian = await getLiveDataDevice(deviceMedian);
+
+  let speedsDataSorted = [];
+
+  for (let i = 0; i < dataMedian.length; i++) {
+    speedsDataSorted.push(dataMedian[i].speed);
+  }
+
+  const min = Math.min(...speedsDataSorted);
+  const q1 = calculerPremierQuartile(speedsDataSorted);
+  const q2 = calculerMedian(speedsDataSorted);
+  const q3 = calculerTroisiemeQuartile(speedsDataSorted);
+  const max = Math.max(...speedsDataSorted);
+
   devices.forEach(async device => {
-    visu_function = addItineraireSpeedWall;
 
     const data = await getLiveDataDevice(device);
 
     let points = [];
+    let pointsLine = [];
     let colors = [];
+    let colorsLine = [];
     let speedsData = [];
-    let speedsDataSorted = [];
 
     for (let i = 0; i < data.length; i++) {
       speedsData.push(data[i].speed);
-      speedsDataSorted.push(data[i].speed);
     }
-
-    const min = Math.min(...speedsDataSorted);
-    const q1 = calculerPremierQuartile(speedsDataSorted);
-    const q2 = calculerMedian(speedsDataSorted);
-    const q3 = calculerTroisiemeQuartile(speedsDataSorted);
-    const max = Math.max(...speedsDataSorted);
-
-    console.log(q1);
-    console.log(q2);
-    console.log(q3);
 
     let speeds = [];
 
@@ -682,17 +721,11 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       }
     }
 
-    /*
-    let min = Math.min(...speeds);
-    let max = Math.max(...speeds);
-  
-    /* Normalisation des vitesses pour les utiliser dans les couleurs /
-    for (let i = 0; i < speeds.length; i++) {
-      speeds[i] = (speeds[i] - min) / (max - min);
-    }*/
+    const wallZtop = 20 * (indexVisu + 1);
+    const wallZbottom = 20 * indexVisu;
 
     if (dimension == 2) {
-      points = createPoints2D(data);
+      points = createPoints2D(data, 0);
       colors = createColors2D(speeds);
 
       line3d = createLineColor(points, colors);
@@ -705,64 +738,76 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       // add line to scene so it can be rendered
       controller.threeViewer.scene.add(line3d);
     } else {
+      /* On dessine les lignes qui vont séparer les différentes portion du mur */
+      pointsLine = createPoints2D(data, wallZtop);
+      colorsLine = createColors2D(speeds);
 
+      line3d = createLineColor(pointsLine, colorsLine);
+      line3d.computeLineDistances();
+
+      controller.threeViewer.scene.remove(line);
+
+      visu_meshes.push(line3d);
+
+      // add line to scene so it can be rendered
+      controller.threeViewer.scene.add(line3d);
+
+      /* On dessine le mur */
       let geometry = new THREE.BufferGeometry();
-      // create a simple square shape. We duplicate the top left and bottom right
-      // vertices because each vertex needs to appear once per triangle.
+
       let vertices = [];
       let colors = [];
-      const wallZ = 20;
 
       for (let i = 0; i < (data.length - 1); i++) {
         //Face 1
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-        vertices.push(wallZ);
+        vertices.push(wallZtop);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-        vertices.push(0);
+        vertices.push(wallZbottom);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-        vertices.push(0);
+        vertices.push(wallZbottom);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-        vertices.push(0);
+        vertices.push(wallZbottom);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-        vertices.push(wallZ);
+        vertices.push(wallZtop);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-        vertices.push(wallZ);
+        vertices.push(wallZtop);
 
         // Face 2
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-        vertices.push(wallZ);
+        vertices.push(wallZtop);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-        vertices.push(0);
+        vertices.push(wallZbottom);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-        vertices.push(0);
+        vertices.push(wallZbottom);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-        vertices.push(0);
+        vertices.push(wallZbottom);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-        vertices.push(wallZ);
+        vertices.push(wallZtop);
 
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
         vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-        vertices.push(wallZ);
+        vertices.push(wallZtop);
       }
 
       for (let i = 0; i < (data.length - 1); i++) {
@@ -833,6 +878,25 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       visu_meshes.push(wall);
 
       controller.threeViewer.scene.add(wall);
+
+      /* Création des sphères pour la simulation */
+      const geometrySphere = new THREE.SphereGeometry(7, 32, 16);
+      const materialSphere = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+      const sphere = new THREE.Mesh(geometrySphere, materialSphere);
+
+      sphere.position.x = controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[0];
+      sphere.position.y = controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[1];
+      sphere.position.z = (wallZbottom + wallZtop) / 2;
+
+      console.log("____ ", sphere.position);
+      controller.threeViewer.scene.add(sphere);
+
+      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1 });
+      controller.threeViewer.animeTrailer = true;
+      controller.threeViewer.state.clock.start();
+
     }
+
+    indexVisu++;
   })
 }

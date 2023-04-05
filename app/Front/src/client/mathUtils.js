@@ -1,4 +1,4 @@
-function asc(arr) {
+export const asc = function asc(arr) {
     return arr.sort((a, b) => a - b);
 }
 
@@ -23,4 +23,8 @@ export const calculerMedian = function calculerMedian(arr) {
 }
 export const calculerTroisiemeQuartile = function calculerTroisiemeQuartile(arr) {
     return quantile(arr, .75);
+}
+
+export const calculerDistance = function calculerDistance(x1, y1, x2, y2) {
+    return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 }
