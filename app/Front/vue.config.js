@@ -12,5 +12,19 @@ module.exports = defineConfig({
         "dgram": false
       },
     }
+  },
+  pages: {
+    home: {
+      entry: 'src/pages/Home/home.js',
+      template: 'public/index.html',
+      title: 'Home Page',
+      chunks: ['chunk-vendors', 'chunk-common', 'home']
+    },
+    application: {
+      entry: 'src/pages/Application/application.js',
+      template: 'public/index.html',
+      title: 'Application Page',
+      chunks: ['chunk-vendors', 'chunk-common', 'application']
+    }
   }
 })

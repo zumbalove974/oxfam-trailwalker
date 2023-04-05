@@ -60,7 +60,11 @@
 
 
 <script>
+<<<<<<< HEAD:app/Front/src/App.vue
 import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from './client/index.js'
+=======
+import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from '../../client/index.js'
+>>>>>>> dev:app/Front/src/pages/Application/application.vue
 
 // Primevue components
 import MultiSelect from 'primevue/multiselect';
