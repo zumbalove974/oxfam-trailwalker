@@ -7,6 +7,7 @@ import { planStyle } from "./OLViewer"; //  planStyle, grisStyle,
 import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
+
 import { getLiveDataDevice, getControlPoints } from "./bddConnexion";
 
 import { asc, calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
@@ -37,7 +38,10 @@ const paramsCovid = {
 
 let visu_meshes = [];
 let visu_function;
+
+let cps = [];
 let devices = [];
+
 let device;
 let GPSvisu_mesh;
 let line;
@@ -256,6 +260,8 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
   }
 }
 
+
+
 export const getVitesseMoyenne = async function getVitesseMoyenne(device) {
   const data = await getLiveDataDevice(device);
 
@@ -266,21 +272,6 @@ export const getVitesseMoyenne = async function getVitesseMoyenne(device) {
   })
 
   return somme / data.length;
-}
-
-export async function addCPs() {
-  // Coordinates of the 10 points
-  const points = await getControlPoints();
-  points.forEach((point) => {
-    let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-    let geometry = new THREE.CircleGeometry(10, 32);
-    let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
-    let circle = new THREE.Mesh(geometry, material);
-    circle.position.x = worldCoords[0];
-    circle.position.y = worldCoords[1];
-    circle.position.z = 0;
-    controller.threeViewer.scene.add(circle);
-  });
 }
 
 
@@ -309,6 +300,22 @@ function addCursor() {
 }
 
 
+export const addCPs = async function addCPs() {
+  cps = await getControlPoints();
+  // Coordinates of the 10 points
+  cps.forEach(async point => {
+    let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+    let geometry = new THREE.CircleGeometry(10, 32);
+    let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+    let circle = new THREE.Mesh(geometry, material);
+    circle.position.x = worldCoords[0];
+    circle.position.y = worldCoords[1];
+    circle.position.z = 0;
+    controller.threeViewer.scene.add(circle);
+  })
+};
+
+
 async function addItineraireReference() {
 
   const coords = await getLiveDataDevice(3843);
@@ -335,6 +342,7 @@ async function addItineraireReference() {
   visu_meshes.push(GPSvisu_mesh);
 
   controller.threeViewer.scene.add(GPSvisu_mesh);
+
 }
 
 export const addItineraire = function addItineraire(deviceNumbers) {
