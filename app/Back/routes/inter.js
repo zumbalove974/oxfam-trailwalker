@@ -12,7 +12,6 @@ router.pool = new Pool({
 
 router.connectDB = async (req, that) => {
     try {
-
         const response = await that.pool.query(
             `SELECT * FROM public."Interpolation_${req.params.deviceNumber}" ORDER BY "index"`);
 
@@ -28,7 +27,6 @@ router.get('/:deviceNumber', function (req, res, next) {
 
     router.connectDB(req, router).then(r => {
         res.json(r);
-        router.pool.end();
     })
 
 

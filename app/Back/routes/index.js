@@ -43,9 +43,7 @@ router.connectDB = async (req, that) => {
 router.get('/', function (req, res, next) {
 
   router.connectDB(req, router).then(r => {
-    //res.render('index', { title: r });
     res.json(r);
-    router.pool.end();
   })
 
 

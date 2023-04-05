@@ -29,7 +29,6 @@ router.get('/:deviceNumber', function (req, res, next) {
 
     router.connectDB(req, router).then(r => {
         res.json(r);
-        router.pool.end();
     })
 
 
