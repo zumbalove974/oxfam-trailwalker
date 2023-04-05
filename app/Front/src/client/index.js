@@ -307,7 +307,7 @@ function addCursor() {
   controller.threeViewer.scene.add(traitVertical);
   controller.threeViewer.scene.add(traitHorizontal);
 }
-    
+
 
 async function addItineraireReference() {
 
@@ -891,7 +891,7 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       console.log("____ ", sphere.position);
       controller.threeViewer.scene.add(sphere);
 
-      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1 });
+      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0 });
       controller.threeViewer.animeTrailer = true;
       controller.threeViewer.state.clock.start();
 
