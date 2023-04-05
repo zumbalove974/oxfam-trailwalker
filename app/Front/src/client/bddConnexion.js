@@ -12,15 +12,26 @@ export const getAllLiveData = async function getAllLiveData() {
         })
 }
 
-export const getLiveDataDevice = async function getLiveDataDevice(deviceNumber) {
+export const getLiveDataDevice = function getLiveDataDevice(deviceNumber) {
     return fetch(`http://localhost:5500/inter/${deviceNumber}`, {
         method: 'GET'
     })
         .then(response => response.json())
         .then(response => {
+        
+            //console.log("bddConnection.response");
+            //console.log(response);
 
-            console.log("bddConnection.response");
-            console.log(response);
+            return response;
+        })
+}
+
+export const getControlPoints = async function getControlPoints() {
+    return fetch(`http://localhost:5500/cp`, {
+        method: 'GET'
+    })
+        .then(response => response.json())
+        .then(response => {
 
             return response;
         })

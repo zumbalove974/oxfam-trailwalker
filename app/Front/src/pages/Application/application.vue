@@ -3,8 +3,8 @@
 
   <Toast position="bottom-right" />
 
-  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners ? dimension : 2" :activeIndex="0"
-    class="onglet up">
+  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    :activeIndex="0" class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown">
@@ -28,18 +28,21 @@
     </AccordionTab>
   </Accordion>
 
-  <Accordion @pointerover="removeEventListeners" @pointerleave="addEventListeners" expandIcon="pi pi-ellipsis-h"
-    collapseIcon="pi pi-ellipsis-v" class="onglet left">
+  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
-      <DataTable scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
+      <DataTable v-model:selection="selectedProduct" @rowSelect="onRowSelect" @rowUnselect="onRowUnselect"
+        scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
         :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
-          headerStyle="background-color: #A855F7; color: white" :sortable=true></Column>
+        <Column :selected=true v-for="col of columns" :selection-mode="col.selectionMode" :headerStyle="col.headerStyle"
+          :key="col.field" :field="col.field" :header="col.header" :sortable="col.isSortable">
+        </Column>
       </DataTable>
     </AccordionTab>
   </Accordion>
 
-  <div @pointerover="removeEventListeners" @pointerleave="addEventListeners" class="onglet right">
+  <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    class="onglet right">
     <div class="card">
       <div :style="{ position: 'relative', height: '350px' }">
         <SpeedDial id="speedial" showIcon="pi pi-sliders-h" hideIcon="pi pi-times" :model="items"
@@ -57,7 +60,7 @@
 
 
 <script>
-import { init, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from './client/index.js'
+import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from '../../client/index.js'
 
 // Primevue components
 import SelectButton from 'primevue/selectbutton';
@@ -105,8 +108,10 @@ export default {
       createDimensionEnvironment: createDimensionEnvironment,
       removeEventListeners: removeEventListeners,
       addEventListeners: addEventListeners,
+      getVitesseMoyenne: getVitesseMoyenne,
       dimension: 2,
       toast: null,
+      tabOpen: 1,
       devices: [],
       devicesTab: [],
       deviceNumber: null,
@@ -120,7 +125,7 @@ export default {
         {
           label: 'Trajectoire simple',
           command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire de base est affichée", life: 10000 });
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
             this.addItineraire(this.devices);
           }
         },
@@ -154,9 +159,11 @@ export default {
         }
       ],
       columns: [
-        { field: 'id', header: 'ID' },
-        { field: 'vitesse', header: 'Vitesse moy.' }
-      ]
+        { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
+        { field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
+        { field: 'vitesse', header: 'Vitesse moy.', headerStyle: "background-color: #A855F7; color: white", isSortable: true }
+      ],
+      selectedProduct: null
     }
   },
   async mounted() {
@@ -182,23 +189,42 @@ export default {
   },
   methods: {
     changerDeDimension() {
-      createDimensionEnvironment(this.dimension.value);
+      this.dimension = this.dimension.value;
+      createDimensionEnvironment(this.dimension);
     },
-    addDevice() {
+    getValuesFromDevicesTab() {
+      let res = [];
+      this.devicesTab.forEach(device => {
+        res.push(device.id);
+      })
+
+      return res;
+    },
+    convertToKmH(vitesse) {
+      return vitesse * 3.6
+    },
+    tronquer(nombre, decimal) {
+      return Math.round(nombre * (10 ** decimal)) / (10 ** decimal);
+    },
+    async addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
         if (this.deviceNumber) {
-          if (!this.devices.includes(this.deviceNumber)) {
-            this.devices.push(this.deviceNumber);
-            this.devicesTab.push({ id: this.deviceNumber, vitesse: 10 });
+          const ids = this.getValuesFromDevicesTab();
+          if (!ids.includes(this.deviceNumber)) {
+            const moyenne = await this.getVitesseMoyenne(this.deviceNumber);
+            this.devicesTab.push({ id: this.deviceNumber, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
+            this.tabOpen = 0;
           }
         }
 
         if (this.deviceNumberFrom && this.deviceNumberTo) {
           if (this.deviceNumberFrom < this.deviceNumberTo) {
             for (let i = this.deviceNumberFrom; i <= this.deviceNumberTo; i++) {
-              if (!this.devices.includes(i)) {
-                this.devices.push(i);
-                this.devicesTab.push({ id: i, vitesse: 10 });
+              const ids = this.getValuesFromDevicesTab();
+              if (!ids.includes(i)) {
+                const moyenne = await this.getVitesseMoyenne(i);
+                this.devicesTab.push({ id: i, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
+                this.tabOpen = 0;
               }
             }
           } else {
@@ -208,6 +234,14 @@ export default {
       } else {
         this.toast.add({ severity: 'warn', summary: 'Attention', detail: "Vous n'avez rien écris", life: 2000 });
       }
+    },
+    onRowSelect(event) {
+      this.devices.push(event.data.id);
+    },
+    onRowUnselect(event) {
+      this.devices = this.devices.filter(function (item) {
+        return item !== event.data.id;
+      })
     }
   }
 }
