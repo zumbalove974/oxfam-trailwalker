@@ -1,39 +1,37 @@
 var express = require('express');
 var router = express.Router();
 const { Pool } = require("pg");
-const dotenv = require("dotenv");
-dotenv.config();
 
-/* GET home page. */
+router.pool = new Pool({
+    user: 'postgres_user',
+    host: 'database',
+    database: 'postgres_user',
+    password: 'postgres_password',
+    port: 5432,
+});
+
+router.connectDB = async (req, that) => {
+    try {
+
+        const response = await that.pool.query(
+            `SELECT * FROM public."Interpolation_${req.params.deviceNumber}" ORDER BY "index"`);
+
+        console.log(response);
+
+        return response.rows;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 router.get('/:deviceNumber', function (req, res, next) {
 
-    const pool = new Pool({
-        user: 'postgres_user',
-        host: 'database',
-        database: 'postgres_user',
-        password: 'postgres_password',
-        port: 5432,
-    });
-
-    const connectDb = async () => {
-        try {
-
-            const response = await pool.query(`SELECT * FROM public."Interpolation_${req.params.deviceNumber}" ORDER BY "index"`);
-
-            console.log(response);
-
-            return response.rows;
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    connectDb().then(r => {
-        //res.render('index', { title: r });
+    router.connectDB(req, router).then(r => {
         res.json(r);
-        pool.end();
+        router.pool.end();
     })
 
 
 });
+
 module.exports = router;
