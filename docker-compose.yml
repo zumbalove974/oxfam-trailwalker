@@ -38,7 +38,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 30s
 
   container_test:
     build:
@@ -65,10 +65,16 @@ services:
     links:
       - "db:database"
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://localhost:3000/" ]
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "http://localhost:3000/inter/3883"
+        ]
       interval: 1s
       timeout: 20s
       retries: 5
-      start_period: 10s
+      start_period: 30s
     depends_on:
       - db
