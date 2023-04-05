@@ -16,6 +16,9 @@
 import Menubar from 'primevue/menubar';
 
 export default {
+    components: {
+        Menubar
+    },
     data() {
         return {
             items: [
