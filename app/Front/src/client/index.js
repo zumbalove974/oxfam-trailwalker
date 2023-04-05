@@ -262,7 +262,6 @@ export async function addCPs() {
   // Coordinates of the 10 points
   const points = await getControlPoints();
   points.forEach((point) => {
-    console.log("points hhhh", points);
     let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
     let geometry = new THREE.CircleGeometry(10, 32);
     let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
@@ -298,25 +297,6 @@ function addCursor() {
   controller.threeViewer.scene.add(traitVertical);
   controller.threeViewer.scene.add(traitHorizontal);
 }
-
-export const addCPs = function addCPs() {
-  // Coordinates of the 10 points
-  const points = [
-    [119217.3831, 6433404.488, "Départ"],
-    [124180.5423, 6410453.993, "PC3"],
-    [132238.2362, 6435533.093, "PC1"],
-    [105920.382, 6414143.439, "PC5"],
-    [102033.4436, 6428455.438, "PC6"],
-    [111821.8043, 6409726.207, "PC4"],
-    [119217.3831, 6433404.488, "Arrivé"],
-    [133515.4635, 6422798.163, "PC2"],
-    [122185.2528, 6434184.187, "PC8"],
-    [105412.5035, 6430485.632, "PC7"]
-  ];
-
-  points.forEach((point) => {
-    //console.log("points", points);
-
     
 
 export const addItineraire = function addItineraire(deviceNumbers) {
