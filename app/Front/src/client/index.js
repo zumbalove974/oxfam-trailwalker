@@ -8,7 +8,7 @@ import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
 import { getLiveDataDevice } from "./bddConnexion";
-
+import { getControlPoints } from "./bddConnexion";
 import { calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
 
 //data can be imported like this or read from the data folder
@@ -257,6 +257,24 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
   }
 }
 
+
+export async function addCPs() {
+  // Coordinates of the 10 points
+  const points = await getControlPoints();
+  points.forEach((point) => {
+    console.log("points hhhh", points);
+    let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+    let geometry = new THREE.CircleGeometry(10, 32);
+    let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+    let circle = new THREE.Mesh(geometry, material);
+    circle.position.x = worldCoords[0];
+    circle.position.y = worldCoords[1];
+    circle.position.z = 0;
+    controller.threeViewer.scene.add(circle);
+  });
+}
+
+
 /* Ajoute un curseur au centre de la scene */
 function addCursor() {
 
@@ -298,17 +316,8 @@ export const addCPs = function addCPs() {
 
   points.forEach((point) => {
     //console.log("points", points);
-    let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-    let geometry = new THREE.CircleGeometry(10, 32);
-    let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
-    let circle = new THREE.Mesh(geometry, material);
-    circle.position.x = worldCoords[0];
-    circle.position.y = worldCoords[1];
-    circle.position.z = 0;
-    controller.threeViewer.scene.add(circle);
 
-  });
-}
+    
 
 export const addItineraire = function addItineraire(deviceNumbers) {
 
