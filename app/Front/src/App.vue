@@ -60,9 +60,10 @@
 
 
 <script>
-import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from './client/index.js'
+import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from './client/index.js'
 
 // Primevue components
+import MultiSelect from 'primevue/multiselect';
 import SelectButton from 'primevue/selectbutton';
 import SpeedDial from 'primevue/speeddial';
 import InputNumber from 'primevue/inputnumber';
@@ -105,6 +106,7 @@ export default {
       addItineraireSpeed3D: addItineraireSpeed3D,
       addItineraireSpeedWall: addItineraireSpeedWall,
       addCPs: addCPs,
+      addTeamMarker: addTeamMarker,
       createDimensionEnvironment: createDimensionEnvironment,
       removeEventListeners: removeEventListeners,
       addEventListeners: addEventListeners,
@@ -205,6 +207,9 @@ export default {
     },
     tronquer(nombre, decimal) {
       return Math.round(nombre * (10 ** decimal)) / (10 ** decimal);
+    },
+    addTeamMarkerPoint() {
+      this.addTeamMarker(this.deviceNumber, this.selectedTimestamp)
     },
     async addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
