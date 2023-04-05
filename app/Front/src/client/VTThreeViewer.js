@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 //import { ZOOM_RES_L93 } from "./Utils";
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils";
-import { calculerDistance } from "./mathUtils.js";
+//import { calculerDistance } from "./mathUtils.js";
 import { calculerTempsTimestamp } from "./bddUtils.js";
 
 export const mergedRender = "Merged";
@@ -38,7 +38,7 @@ export class VTThreeViewer {
       fps: 30,
       per: 0
     };
-    this.coeficientVitesseAnimation = 10;
+    this.coeficientVitesseAnimation = 1000;
   }
 
   initThree(backgroundColor) {
@@ -121,23 +121,37 @@ export class VTThreeViewer {
       this.shperes.forEach(sphere => {
         // On vérifie que les coureurs n'ont pas finis la course
         if (sphere.indexTraj < sphere.data.length - 1) {
+
+          let temps = 0;
+          sphere.indexPoint = 1;
+
           if (this.state.clock.getElapsedTime() > sphere.temps) {
-            let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
-            let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
-            let x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + 1].x, sphere.data[sphere.indexTraj + 1].y])[0];
-            let y1 = this.getWorldCoords([sphere.data[sphere.indexTraj + 1].x, sphere.data[sphere.indexTraj + 1].y])[1];
 
-            let distance = calculerDistance(x0, y0, x1, y1);
-            if (sphere.data[sphere.indexTraj].speed == 0)
-              sphere.temps += 
-            else
-              sphere.temps += (distance / (sphere.data[sphere.indexTraj].speed) / this.coeficientVitesseAnimation);
+            let x1;
+            let y1;
 
-            console.log(sphere.temps);
+            while (temps == 0) {
+              console.log("__________________")
+              //let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
+              //let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
+              x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[0];
+              y1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[1];
 
-            sphere.mesh.position.x = x0;
-            sphere.mesh.position.y = y0;
-            sphere.indexTraj++;
+              //let distance = calculerDistance(x0, y0, x1, y1);
+              temps = calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp) - calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp);
+
+              console.log(temps)
+              console.log(calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp))
+              console.log(calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp))
+
+              sphere.indexPoint++;
+              sphere.indexTraj++;
+            }
+
+            sphere.mesh.position.x = x1;
+            sphere.mesh.position.y = y1;
+
+            sphere.temps += temps / this.coeficientVitesseAnimation;
           }
         }
       })
