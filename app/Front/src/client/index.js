@@ -10,6 +10,7 @@ import { ZOOM_RES_L93 } from "./Utils";
 import { getLiveDataDevice } from "./bddConnexion";
 import { getControlPoints } from "./bddConnexion";
 import { calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
+import { async } from "regenerator-runtime";
 
 //data can be imported like this or read from the data folder
 //import windData from "../../data/wind.json";
@@ -300,12 +301,10 @@ function addCursor() {
   controller.threeViewer.scene.add(traitHorizontal);
 }
 
-export const addCPs = async function addCPs(cpNumbers) {
+export const addCPs = async function addCPs() {
+  cps = await getControlPoints();
   // Coordinates of the 10 points
-  cps = cpNumbers;
-  cps.forEach(async cpNumber => {
-    const point = await getControlPoints(cpNumber);
-    console.log("point", point);
+  cps.forEach(async point => {
     let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
     let geometry = new THREE.CircleGeometry(10, 32);
     let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });

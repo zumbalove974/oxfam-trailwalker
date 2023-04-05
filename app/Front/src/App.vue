@@ -112,9 +112,7 @@ export default {
       toast: null,
       tabOpen: 1,
       devices: [],
-      cpNumbers: [],
       devicesTab: [],
-      cpNumber: null,
       deviceNumber: null,
       deviceNumberFrom: null,
       deviceNumberTo: null,
@@ -200,9 +198,6 @@ export default {
       })
 
       return res;
-    },
-    addCP() {
-
     },
     addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {

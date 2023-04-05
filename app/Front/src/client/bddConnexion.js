@@ -26,8 +26,8 @@ export const getLiveDataDevice = async function getLiveDataDevice(deviceNumber) 
         })
 }
 
-export const getControlPoints = async function getControlPoints(cpNumber) {
-    return fetch(`http://localhost:5500/cp/${cpNumber}`, {
+export const getControlPoints = async function getControlPoints() {
+    return fetch(`http://localhost:5500/cp`, {
         method: 'GET'
     })
         .then(response => response.json())
