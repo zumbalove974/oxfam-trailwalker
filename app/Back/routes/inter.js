@@ -15,8 +15,6 @@ router.connectDB = async (req, that) => {
         const response = await that.pool.query(
             `SELECT * FROM public."Interpolation_${req.params.deviceNumber}" ORDER BY "index"`);
 
-        console.log(response);
-
         return response.rows;
     } catch (error) {
         console.log(error)

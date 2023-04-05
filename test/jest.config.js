@@ -4,14 +4,14 @@
  */
 
 module.exports = {
-  rootDir: '../',
+  rootDir: '.',
   // All imported modules in your tests should be mocked automaticallymodule.exports = {presets: ['@babel/preset-env']}
   automock: false,
   // Set up Jest to run tests in a Node.js environment
   testEnvironment: 'node',
   // A list of paths to directories that Jest should use to search for files in
   roots: [
-    '<rootDir>/test'
+    '<rootDir>'
   ],
   // Stop running tests after `n` failures
   bail: 3,
@@ -29,7 +29,7 @@ module.exports = {
   collectCoverageFrom: ['**/*.{js,jsx,vue}', '!**/node_modules/**', '!**/vendor/**'],
 
   // The directory where Jest should output its coverage files
-  coverageDirectory: '<rootDir>/test/coverage',
+  coverageDirectory: '<rootDir>/coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
   coveragePathIgnorePatterns: [
@@ -84,16 +84,17 @@ module.exports = {
 
   // An array of directory names to be searched recursively up from the requiring module's location
   moduleDirectories: [
-    "node_modules", "Back", "test"
+    "node_modules", "Back"
   ],
 
   // An array of file extensions your modules use
   moduleFileExtensions: ['vue', 'js', 'jsx', 'json'],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/app/Front/src/$1'
-  },
+  // moduleNameMapper: {
+  //   '^@/(.*)$': '<rootDir>/app/Front/src/$1'
+  // },
+
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],
 
@@ -175,12 +176,12 @@ module.exports = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    '^.+\\.vue$': '<rootDir>/test/node_modules/vue-jest',
-    '^.+\\.(js|jsx)$': '<rootDir>/test/node_modules/babel-jest'
+    '^.+\\.vue$': '<rootDir>/node_modules/vue-jest',
+    '^.+\\.(js|jsx)$': '<rootDir>/node_modules/babel-jest'
   },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: [
-    "<rootDir>/test/node_modules"
+    "<rootDir>/node_modules"
   ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them

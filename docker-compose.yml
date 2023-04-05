@@ -49,6 +49,8 @@ services:
     depends_on:
       vue-ui:
         condition: service_healthy
+      express-back:
+        condition: service_healthy
     command: npm run test
 
   express-back:
@@ -62,3 +64,11 @@ services:
       - /usr/src/app/Back/node_modules
     links:
       - "db:database"
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:3000/" ]
+      interval: 1s
+      timeout: 20s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - db

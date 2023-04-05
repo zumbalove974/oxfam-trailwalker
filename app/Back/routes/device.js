@@ -16,8 +16,6 @@ router.connectDB = async (req, that) => {
         const response = await that.pool.query(
             `SELECT * FROM public."Device_${req.params.deviceNumber}" ORDER BY "timestamp"`);
 
-        console.log(response);
-
         return response.rows;
 
     } catch (error) {

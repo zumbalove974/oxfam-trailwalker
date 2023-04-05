@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "test": "echo 'test_unitaires'"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -17,6 +18,7 @@
     "pug": "2.0.0-beta11"
   },
   "devDependencies": {
+    "jest": "^29.5.0",
     "nodemon": "^2.0.22"
   }
 }
