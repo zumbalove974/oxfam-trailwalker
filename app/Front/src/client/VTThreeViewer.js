@@ -146,8 +146,10 @@ export class VTThreeViewer {
               sphere.indexTraj++;
             }
 
-            sphere.mesh.position.x = x1;
-            sphere.mesh.position.y = y1;
+            if (sphere.tempsBetweenPoints > 0) {
+              sphere.mesh.position.x = x1;
+              sphere.mesh.position.y = y1;
+            }
 
             sphere.temps += (sphere.tempsBetweenPoints / this.coeficientVitesseAnimation);
             sphere.tempsBetweenPoints = 0;
