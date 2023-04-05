@@ -298,7 +298,7 @@ function addCursor() {
   controller.threeViewer.scene.add(traitVertical);
   controller.threeViewer.scene.add(traitHorizontal);
 }
-    
+
 
 
 export const addCPs = async function addCPs() {
@@ -313,7 +313,8 @@ export const addCPs = async function addCPs() {
     circle.position.y = worldCoords[1];
     circle.position.z = 0;
     controller.threeViewer.scene.add(circle);
-  });
+  })
+};
 
 async function addItineraireReference() {
 
