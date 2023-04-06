@@ -192,19 +192,22 @@ function scroll() {
 
 /* Lorsqu'on est en 3D l'utilisateur peut déplacer la caméra avec les flèches directionnelles */
 function onKeyDown(event) {
-  event.preventDefault();
   switch (event.key) {
     case 'ArrowUp':
-      controller.threeViewer.perspectiveCamera.position.y += 10;
+      event.preventDefault();
+      controller.threeViewer.perspectiveCamera.translateZ(-10);
       break;
     case 'ArrowDown':
-      controller.threeViewer.perspectiveCamera.position.y -= 10;
+      event.preventDefault();
+      controller.threeViewer.perspectiveCamera.translateZ(10);
       break;
     case 'ArrowRight':
-      controller.threeViewer.perspectiveCamera.position.x += 10;
+      event.preventDefault();
+      controller.threeViewer.perspectiveCamera.translateX(10);
       break;
     case 'ArrowLeft':
-      controller.threeViewer.perspectiveCamera.position.x -= 10;
+      event.preventDefault();
+      controller.threeViewer.perspectiveCamera.translateX(-10);
       break;
   }
 }
