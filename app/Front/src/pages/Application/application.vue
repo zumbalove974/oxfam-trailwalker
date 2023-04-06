@@ -8,7 +8,11 @@
     <AccordionTab header="Ajouter une ou plusieurs équipes">
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown">
-          <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+          <span class="p-float-label">
+            <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+            <label for="number-input">Number</label>
+          </span>
+
           <div class="card flex justify-content-center">
             <Button id="addTeamBtn" label="Ajouter" @click="addDevice" />
           </div>
@@ -17,11 +21,17 @@
         <div class="flexRow evenly upSize">
           <div>
             <label for="integeronly" class="font-bold block mb-2 spaceRight"> De </label>
-            <InputNumber placeholder="First device" v-model="deviceNumberFrom" inputId="integeronly" />
+            <span class="p-float-label">
+              <InputNumber placeholder="First device" v-model="deviceNumberFrom" inputId="integeronly" />
+              <label for="number-input"></label>
+            </span>
           </div>
           <div>
             <label for="integeronly" class="font-bold block mb-2 spaceRight"> à </label>
-            <InputNumber placeholder="Last device" v-model="deviceNumberTo" inputId="integeronly" />
+            <span class="p-float-label">
+              <InputNumber placeholder="Last device" v-model="deviceNumberTo" inputId="integeronly" />
+              <label for="number-input"></label>
+            </span>
           </div>
         </div>
       </div>
@@ -53,15 +63,20 @@
     </div>
   </div>
 
-  <div id="dimensionBtn" class="card flex justify-content-center">
-    <SelectButton @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
+  <div id="resetCameraBtn" class="card flex justify-content-center">
+    <Button @click="resetCamera(dimension)" class="p-button-lg" :size="large" icon="pi pi-arrows-alt" text raised rounded
+      aria-label="Filter" />
+  </div>
+
+  <div id="dimensionBtnContainer" class="card flex justify-content-center p-button-lg">
+    <SelectButton id="dimensionBtn" @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
 </template>
 
 
 <script>
-import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from '../../client/index.js'
+import { init, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from '../../client/index.js'
 
 // Primevue components
 import SelectButton from 'primevue/selectbutton';
@@ -110,6 +125,7 @@ export default {
       removeEventListeners: removeEventListeners,
       addEventListeners: addEventListeners,
       getVitesseMoyenne: getVitesseMoyenne,
+      resetCamera: resetCamera,
       dimension: 2,
       toast: null,
       tabOpen: 1,
@@ -347,11 +363,15 @@ body {
   max-height: 90vh;
 }
 
-#dimensionBtn {
+#dimensionBtnContainer {
   position: absolute;
   z-index: 2;
   bottom: 50px;
   right: 50px;
+}
+
+#dimensionBtn>.p-button.p-component:focus {
+  background-color: #A855F7 !important;
 }
 
 .font-bold {
@@ -396,5 +416,12 @@ body {
 
 .p-button.p-component.p-highlight {
   background-color: #A855F7 !important;
+}
+
+#resetCameraBtn {
+  position: absolute;
+  z-index: 2;
+  bottom: 50px;
+  left: 50px;
 }
 </style>

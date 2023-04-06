@@ -217,6 +217,19 @@ function onKeyUp() {
   controller.threeViewer.translateZ = 0;
 }
 
+export const resetCamera = function resetCamera(dimension) {
+
+  //const worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+  //controller.threeViewer.perspectiveCamera.position.set(worldCoords[0], worldCoords[1], cameraZ);
+  controller.olViewer.map.getView().setCenter(vavinCenter);
+
+  createDimensionEnvironment(2)
+
+  if (dimension == 3) {
+    createDimensionEnvironment(3)
+  }
+}
+
 /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
 export const addEventListeners = function addEventListeners() {
   /* On désactive l'orbit control lors du click (drag) */
