@@ -410,11 +410,7 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
     color: "blue"
   });
 
-  let shape = new THREE.Shape();
-  shape.moveTo(
-    controller.threeViewer.getWorldCoords([trace[0].x, trace[0].y])[0],
-    controller.threeViewer.getWorldCoords([trace[0].x, trace[0].y])[1]
-  )
+  let shape = [];
 
   for (let i = 0; i < trace.length - 1; i++) {
 
@@ -422,49 +418,74 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
     let yA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[1];
     let xB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[0];
     let yB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[1];
-    let dA = trace[i].speed;
-    let dB = trace[i + 1].speed;
+    let dA = (trace[i].speed ** 2) * 1.5;
+    let dB = (trace[i + 1].speed ** 2) * 1.5;
     let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
-    if (normAB <= 0) { continue }
 
-    shape.lineTo(
-      xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
-      yA - dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
-    shape.lineTo(
-      xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
-      yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
+    if (normAB === 0) { continue }
+
+    if (dB != 0) {
+      shape.push(
+        xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yA - dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      shape.push(
+        xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      shape.push(
+        xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    }
+    if (dA != 0) {
+      shape.push(
+        xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yA - dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      shape.push(
+        xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      shape.push(
+        xA - dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yA + dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    }
   }
 
-  for (let i = trace.length - 2; i >= 0; i--) {
+  for (let i = 0; i < trace.length - 2; i++) {
 
     let xA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[0];
     let yA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[1];
     let xB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[0];
     let yB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[1];
-    let dA = trace[i].speed;
-    let dB = trace[i + 1].speed;
-    let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
-    if (normAB <= 0) { continue }
+    let xC = controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[0];
+    let yC = controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[1];
+    let dB = (trace[i + 1].speed ** 2) * 1.5;
+    let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2));
+    let normBC = Math.sqrt(Math.pow(xB - xC, 2) + Math.pow(yB - yC, 2));
 
-    shape.lineTo(
+    if (normAB === 0 || normBC === 0 || dB === 0) { continue }
+
+    shape.push(xB, yB, 0);
+    shape.push(
+      xB - dB * Math.cos((xC - xB) / normBC) * Math.sin((yB - yB) / normBC),
+      yB + dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+    shape.push(
       xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
-      yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
-    shape.lineTo(
-      xA - dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
-      yA + dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB))
+      yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+    shape.push(xB, yB, 0);
+    shape.push(
+      xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+      yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    shape.push(
+      xB + dB * Math.cos((xC - xB) / normBC) * Math.sin((yB - yB) / normBC),
+      yB - dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+
   }
 
-  shape.lineTo(
-    controller.threeViewer.getWorldCoords([trace[0].x, trace[0].y])[0],
-    controller.threeViewer.getWorldCoords([trace[0].x, trace[0].y])[1]
-  )
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
 
-  const geometry = new THREE.ShapeBufferGeometry(shape);
   let visu_mesh = new THREE.Mesh(geometry, material);
   visu_meshes.push(visu_mesh)
   controller.threeViewer.scene.add(visu_mesh);
-
-  addItineraire(deviceNumbers);
 
   visu_function = addItineraireEpaisseur;
 }
