@@ -15,7 +15,6 @@ import "primevue/resources/themes/lara-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import Button from 'primevue/button';
-import Menubar from '../../components/MenuBar.vue'
 
 // https://github.com/OmranEdoo/rasberryWeather974/tree/dev/Front/dist
 // avoir une page router

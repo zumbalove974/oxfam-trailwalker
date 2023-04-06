@@ -195,21 +195,26 @@ function onKeyDown(event) {
   switch (event.key) {
     case 'ArrowUp':
       event.preventDefault();
-      controller.threeViewer.perspectiveCamera.translateZ(-10);
+      controller.threeViewer.translateZ = -5;
       break;
     case 'ArrowDown':
       event.preventDefault();
-      controller.threeViewer.perspectiveCamera.translateZ(10);
+      controller.threeViewer.translateZ = 5;
       break;
     case 'ArrowRight':
       event.preventDefault();
-      controller.threeViewer.perspectiveCamera.translateX(10);
+      controller.threeViewer.translateX = 5;
       break;
     case 'ArrowLeft':
       event.preventDefault();
-      controller.threeViewer.perspectiveCamera.translateX(-10);
+      controller.threeViewer.translateX = -5;
       break;
   }
+}
+
+function onKeyUp() {
+  controller.threeViewer.translateX = 0;
+  controller.threeViewer.translateZ = 0;
 }
 
 /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
@@ -238,6 +243,7 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     console.log("___dimension 2___");
 
     window.removeEventListener('keydown', onKeyDown, false);
+    window.removeEventListener('keyup', onKeyUp, false);
 
     controller.threeViewer.controls.enabled = false;
 
@@ -258,6 +264,7 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     console.log("___dimension 3___");
 
     window.addEventListener('keydown', onKeyDown, false);
+    window.addEventListener('keyup', onKeyUp, false);
 
     removeEventListeners();
   }

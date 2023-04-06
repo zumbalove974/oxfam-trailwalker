@@ -39,6 +39,8 @@ export class VTThreeViewer {
       per: 0
     };
     this.coeficientVitesseAnimation = 1000;
+    this.translateX = 0;
+    this.translateZ = 0;
   }
 
   initThree(backgroundColor) {
@@ -117,6 +119,9 @@ export class VTThreeViewer {
   animate() {
     this.renderer.render(this.scene, this.currentCamera);
 
+    this.perspectiveCamera.translateX(this.translateX);
+    this.perspectiveCamera.translateZ(this.translateZ);
+
     if (this.animeTrailer) {
       this.shperes.forEach(sphere => {
         // On vérifie que les coureurs n'ont pas finis la course
@@ -138,9 +143,6 @@ export class VTThreeViewer {
 
               //let distance = calculerDistance(x0, y0, x1, y1);
               sphere.tempsBetweenPoints = calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp) - calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp);
-
-              //console.log(sphere.tempsBetweenPoints)
-              //console.log(sphere.indexTraj)
 
               sphere.indexPoint++;
               sphere.indexTraj++;
