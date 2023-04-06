@@ -39,6 +39,8 @@ export class VTThreeViewer {
       per: 0
     };
     this.coeficientVitesseAnimation = 1000;
+    this.translateX = 0;
+    this.translateZ = 0;
   }
 
   initThree(backgroundColor) {
@@ -117,41 +119,42 @@ export class VTThreeViewer {
   animate() {
     this.renderer.render(this.scene, this.currentCamera);
 
+    this.perspectiveCamera.translateX(this.translateX);
+    this.perspectiveCamera.translateZ(this.translateZ);
+
     if (this.animeTrailer) {
       this.shperes.forEach(sphere => {
         // On vérifie que les coureurs n'ont pas finis la course
-        if (sphere.indexTraj < sphere.data.length - 1) {
+        if (sphere.indexTraj < sphere.data.length - 10) {
 
-          let temps = 0;
           sphere.indexPoint = 1;
 
           if (this.state.clock.getElapsedTime() > sphere.temps) {
 
             let x1;
             let y1;
+            console.log(sphere.temps)
 
-            while (temps == 0) {
-              console.log("__________________")
+            while (sphere.tempsBetweenPoints == 0) {
               //let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
               //let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
               x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[0];
               y1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[1];
 
               //let distance = calculerDistance(x0, y0, x1, y1);
-              temps = calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp) - calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp);
-
-              console.log(temps)
-              console.log(calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp))
-              console.log(calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp))
+              sphere.tempsBetweenPoints = calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp) - calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp);
 
               sphere.indexPoint++;
               sphere.indexTraj++;
             }
 
-            sphere.mesh.position.x = x1;
-            sphere.mesh.position.y = y1;
+            if (sphere.tempsBetweenPoints > 0) {
+              sphere.mesh.position.x = x1;
+              sphere.mesh.position.y = y1;
+            }
 
-            sphere.temps += temps / this.coeficientVitesseAnimation;
+            sphere.temps += (sphere.tempsBetweenPoints / this.coeficientVitesseAnimation);
+            sphere.tempsBetweenPoints = 0;
           }
         }
       })
