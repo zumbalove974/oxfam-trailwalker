@@ -138,6 +138,7 @@ export default {
         {
           label: 'Points de contrôle',
           command: () => {
+            this.toast.removeAllGroups();
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
             this.addCPs();
           }
@@ -236,11 +237,13 @@ export default {
         this.visuFunction();
     },
     displayVisuSimple() {
+      this.toast.removeAllGroups();
       this.visuFunction = this.displayVisuSimple;
       this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
       this.addItineraire(this.devices);
     },
     displayVisuEpaisseur() {
+      this.toast.removeAllGroups();
       this.visuFunction = this.displayVisuEpaisseur;
 
       if (this.devices.length > 1)
@@ -251,6 +254,7 @@ export default {
       this.addItineraireEpaisseur(this.devices);
     },
     displayVisuMontagne() {
+      this.toast.removeAllGroups();
       this.visuFunction = this.displayVisuMontagne;
 
       if (this.devices.length > 1)
@@ -261,6 +265,7 @@ export default {
       this.addItineraireSpeed3D(this.devices, this.dimension);
     },
     displayVisuMur() {
+      this.toast.removeAllGroups();
       this.visuFunction = this.displayVisuMur;
 
       this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });

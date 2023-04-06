@@ -144,10 +144,10 @@ export class VTThreeViewer {
               //let distance = calculerDistance(x0, y0, x1, y1);
               sphere.tempsBetweenPoints = calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp) - calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp);
 
-              if (sphere.indexTraj < sphere.data.length - sphere.indexPoint)
+              if (sphere.indexTraj < sphere.data.length - sphere.indexPoint - 1)
                 sphere.indexPoint++;
               else
-                break
+                break;
 
               sphere.indexTraj++;
             }
