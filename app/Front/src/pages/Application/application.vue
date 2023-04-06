@@ -56,18 +56,18 @@
     <SelectButton @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
+
+  <Dropdown v-model="selectedTimestamp" :options="timestamps" :placeholder="'Choisir un timestamp'" />
 </template>
 
 
 <script>
-<<<<<<< HEAD:app/Front/src/App.vue
+
 import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from './client/index.js'
-=======
-import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from '../../client/index.js'
->>>>>>> dev:app/Front/src/pages/Application/application.vue
+
 
 // Primevue components
-import MultiSelect from 'primevue/multiselect';
+import { Dropdown } from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import SpeedDial from 'primevue/speeddial';
 import InputNumber from 'primevue/inputnumber';
@@ -92,6 +92,7 @@ export default {
   name: 'App',
 
   components: {
+    Dropdown,
     SelectButton,
     SpeedDial,
     InputNumber,
@@ -118,6 +119,8 @@ export default {
       dimension: 2,
       toast: null,
       tabOpen: 1,
+      selectedTimestamp,
+      timestamps: [],
       devices: [],
       devicesTab: [],
       deviceNumber: null,
@@ -151,6 +154,13 @@ export default {
         },
         {
           label: 'Points de contrôle',
+          command: () => {
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
+            this.addCPs();
+          }
+        },
+        {
+          label: 'Position(s) équipe',
           command: () => {
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
             this.addCPs();
