@@ -1,8 +1,8 @@
 const { describe, expect, test } = require('@jest/globals');
 
 describe("Test the inter path", () => {
-    test("It should response the correct obj", async () => {
-        const json = await fetch(`http://localhost:5500/inter/3883`, {
+    test("It should respond with the correct obj", async () => {
+        const json = await fetch(`http://express-back:3000/inter/3883`, {
             method: 'GET'
         })
             .then(response => response.json())
