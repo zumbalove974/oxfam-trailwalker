@@ -32,8 +32,9 @@
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
       <DataTable v-model:selection="selectedProduct" @rowSelect="onRowSelect" @rowUnselect="onRowUnselect"
-        scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
-        :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
+        @rowSelectAll="onRowSelectAll" @rowUnselectAll="onRowUnselectAll" scrollHeight="80vh" style="max-height: 80vh;"
+        :resizable-columns=true :row-hover=true :scrollable=true :value="devicesTab"
+        tableStyle="min-width: 10rem; max-height: 10rem;">
         <Column :selected=true v-for="col of columns" :selection-mode="col.selectionMode" :headerStyle="col.headerStyle"
           :key="col.field" :field="col.field" :header="col.header" :sortable="col.isSortable">
         </Column>
@@ -233,6 +234,20 @@ export default {
       this.devices = this.devices.filter(function (item) {
         return item !== event.data.id;
       })
+      if (this.visuFunction)
+        this.visuFunction();
+    },
+    onRowSelectAll(event) {
+      event.data.forEach(device => {
+        this.devices.push(device.id);
+      })
+
+      if (this.visuFunction)
+        this.visuFunction();
+    },
+    onRowUnselectAll() {
+      this.devices = [];
+
       if (this.visuFunction)
         this.visuFunction();
     },

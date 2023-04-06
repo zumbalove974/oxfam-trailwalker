@@ -135,7 +135,7 @@ export class VTThreeViewer {
             let y1;
             //console.log(sphere.temps)
 
-            while (sphere.tempsBetweenPoints == 0) {
+            while (sphere.tempsBetweenPoints == 0 && sphere.running) {
               //let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
               //let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
               x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[0];
@@ -144,10 +144,12 @@ export class VTThreeViewer {
               //let distance = calculerDistance(x0, y0, x1, y1);
               sphere.tempsBetweenPoints = calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp) - calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp);
 
-              if (sphere.indexTraj < sphere.data.length - sphere.indexPoint - 1)
+              if (sphere.indexTraj < sphere.data.length - sphere.indexPoint - 1) {
                 sphere.indexPoint++;
-              else
+              } else {
+                sphere.running = false;
                 break;
+              }
 
               sphere.indexTraj++;
             }

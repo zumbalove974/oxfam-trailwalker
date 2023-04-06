@@ -593,54 +593,54 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
 
     for (let i = 0; i < (data.length - 1); i++) {
       // Face 1
+      colors.push(1 - speeds[i]);
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
+      colors.push(0.2);
 
+      colors.push(1 - speeds[i + 1]);
       colors.push(speeds[i + 1]);
-      colors.push(0.0);
-      colors.push(0.0);
+      colors.push(0.2);
 
+      colors.push(1 - speeds[i]);
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
+      colors.push(0.2);
 
       //Face 2
+      colors.push(1 - speeds[i]);
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
+      colors.push(0.2);
 
+      colors.push(1 - speeds[i]);
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
+      colors.push(0.2);
 
+      colors.push(1 - speeds[i + 1]);
       colors.push(speeds[i + 1]);
-      colors.push(0.0);
-      colors.push(0.0);
+      colors.push(0.2);
     }
 
     // itemSize = 3 because there are 3 values (components) per vertex
@@ -696,7 +696,8 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
   visu_function = addItineraireSpeedWall;
 
   devices = deviceNumbers;
-  let moyennes, moyennesDict;
+  let moyennes
+  let moyennesDict;
 
   let res = await getMoyenneDevice(devices);
 
@@ -839,53 +840,53 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
       for (let i = 0; i < (data.length - 1); i++) {
         // Face 1
-        colors.push(speeds[i]);
         colors.push(1.0 - speeds[i]);
-        colors.push(0.0);
-
         colors.push(speeds[i]);
+        colors.push(0.0);
+
         colors.push(1.0 - speeds[i]);
-        colors.push(0.0);
-
-        colors.push(speeds[i + 1]);
-        colors.push(1.0 - speeds[i + 1]);
-        colors.push(0.0);
-
-        colors.push(speeds[i + 1]);
-        colors.push(1.0 - speeds[i + 1]);
-        colors.push(0.0);
-
-        colors.push(speeds[i + 1]);
-        colors.push(1.0 - speeds[i + 1]);
-        colors.push(0.0);
-
         colors.push(speeds[i]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
         colors.push(1.0 - speeds[i]);
+        colors.push(speeds[i]);
         colors.push(0.0);
 
         //Face 2
-        colors.push(speeds[i]);
         colors.push(1.0 - speeds[i]);
-        colors.push(0.0);
-
-        colors.push(speeds[i + 1]);
-        colors.push(1.0 - speeds[i + 1]);
-        colors.push(0.0);
-
         colors.push(speeds[i]);
-        colors.push(1.0 - speeds[i]);
         colors.push(0.0);
 
-        colors.push(speeds[i + 1]);
         colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
         colors.push(0.0);
 
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i]);
         colors.push(speeds[i]);
-        colors.push(1.0 - speeds[i]);
         colors.push(0.0);
 
-        colors.push(speeds[i + 1]);
         colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
         colors.push(0.0);
       }
 
@@ -917,7 +918,7 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
       controller.threeViewer.scene.add(sphere);
 
-      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0, wall: wall, line: line3d });
+      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0, wall: wall, line: line3d, running: true });
       controller.threeViewer.animeTrailer = true;
       controller.threeViewer.state.clock.start();
     }
