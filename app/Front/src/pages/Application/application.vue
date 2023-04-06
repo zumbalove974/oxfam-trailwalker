@@ -64,7 +64,7 @@
 <script>
 
 import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from './client/index.js'
-
+import { getLiveDataDevice } from "./bddConnexion";
 
 // Primevue components
 import { Dropdown } from 'primevue/dropdown';
@@ -111,6 +111,7 @@ export default {
       addItineraireSpeed3D: addItineraireSpeed3D,
       addItineraireSpeedWall: addItineraireSpeedWall,
       addCPs: addCPs,
+      getLiveDataDevice: getLiveDataDevice,
       addTeamMarker: addTeamMarker,
       createDimensionEnvironment: createDimensionEnvironment,
       removeEventListeners: removeEventListeners,
@@ -119,7 +120,7 @@ export default {
       dimension: 2,
       toast: null,
       tabOpen: 1,
-      selectedTimestamp,
+      selectedTimestamp: '',
       timestamps: [],
       devices: [],
       devicesTab: [],
@@ -160,10 +161,10 @@ export default {
           }
         },
         {
-          label: 'Position(s) équipe',
+          label: 'Position équipe',
           command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
-            this.addCPs();
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
+            this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
           }
         },
         {
@@ -184,6 +185,7 @@ export default {
   },
   async mounted() {
     this.toast = useToast();
+    this.loadTimestamps();
 
     this.init();
     createDimensionEnvironment(this.dimension);
@@ -221,6 +223,15 @@ export default {
     },
     tronquer(nombre, decimal) {
       return Math.round(nombre * (10 ** decimal)) / (10 ** decimal);
+    },
+    async loadTimestamps() {
+      try {
+        const liveData = await getLiveDataDevice(this.deviceNumber);
+        const timestamps = liveData.map(row => row.timestamp);
+        this.timestamps = timestamps;
+      } catch (error) {
+        console.error(error);
+      }
     },
     addTeamMarkerPoint() {
       this.addTeamMarker(this.deviceNumber, this.selectedTimestamp)

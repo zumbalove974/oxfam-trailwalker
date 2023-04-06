@@ -319,30 +319,18 @@ export const addCPs = async function addCPs() {
 export const addTeamMarker = async function addTeamMarker(deviceNumber, timeStamp) {
   device = deviceNumber;
   time_stamp = timeStamp;
-  // Get the team's position from the database based on deviceNumber and timeStamp
   const teamPositions = await getLiveDataDevice(deviceNumber);
-
   for (let i = 0; i < teamPositions.length; i++) {
     if (teamPositions[i].timestamp === time_stamp) {
       console.log(teamPositions[i].timestamp);
       // Convert the team's position from Web Mercator to world coordinates
       const worldCoords = controller.threeViewer.getWorldCoords([teamPositions[i].x, teamPositions[i].y]);
-
-      // Create a new Three.js sphere geometry to represent the team's position
       const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
-
-      // Create a new Three.js material for the sphere
       const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
-
-      // Create a new Three.js mesh with the geometry and material
       const sphere = new THREE.Mesh(geometry, material);
-
-      // Set the position of the sphere to the team's world coordinates
       sphere.position.x = worldCoords[0];
       sphere.position.y = worldCoords[1];
       sphere.position.z = 0;
-
-      // Add the sphere to the Three.js scene
       controller.threeViewer.scene.add(sphere);
     }
   }
