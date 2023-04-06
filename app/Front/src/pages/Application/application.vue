@@ -1,7 +1,7 @@
 <template>
   <div id="map" class="map"></div>
 
-  <Toast position="bottom-right" />
+  <Toast position="bottom-center" />
 
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
     :activeIndex="0" class="onglet up">
@@ -117,6 +117,7 @@ export default {
       deviceNumber: null,
       deviceNumberFrom: null,
       deviceNumberTo: null,
+      visuFunction: null,
       options: [
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
@@ -124,33 +125,15 @@ export default {
       items: [
         {
           label: 'Trajectoire simple',
-          command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
-            this.addItineraire(this.devices);
-          }
+          command: () => this.displayVisuSimple()
         },
         {
           label: 'Épaisseur de la ligne',
-          command: () => {
-
-            if (this.devices.length > 1)
-              this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-            else
-              this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
-
-            this.addItineraireEpaisseur(this.devices);
-          }
+          command: () => this.displayVisuEpaisseur()
         },
         {
-          label: '2D+1 vitesses',
-          command: () => {
-            if (this.devices.length > 1)
-              this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-            else
-              this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
-
-            this.addItineraireSpeed3D(this.devices, this.dimension);
-          }
+          label: '2D+1 vitesses axe verticale',
+          command: () => this.displayVisuMontagne()
         },
         {
           label: 'Points de contrôle',
@@ -161,10 +144,7 @@ export default {
         },
         {
           label: 'Visualisation du mur',
-          command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
-            this.addItineraireSpeedWall(this.devices);
-          }
+          command: () => this.displayVisuMur()
         }
       ],
       columns: [
@@ -189,7 +169,6 @@ export default {
     document.getElementById("speedial_2").children[0].innerHTML = "3";
     document.getElementById("speedial_3").children[0].innerHTML = "4";
     document.getElementById("speedial_4").children[0].innerHTML = "5";
-
 
     document.getElementById("speedial_1").children[0].style = "background-color: green";
     document.getElementById("speedial_2").children[0].style = "background-color: cyan";
@@ -246,11 +225,46 @@ export default {
     },
     onRowSelect(event) {
       this.devices.push(event.data.id);
+      if (this.visuFunction)
+        this.visuFunction();
     },
     onRowUnselect(event) {
       this.devices = this.devices.filter(function (item) {
         return item !== event.data.id;
       })
+      if (this.visuFunction)
+        this.visuFunction();
+    },
+    displayVisuSimple() {
+      this.visuFunction = this.displayVisuSimple;
+      this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
+      this.addItineraire(this.devices);
+    },
+    displayVisuEpaisseur() {
+      this.visuFunction = this.displayVisuEpaisseur;
+
+      if (this.devices.length > 1)
+        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
+      else
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
+
+      this.addItineraireEpaisseur(this.devices);
+    },
+    displayVisuMontagne() {
+      this.visuFunction = this.displayVisuMontagne;
+
+      if (this.devices.length > 1)
+        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
+      else
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
+
+      this.addItineraireSpeed3D(this.devices, this.dimension);
+    },
+    displayVisuMur() {
+      this.visuFunction = this.displayVisuMur;
+
+      this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
+      this.addItineraireSpeedWall(this.devices);
     }
   }
 }

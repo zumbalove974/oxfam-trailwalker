@@ -676,8 +676,20 @@ async function getMoyenneDevice(devices) {
   return [moyennes, moyennesDict];
 }
 
+function disposeThreeMesh(mesh) {
+  mesh.geometry.dispose();
+  mesh.material.dispose();
+  controller.threeViewer.scene.remove(mesh);
+}
+
 
 export const addItineraireSpeedWall = async function addItineraireSpeedWall(deviceNumbers) {
+
+  controller.threeViewer.shperes.forEach(sphere => {
+    disposeThreeMesh(sphere.mesh);
+    disposeThreeMesh(sphere.wall);
+    disposeThreeMesh(sphere.line);
+  })
 
   let indexVisu = 0;
 
@@ -903,13 +915,11 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       sphere.position.y = controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[1];
       sphere.position.z = (wallZbottom + wallZtop) / 2;
 
-      console.log("____ ", sphere.position);
       controller.threeViewer.scene.add(sphere);
 
-      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0 });
+      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0, wall: wall, line: line3d });
       controller.threeViewer.animeTrailer = true;
       controller.threeViewer.state.clock.start();
-
     }
 
     indexVisu++;
