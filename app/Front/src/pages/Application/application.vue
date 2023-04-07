@@ -36,6 +36,31 @@
         </div>
       </div>
     </AccordionTab>
+    <AccordionTab header="Ajouter un marquer d'équipe à un temps donné">
+      <div class="flexColumn">
+        <div class="flexRow evenly upSize spaceDown">
+          <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+          <div class="card flex justify-content-center">
+            <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps" />
+          </div>
+        </div>
+        <div class="flexRow evenly upSize">
+          <div class="p-float-label">
+            <div v-if="deviceNumber">
+              <Dropdown v-if="timestamps.length > 0" v-model="selectedTimestamp" showClear editable :options="timestamps"
+                :placeholder="'Choisir un timestamp'" :key="timestamps.toString()" />
+              <div v-else>
+                <p>Loading timestamps...</p>
+                <Dropdown :options="['Loading...']" :disabled="true" />
+              </div>
+            </div>
+            <div v-else>
+              <p>Please select a device number.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AccordionTab>
   </Accordion>
 
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
@@ -76,9 +101,13 @@
 
 
 <script>
-import { init, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from '../../client/index.js'
+
+import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import { getLiveDataDevice } from "../../client/bddConnexion";
+
 
 // Primevue components
+import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import SpeedDial from 'primevue/speeddial';
 import InputNumber from 'primevue/inputnumber';
@@ -103,6 +132,7 @@ export default {
   name: 'App',
 
   components: {
+    Dropdown,
     SelectButton,
     SpeedDial,
     InputNumber,
@@ -121,6 +151,8 @@ export default {
       addItineraireSpeed3D: addItineraireSpeed3D,
       addItineraireSpeedWall: addItineraireSpeedWall,
       addCPs: addCPs,
+      getLiveDataDevice: getLiveDataDevice,
+      addTeamMarker: addTeamMarker,
       createDimensionEnvironment: createDimensionEnvironment,
       removeEventListeners: removeEventListeners,
       addEventListeners: addEventListeners,
@@ -129,6 +161,8 @@ export default {
       dimension: 2,
       toast: null,
       tabOpen: 1,
+      selectedTimestamp: '',
+      timestamps: [],
       devices: [],
       devicesTab: [],
       deviceNumber: null,
@@ -161,6 +195,13 @@ export default {
           }
         },
         {
+          label: 'Position équipe',
+          command: () => {
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
+            this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+          }
+        },
+        {
           label: 'Visualisation du mur',
           command: () => this.displayVisuMur()
         }
@@ -175,6 +216,9 @@ export default {
   },
   async mounted() {
     this.toast = useToast();
+    if (this.deviceNumber) {
+      await this.loadTimestamps();
+    }
 
     this.init();
     createDimensionEnvironment(this.dimension);
@@ -187,11 +231,14 @@ export default {
     document.getElementById("speedial_2").children[0].innerHTML = "3";
     document.getElementById("speedial_3").children[0].innerHTML = "4";
     document.getElementById("speedial_4").children[0].innerHTML = "5";
+    document.getElementById("speedial_5").children[0].innerHTML = "6";
 
     document.getElementById("speedial_1").children[0].style = "background-color: green";
     document.getElementById("speedial_2").children[0].style = "background-color: cyan";
     document.getElementById("speedial_3").children[0].style = "background-color: blue";
     document.getElementById("speedial_4").children[0].style = "background-color: red";
+    document.getElementById("speedial_5").children[0].style = "background-color: yellow";
+
   },
   methods: {
     changerDeDimension() {
@@ -211,6 +258,21 @@ export default {
     },
     tronquer(nombre, decimal) {
       return Math.round(nombre * (10 ** decimal)) / (10 ** decimal);
+    },
+    async loadTimestamps() {
+      try {
+        console.log("Loading timestamps...");
+        const liveData = await getLiveDataDevice(this.deviceNumber);
+        const timestamps = liveData.map(row => row.timestamp);
+        console.log("Timestamps loaded:", timestamps);
+        this.timestamps = timestamps;
+        console.log('console.log(this.timestamps):', this.timestamps)
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    addTeamMarkerPoint() {
+      this.addTeamMarker(this.deviceNumber, this.selectedTimestamp)
     },
     async addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {

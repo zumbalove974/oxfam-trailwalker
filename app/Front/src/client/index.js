@@ -41,7 +41,7 @@ let visu_function;
 
 let cps = [];
 let devices = [];
-
+let time_stamp;
 let device;
 let GPSvisu_mesh;
 let line;
@@ -338,6 +338,25 @@ export const addCPs = async function addCPs() {
   })
 };
 
+export const addTeamMarker = async function addTeamMarker(deviceNumber, timeStamp) {
+  device = deviceNumber;
+  time_stamp = timeStamp;
+  const teamPositions = await getLiveDataDevice(deviceNumber);
+  for (let i = 0; i < teamPositions.length; i++) {
+    if (teamPositions[i].timestamp === time_stamp) {
+      console.log(teamPositions[i].timestamp);
+      // Convert the team's position from Web Mercator to world coordinates
+      const worldCoords = controller.threeViewer.getWorldCoords([teamPositions[i].x, teamPositions[i].y]);
+      const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
+      const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
+      const sphere = new THREE.Mesh(geometry, material);
+      sphere.position.x = worldCoords[0];
+      sphere.position.y = worldCoords[1];
+      sphere.position.z = 0;
+      controller.threeViewer.scene.add(sphere);
+    }
+  }
+}
 
 async function addItineraireReference() {
 
