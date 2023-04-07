@@ -31,15 +31,18 @@
         <div class="flexRow evenly upSize spaceDown">
           <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
           <div class="card flex justify-content-center">
-            <Button id="addTeamBtn" label="Ajouter" @click="pickDevice" />
+            <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps" />
           </div>
         </div>
         <div class="flexRow evenly upSize">
-          <div>
+          <div class="p-float-label">
             <div v-if="deviceNumber">
-              <Dropdown v-if="timestamps.length > 0" v-model="selectedTimestamp" :options="timestamps"
-                :placeholder="'Choisir un timestamp'" />
-              <div v-else>Loading timestamps...</div>
+              <Dropdown v-if="timestamps.length > 0" v-model="selectedTimestamp" showClear editable :options="timestamps"
+                :placeholder="'Choisir un timestamp'" :key="timestamps.toString()" />
+              <div v-else>
+                <p>Loading timestamps...</p>
+                <Dropdown :options="['Loading...']" :disabled="true" />
+              </div>
             </div>
             <div v-else>
               <p>Please select a device number.</p>
@@ -87,7 +90,7 @@ import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItin
 import { getLiveDataDevice } from "../../client/bddConnexion";
 
 // Primevue components
-import { Dropdown } from 'primevue/dropdown';
+import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import SpeedDial from 'primevue/speeddial';
 import InputNumber from 'primevue/inputnumber';
@@ -262,22 +265,12 @@ export default {
       try {
         console.log("Loading timestamps...");
         const liveData = await getLiveDataDevice(this.deviceNumber);
-        console.log("Timestamps loaded:", timestamps);
         const timestamps = liveData.map(row => row.timestamp);
+        console.log("Timestamps loaded:", timestamps);
         this.timestamps = timestamps;
+        console.log('console.log(this.timestamps):', this.timestamps)
       } catch (error) {
         console.error(error);
-      }
-    },
-    async pickDevice() {
-      if (this.deviceNumber) {
-        await this.getLiveDataDevice(this.deviceNumber);
-      } else {
-        this.$refs.toast.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Please select a device number.'
-        });
       }
     },
     addTeamMarkerPoint() {
