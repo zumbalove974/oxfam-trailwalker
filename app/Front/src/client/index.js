@@ -217,6 +217,19 @@ function onKeyUp() {
   controller.threeViewer.translateZ = 0;
 }
 
+export const resetCamera = function resetCamera(dimension) {
+
+  //const worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+  //controller.threeViewer.perspectiveCamera.position.set(worldCoords[0], worldCoords[1], cameraZ);
+  controller.olViewer.map.getView().setCenter(vavinCenter);
+
+  createDimensionEnvironment(2)
+
+  if (dimension == 3) {
+    createDimensionEnvironment(3)
+  }
+}
+
 /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
 export const addEventListeners = function addEventListeners() {
   /* On désactive l'orbit control lors du click (drag) */
@@ -612,54 +625,54 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
 
     for (let i = 0; i < (data.length - 1); i++) {
       // Face 1
+      colors.push(1 - speeds[i]);
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
+      colors.push(0.2);
 
+      colors.push(1 - speeds[i + 1]);
       colors.push(speeds[i + 1]);
-      colors.push(0.0);
-      colors.push(0.0);
+      colors.push(0.2);
 
+      colors.push(1 - speeds[i]);
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
+      colors.push(0.2);
 
       //Face 2
+      colors.push(1 - speeds[i]);
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
-
       colors.push(0.2);
+
       colors.push(1.0);
       colors.push(0.2);
+      colors.push(0.2);
 
+      colors.push(1 - speeds[i]);
       colors.push(speeds[i]);
-      colors.push(0.0);
-      colors.push(0.0);
+      colors.push(0.2);
 
+      colors.push(1 - speeds[i + 1]);
       colors.push(speeds[i + 1]);
-      colors.push(0.0);
-      colors.push(0.0);
+      colors.push(0.2);
     }
 
     // itemSize = 3 because there are 3 values (components) per vertex
@@ -695,15 +708,28 @@ async function getMoyenneDevice(devices) {
   return [moyennes, moyennesDict];
 }
 
+function disposeThreeMesh(mesh) {
+  mesh.geometry.dispose();
+  mesh.material.dispose();
+  controller.threeViewer.scene.remove(mesh);
+}
+
 
 export const addItineraireSpeedWall = async function addItineraireSpeedWall(deviceNumbers) {
+
+  controller.threeViewer.shperes.forEach(sphere => {
+    disposeThreeMesh(sphere.mesh);
+    disposeThreeMesh(sphere.wall);
+    disposeThreeMesh(sphere.line);
+  })
 
   let indexVisu = 0;
 
   visu_function = addItineraireSpeedWall;
 
   devices = deviceNumbers;
-  let moyennes, moyennesDict;
+  let moyennes
+  let moyennesDict;
 
   let res = await getMoyenneDevice(devices);
 
@@ -846,53 +872,53 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
       for (let i = 0; i < (data.length - 1); i++) {
         // Face 1
-        colors.push(speeds[i]);
         colors.push(1.0 - speeds[i]);
-        colors.push(0.0);
-
         colors.push(speeds[i]);
+        colors.push(0.0);
+
         colors.push(1.0 - speeds[i]);
-        colors.push(0.0);
-
-        colors.push(speeds[i + 1]);
-        colors.push(1.0 - speeds[i + 1]);
-        colors.push(0.0);
-
-        colors.push(speeds[i + 1]);
-        colors.push(1.0 - speeds[i + 1]);
-        colors.push(0.0);
-
-        colors.push(speeds[i + 1]);
-        colors.push(1.0 - speeds[i + 1]);
-        colors.push(0.0);
-
         colors.push(speeds[i]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
         colors.push(1.0 - speeds[i]);
+        colors.push(speeds[i]);
         colors.push(0.0);
 
         //Face 2
-        colors.push(speeds[i]);
         colors.push(1.0 - speeds[i]);
-        colors.push(0.0);
-
-        colors.push(speeds[i + 1]);
-        colors.push(1.0 - speeds[i + 1]);
-        colors.push(0.0);
-
         colors.push(speeds[i]);
-        colors.push(1.0 - speeds[i]);
         colors.push(0.0);
 
-        colors.push(speeds[i + 1]);
         colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
         colors.push(0.0);
 
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
+        colors.push(0.0);
+
+        colors.push(1.0 - speeds[i]);
         colors.push(speeds[i]);
-        colors.push(1.0 - speeds[i]);
         colors.push(0.0);
 
-        colors.push(speeds[i + 1]);
         colors.push(1.0 - speeds[i + 1]);
+        colors.push(speeds[i + 1]);
         colors.push(0.0);
       }
 
@@ -922,13 +948,11 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       sphere.position.y = controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[1];
       sphere.position.z = (wallZbottom + wallZtop) / 2;
 
-      console.log("____ ", sphere.position);
       controller.threeViewer.scene.add(sphere);
 
-      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0 });
+      controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0, wall: wall, line: line3d, running: true });
       controller.threeViewer.animeTrailer = true;
       controller.threeViewer.state.clock.start();
-
     }
 
     indexVisu++;
