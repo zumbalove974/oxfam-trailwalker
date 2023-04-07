@@ -56,7 +56,7 @@ Tout est sur `localhost`
 
 
 
-##Logiciels utilisés qu'on peut retrouver dans la partie architecture de l'appli:
+## Logiciels utilisés qu'on peut retrouver dans la partie architecture de l'appli:
 
 Front : Vue.js, PrimeVue
 Back: Express, PostgreSQL
