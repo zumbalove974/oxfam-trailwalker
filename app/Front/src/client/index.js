@@ -325,7 +325,6 @@ export const addCPs = async function addCPs() {
   })
 };
 
-<<<<<<< HEAD
 export const addTeamMarker = async function addTeamMarker(deviceNumber, timeStamp) {
   device = deviceNumber;
   time_stamp = timeStamp;
@@ -345,9 +344,7 @@ export const addTeamMarker = async function addTeamMarker(deviceNumber, timeStam
     }
   }
 }
-=======
 
->>>>>>> dev
 async function addItineraireReference() {
 
   const coords = await getLiveDataDevice(3843);

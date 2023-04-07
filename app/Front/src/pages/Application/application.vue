@@ -26,6 +26,28 @@
         </div>
       </div>
     </AccordionTab>
+    <AccordionTab header="Ajouter un marquer d'équipe à un temps donné">
+      <div class="flexColumn">
+        <div class="flexRow evenly upSize spaceDown">
+          <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+          <div class="card flex justify-content-center">
+            <Button id="addTeamBtn" label="Ajouter" @click="pickDevice" />
+          </div>
+        </div>
+        <div class="flexRow evenly upSize">
+          <div>
+            <div v-if="deviceNumber">
+              <Dropdown v-if="timestamps.length > 0" v-model="selectedTimestamp" :options="timestamps"
+                :placeholder="'Choisir un timestamp'" />
+              <div v-else>Loading timestamps...</div>
+            </div>
+            <div v-else>
+              <p>Please select a device number.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AccordionTab>
   </Accordion>
 
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
@@ -56,15 +78,13 @@
     <SelectButton @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
-
-  <Dropdown v-model="selectedTimestamp" :options="timestamps" :placeholder="'Choisir un timestamp'" />
 </template>
 
 
 <script>
 
-import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from './client/index.js'
-import { getLiveDataDevice } from "./bddConnexion";
+import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import { getLiveDataDevice } from "../../client/bddConnexion";
 
 // Primevue components
 import { Dropdown } from 'primevue/dropdown';
@@ -194,7 +214,9 @@ export default {
   },
   async mounted() {
     this.toast = useToast();
-    this.loadTimestamps();
+    if (this.deviceNumber) {
+      await this.loadTimestamps();
+    }
 
     this.init();
     createDimensionEnvironment(this.dimension);
@@ -207,12 +229,15 @@ export default {
     document.getElementById("speedial_2").children[0].innerHTML = "3";
     document.getElementById("speedial_3").children[0].innerHTML = "4";
     document.getElementById("speedial_4").children[0].innerHTML = "5";
+    document.getElementById("speedial_5").children[0].innerHTML = "6";
 
 
     document.getElementById("speedial_1").children[0].style = "background-color: green";
     document.getElementById("speedial_2").children[0].style = "background-color: cyan";
     document.getElementById("speedial_3").children[0].style = "background-color: blue";
     document.getElementById("speedial_4").children[0].style = "background-color: red";
+    document.getElementById("speedial_5").children[0].style = "background-color: yellow";
+
   },
   methods: {
     changerDeDimension() {
@@ -235,11 +260,24 @@ export default {
     },
     async loadTimestamps() {
       try {
+        console.log("Loading timestamps...");
         const liveData = await getLiveDataDevice(this.deviceNumber);
+        console.log("Timestamps loaded:", timestamps);
         const timestamps = liveData.map(row => row.timestamp);
         this.timestamps = timestamps;
       } catch (error) {
         console.error(error);
+      }
+    },
+    async pickDevice() {
+      if (this.deviceNumber) {
+        await this.getLiveDataDevice(this.deviceNumber);
+      } else {
+        this.$refs.toast.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Please select a device number.'
+        });
       }
     },
     addTeamMarkerPoint() {
