@@ -406,11 +406,10 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
 
   const trace = await getLiveDataDevice(device);
 
-  const material = new THREE.MeshBasicMaterial({
-    color: "blue"
-  });
+  const maxSpeed = Math.max(...trace.map(t => t.speed));
 
   let shape = [];
+  let color = [];
 
   for (let i = 0; i < trace.length - 2; i++) {
 
@@ -437,7 +436,14 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
       shape.push(
         xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
         yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      color.push(
+        1 - trace[i].speed / maxSpeed, trace[i].speed / maxSpeed, 0.2)
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
     }
+
     if (dA != 0) {
       shape.push(
         xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
@@ -448,6 +454,12 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
       shape.push(
         xA - dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
         yA + dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      color.push(
+        1 - trace[i].speed / maxSpeed, trace[i].speed / maxSpeed, 0.2)
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+      color.push(
+        1 - trace[i].speed / maxSpeed, trace[i].speed / maxSpeed, 0.2)
     }
 
     if (normAB != 0 && normBC != 0 && dB != 0) {
@@ -458,6 +470,12 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
       shape.push(
         xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
         yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
 
       shape.push(xB, yB, 0);
       shape.push(
@@ -466,19 +484,29 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
       shape.push(
         xB + dB * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
         yB - dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
-
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+      color.push(
+        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
     }
 
   }
-
+  const material = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+  });
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
 
   let visu_mesh = new THREE.Mesh(geometry, material);
   visu_meshes.push(visu_mesh)
   controller.threeViewer.scene.add(visu_mesh);
 
   visu_function = addItineraireEpaisseur;
+
+  console.log(Math.max(...trace.map(t => t.speed)))
 }
 
 function createPoints2D(data, z) {
