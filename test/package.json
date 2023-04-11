@@ -4,7 +4,7 @@
     "private": true,
     "main": "index.js",
     "scripts": {
-        "test": "jest --bail"
+        "test": "jest"
     },
     "devDependencies": {
         "@types/jest": "^29.5.0",
