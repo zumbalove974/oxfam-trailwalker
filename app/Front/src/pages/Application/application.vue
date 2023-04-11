@@ -102,7 +102,7 @@
 
 <script>
 
-import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import { init, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
 import { getLiveDataDevice } from "../../client/bddConnexion";
 
 
