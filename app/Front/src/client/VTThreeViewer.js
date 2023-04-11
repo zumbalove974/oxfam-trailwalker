@@ -2,8 +2,9 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 //import { ZOOM_RES_L93 } from "./Utils";
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils";
-//import { calculerDistance } from "./mathUtils.js";
+import { getEquationDroite2D, calculerDistance2D, calculerDiffRotation } from "./mathUtils.js";
 import { calculerTempsTimestamp } from "./bddUtils.js";
+import { clickUp } from "./index.js";
 
 export const mergedRender = "Merged";
 export const singleRender = "Single";
@@ -41,6 +42,10 @@ export class VTThreeViewer {
     this.coeficientVitesseAnimation = 1000;
     this.translateX = 0;
     this.translateZ = 0;
+    this.cameraZ = null;
+    this.isTransitioning = [false, false];
+    this.vavinCenter = null;
+    this.counterEnd = [false, false, false];
   }
 
   initThree(backgroundColor) {
@@ -121,6 +126,79 @@ export class VTThreeViewer {
 
     this.perspectiveCamera.translateX(this.translateX);
     this.perspectiveCamera.translateZ(this.translateZ);
+
+    if (this.isTransitioning[0] || this.isTransitioning[1]) {
+
+      let x2 = this.getWorldCoords(this.vavinCenter)[0];
+      let y2 = this.getWorldCoords(this.vavinCenter)[1];
+      let x1 = this.perspectiveCamera.position.x;
+      let y1 = this.perspectiveCamera.position.y;
+
+      if (calculerDistance2D(x1, y1, x2, y2) > 10) {
+        const params = getEquationDroite2D(x1, y1, x2, y2);
+
+        if (x2 > x1) {
+          this.perspectiveCamera.position.x += 5;
+        } else {
+          this.perspectiveCamera.position.x -= 5;
+        }
+
+        this.perspectiveCamera.position.y = params[0] * this.perspectiveCamera.position.x + params[1];
+
+        if (this.perspectiveCamera.position.z > this.cameraZ) {
+          this.perspectiveCamera.position.z -= 5;
+        } else {
+          this.perspectiveCamera.position.z += 5;
+        }
+      } else {
+        this.isTransitioning[0] = false;
+        this.perspectiveCamera.position.set(x2, y2, this.cameraZ);
+
+        //this.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
+        //this.perspectiveCamera.rotation.z += Math.PI / 2;
+
+        this.controls.enabled = true;
+      }
+
+      let rx = this.perspectiveCamera.rotation.x;
+      let ry = this.perspectiveCamera.rotation.y;
+      let rz = this.perspectiveCamera.rotation.z;
+
+      if (calculerDiffRotation(rx, ry, rz) > 0.1 && (!this.counterEnd[0] || !this.counterEnd[1] || !this.counterEnd[2])) {
+        if (rx > 0.02) {
+          this.perspectiveCamera.rotation.x -= 0.01;
+        } else if (rx < -0.2) {
+          this.perspectiveCamera.rotation.x += 0.01;
+        } else {
+          this.counterEnd[0] = true;
+        }
+
+        if (ry > 0.02) {
+          this.perspectiveCamera.rotation.y -= 0.01;
+        } else if (ry < -0.02) {
+          this.perspectiveCamera.rotation.y += 0.01;
+        } else {
+          this.counterEnd[1] = true;
+        }
+
+        if (rz > 0.02) {
+          this.perspectiveCamera.rotation.z -= 0.01;
+        } else if (rz < -0.02) {
+          this.perspectiveCamera.rotation.z += 0.01;
+        } else {
+          this.counterEnd[2] = true;
+        }
+      } else {
+        this.isTransitioning[1] = false;
+        this.perspectiveCamera.rotation.set(0, 0, 0);
+      }
+
+      if (!this.isTransitioning[0] && !this.isTransitioning[1]) {
+        this.counterEnd = [false, false, false];
+
+        clickUp();
+      }
+    }
 
     if (this.animeTrailer) {
       this.shperes.forEach(sphere => {

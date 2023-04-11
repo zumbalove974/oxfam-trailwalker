@@ -77,6 +77,9 @@ export const init = async function init() {
 
   addCursor();
   addItineraireReference();
+
+  controller.threeViewer.cameraZ = cameraZ;
+  controller.threeViewer.vavinCenter = vavinCenter;
 }
 
 const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
@@ -101,7 +104,7 @@ let pointerIsDown = false;
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
-function clickUp() {
+export const clickUp = function clickUp() {
   controller.threeViewer.controls.enabled = true;
   pointerIsDown = false;
 
@@ -260,11 +263,8 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 
     controller.threeViewer.controls.enabled = false;
 
-    controller.threeViewer.perspectiveCamera.position.set(0, 0, cameraZ);
-    controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
-    controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
-
-    controller.threeViewer.controls.enabled = true;
+    controller.threeViewer.mapCenter = controller.olViewer.map.getView().getCenter();;
+    controller.threeViewer.isTransitioning = [true, true];
 
     addEventListeners();
 
