@@ -451,10 +451,9 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
     }
 
     if (normAB != 0 && normBC != 0 && dB != 0) {
-
       shape.push(xB, yB, 0);
       shape.push(
-        xB - dB * Math.cos((xC - xB) / normBC) * Math.sin((yB - yB) / normBC),
+        xB - dB * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
         yB + dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
       shape.push(
         xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
@@ -465,7 +464,7 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
         xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
         yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
       shape.push(
-        xB + dB * Math.cos((xC - xB) / normBC) * Math.sin((yB - yB) / normBC),
+        xB + dB * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
         yB - dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
 
     }
