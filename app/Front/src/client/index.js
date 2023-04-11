@@ -412,15 +412,18 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
 
   let shape = [];
 
-  for (let i = 0; i < trace.length - 1; i++) {
+  for (let i = 0; i < trace.length - 2; i++) {
 
     let xA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[0];
     let yA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[1];
     let xB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[0];
     let yB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[1];
+    let xC = controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[0];
+    let yC = controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[1];
     let dA = (trace[i].speed ** 2) * 1.5;
     let dB = (trace[i + 1].speed ** 2) * 1.5;
     let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+    let normBC = Math.sqrt(Math.pow(xB - xC, 2) + Math.pow(yB - yC, 2));
 
     if (normAB === 0) { continue }
 
@@ -446,37 +449,26 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
         xA - dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
         yA + dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
     }
-  }
 
-  for (let i = 0; i < trace.length - 2; i++) {
+    if (normAB != 0 && normBC != 0 && dB != 0) {
 
-    let xA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[0];
-    let yA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[1];
-    let xB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[0];
-    let yB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[1];
-    let xC = controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[0];
-    let yC = controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[1];
-    let dB = (trace[i + 1].speed ** 2) * 1.5;
-    let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2));
-    let normBC = Math.sqrt(Math.pow(xB - xC, 2) + Math.pow(yB - yC, 2));
+      shape.push(xB, yB, 0);
+      shape.push(
+        xB - dB * Math.cos((xC - xB) / normBC) * Math.sin((yB - yB) / normBC),
+        yB + dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+      shape.push(
+        xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
 
-    if (normAB === 0 || normBC === 0 || dB === 0) { continue }
+      shape.push(xB, yB, 0);
+      shape.push(
+        xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      shape.push(
+        xB + dB * Math.cos((xC - xB) / normBC) * Math.sin((yB - yB) / normBC),
+        yB - dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
 
-    shape.push(xB, yB, 0);
-    shape.push(
-      xB - dB * Math.cos((xC - xB) / normBC) * Math.sin((yB - yB) / normBC),
-      yB + dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
-    shape.push(
-      xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
-      yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
-
-    shape.push(xB, yB, 0);
-    shape.push(
-      xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
-      yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
-    shape.push(
-      xB + dB * Math.cos((xC - xB) / normBC) * Math.sin((yB - yB) / normBC),
-      yB - dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+    }
 
   }
 
