@@ -7,7 +7,7 @@
     "serve": "vue-cli-service serve --port 80",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "test": "echo 'test_unitaires'"
+    "test": "jest"
   },
   "dependencies": {
     "@turf/turf": "^5.1.6",
