@@ -53,6 +53,7 @@ services:
     working_dir: /usr/src/test
     volumes:
       - ./test:/usr/src/test
+      - /usr/src/test/node_modules
     depends_on:
       vue-ui:
         condition: service_healthy

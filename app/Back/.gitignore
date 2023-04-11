@@ -61,3 +61,5 @@ typings/
 .next
 
 /coverage/
+
+package-lock.json
