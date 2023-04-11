@@ -102,7 +102,21 @@
 
 <script>
 
-import { init, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import {
+  init,
+  getVitesseMoyenne,
+  resetCamera,
+  addItineraire,
+  addItineraireEpaisseur,
+  addItineraireSpeed3D,
+  addItineraireSpeedWall,
+  createDimensionEnvironment,
+  addCPs,
+  addTeamMarker,
+  removeEventListeners,
+  addEventListeners,
+  addNightCoverage
+} from '../../client/index.js'
 import { getLiveDataDevice } from "../../client/bddConnexion";
 
 
@@ -158,6 +172,7 @@ export default {
       addEventListeners: addEventListeners,
       getVitesseMoyenne: getVitesseMoyenne,
       resetCamera: resetCamera,
+      addNightCoverage: addNightCoverage,
       dimension: 2,
       toast: null,
       tabOpen: 1,
@@ -204,6 +219,10 @@ export default {
         {
           label: 'Visualisation du mur',
           command: () => this.displayVisuMur()
+        },
+        {
+          label: "Visualisation de l'emprise de la nuit",
+          command: () => this.addNightCoverage()
         }
       ],
       columns: [
