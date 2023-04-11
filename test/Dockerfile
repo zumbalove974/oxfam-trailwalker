@@ -4,4 +4,5 @@ WORKDIR /usr/src/test
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run test
+RUN npm install
+CMD [ "npm", "run", "test" ]

@@ -5,12 +5,19 @@ services:
     image: postgis/postgis
     restart: always
     environment:
+      PGUSER: postgres_user
       POSTGRES_USER: postgres_user
       POSTGRES_PASSWORD: postgres_password
     volumes:
       - ./db-data:/docker-entrypoint-initdb.d
     ports:
       - 6500:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-U", "postgres_user" ]
+      interval: 60s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   adminer:
     image: adminer
@@ -46,10 +53,12 @@ services:
     working_dir: /usr/src/test
     volumes:
       - ./test:/usr/src/test
+      - /usr/src/test/node_modules
     depends_on:
       vue-ui:
         condition: service_healthy
-    command: npm run test
+      express-back:
+        condition: service_healthy
 
   express-back:
     build:
@@ -62,3 +71,31 @@ services:
       - /usr/src/app/Back/node_modules
     links:
       - "db:database"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "--ipv4",
+          "http://express-back:3000/cp"
+        ]
+      interval: 20s
+      timeout: 20s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      db:
+        condition: service_healthy
+
+  all-checks-passed:
+    image: hello-world
+    depends_on:
+      vue-ui:
+        condition: service_healthy
+      express-back:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+      container_test:
+        condition: service_completed_successfully

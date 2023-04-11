@@ -4,21 +4,19 @@
     "private": true,
     "main": "index.js",
     "scripts": {
-        "test": "echo 'test_integration'"
+        "test": "jest"
     },
-    "dependencies": {},
-    "devDependencies": {},
+    "devDependencies": {
+        "@types/jest": "^29.5.0",
+        "jest": "^29.5.0",
+        "jest-cli": "^29.5.0",
+        "superagent": "^8.0.9",
+        "supertest": "^6.3.3"
+    },
     "eslintConfig": {
         "root": true,
         "env": {
             "node": true
-        },
-        "extends": [
-            "plugin:vue/vue3-essential",
-            "eslint:recommended"
-        ],
-        "parserOptions": {
-            "parser": "@babel/eslint-parser"
         },
         "rules": {}
     },
@@ -27,5 +25,10 @@
         "last 2 versions",
         "not dead",
         "not ie 11"
-    ]
+    ],
+    "dependencies": {
+        "-": "^0.0.1",
+        "cross-env": "^7.0.3",
+        "save-dev": "^0.0.1-security"
+    }
 }
