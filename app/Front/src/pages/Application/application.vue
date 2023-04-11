@@ -1,14 +1,18 @@
 <template>
   <div id="map" class="map"></div>
 
-  <Toast position="bottom-right" />
+  <Toast position="bottom-center" />
 
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
     :activeIndex="0" class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown">
-          <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+          <span class="p-float-label">
+            <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+            <label for="number-input">Number</label>
+          </span>
+
           <div class="card flex justify-content-center">
             <Button id="addTeamBtn" label="Ajouter" @click="addDevice" />
           </div>
@@ -17,11 +21,42 @@
         <div class="flexRow evenly upSize">
           <div>
             <label for="integeronly" class="font-bold block mb-2 spaceRight"> De </label>
-            <InputNumber placeholder="First device" v-model="deviceNumberFrom" inputId="integeronly" />
+            <span class="p-float-label">
+              <InputNumber placeholder="First device" v-model="deviceNumberFrom" inputId="integeronly" />
+              <label for="number-input"></label>
+            </span>
           </div>
           <div>
             <label for="integeronly" class="font-bold block mb-2 spaceRight"> à </label>
-            <InputNumber placeholder="Last device" v-model="deviceNumberTo" inputId="integeronly" />
+            <span class="p-float-label">
+              <InputNumber placeholder="Last device" v-model="deviceNumberTo" inputId="integeronly" />
+              <label for="number-input"></label>
+            </span>
+          </div>
+        </div>
+      </div>
+    </AccordionTab>
+    <AccordionTab header="Ajouter un marquer d'équipe à un temps donné">
+      <div class="flexColumn">
+        <div class="flexRow evenly upSize spaceDown">
+          <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+          <div class="card flex justify-content-center">
+            <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps" />
+          </div>
+        </div>
+        <div class="flexRow evenly upSize">
+          <div class="p-float-label">
+            <div v-if="deviceNumber">
+              <Dropdown v-if="timestamps.length > 0" v-model="selectedTimestamp" showClear editable :options="timestamps"
+                :placeholder="'Choisir un timestamp'" :key="timestamps.toString()" />
+              <div v-else>
+                <p>Loading timestamps...</p>
+                <Dropdown :options="['Loading...']" :disabled="true" />
+              </div>
+            </div>
+            <div v-else>
+              <p>Please select a device number.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -32,8 +67,9 @@
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
       <DataTable v-model:selection="selectedProduct" @rowSelect="onRowSelect" @rowUnselect="onRowUnselect"
-        scrollHeight="80vh" style="max-height: 80vh;" :resizable-columns=true :row-hover=true :scrollable=true
-        :value="devicesTab" tableStyle="min-width: 10rem; max-height: 10rem;">
+        @rowSelectAll="onRowSelectAll" @rowUnselectAll="onRowUnselectAll" scrollHeight="80vh" style="max-height: 80vh;"
+        :resizable-columns=true :row-hover=true :scrollable=true :value="devicesTab"
+        tableStyle="min-width: 10rem; max-height: 10rem;">
         <Column :selected=true v-for="col of columns" :selection-mode="col.selectionMode" :headerStyle="col.headerStyle"
           :key="col.field" :field="col.field" :header="col.header" :sortable="col.isSortable">
         </Column>
@@ -52,17 +88,26 @@
     </div>
   </div>
 
-  <div id="dimensionBtn" class="card flex justify-content-center">
-    <SelectButton @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
+  <div id="resetCameraBtn" class="card flex justify-content-center">
+    <Button @click="resetCamera(dimension)" class="p-button-lg" :size="large" icon="pi pi-arrows-alt" text raised rounded
+      aria-label="Filter" />
+  </div>
+
+  <div id="dimensionBtnContainer" class="card flex justify-content-center p-button-lg">
+    <SelectButton id="dimensionBtn" @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
 </template>
 
 
 <script>
-import { init, getVitesseMoyenne, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, removeEventListeners, addEventListeners } from '../../client/index.js'
+
+import { init, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import { getLiveDataDevice } from "../../client/bddConnexion";
+
 
 // Primevue components
+import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import SpeedDial from 'primevue/speeddial';
 import InputNumber from 'primevue/inputnumber';
@@ -87,6 +132,7 @@ export default {
   name: 'App',
 
   components: {
+    Dropdown,
     SelectButton,
     SpeedDial,
     InputNumber,
@@ -105,18 +151,24 @@ export default {
       addItineraireSpeed3D: addItineraireSpeed3D,
       addItineraireSpeedWall: addItineraireSpeedWall,
       addCPs: addCPs,
+      getLiveDataDevice: getLiveDataDevice,
+      addTeamMarker: addTeamMarker,
       createDimensionEnvironment: createDimensionEnvironment,
       removeEventListeners: removeEventListeners,
       addEventListeners: addEventListeners,
       getVitesseMoyenne: getVitesseMoyenne,
+      resetCamera: resetCamera,
       dimension: 2,
       toast: null,
       tabOpen: 1,
+      selectedTimestamp: '',
+      timestamps: [],
       devices: [],
       devicesTab: [],
       deviceNumber: null,
       deviceNumberFrom: null,
       deviceNumberTo: null,
+      visuFunction: null,
       options: [
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
@@ -124,47 +176,34 @@ export default {
       items: [
         {
           label: 'Trajectoire simple',
-          command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
-            this.addItineraire(this.devices);
-          }
+          command: () => this.displayVisuSimple()
         },
         {
           label: 'Épaisseur de la ligne',
-          command: () => {
-
-            if (this.devices.length > 1)
-              this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-            else
-              this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
-
-            this.addItineraireEpaisseur(this.devices);
-          }
+          command: () => this.displayVisuEpaisseur()
         },
         {
-          label: '2D+1 vitesses',
-          command: () => {
-            if (this.devices.length > 1)
-              this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-            else
-              this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
-
-            this.addItineraireSpeed3D(this.devices, this.dimension);
-          }
+          label: '2D+1 vitesses axe verticale',
+          command: () => this.displayVisuMontagne()
         },
         {
           label: 'Points de contrôle',
           command: () => {
+            this.toast.removeAllGroups();
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
             this.addCPs();
           }
         },
         {
-          label: 'Visualisation du mur',
+          label: 'Position équipe',
           command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
-            this.addItineraireSpeedWall(this.devices);
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
+            this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
           }
+        },
+        {
+          label: 'Visualisation du mur',
+          command: () => this.displayVisuMur()
         }
       ],
       columns: [
@@ -177,6 +216,9 @@ export default {
   },
   async mounted() {
     this.toast = useToast();
+    if (this.deviceNumber) {
+      await this.loadTimestamps();
+    }
 
     this.init();
     createDimensionEnvironment(this.dimension);
@@ -189,12 +231,14 @@ export default {
     document.getElementById("speedial_2").children[0].innerHTML = "3";
     document.getElementById("speedial_3").children[0].innerHTML = "4";
     document.getElementById("speedial_4").children[0].innerHTML = "5";
-
+    document.getElementById("speedial_5").children[0].innerHTML = "6";
 
     document.getElementById("speedial_1").children[0].style = "background-color: green";
     document.getElementById("speedial_2").children[0].style = "background-color: cyan";
     document.getElementById("speedial_3").children[0].style = "background-color: blue";
     document.getElementById("speedial_4").children[0].style = "background-color: red";
+    document.getElementById("speedial_5").children[0].style = "background-color: yellow";
+
   },
   methods: {
     changerDeDimension() {
@@ -214,6 +258,21 @@ export default {
     },
     tronquer(nombre, decimal) {
       return Math.round(nombre * (10 ** decimal)) / (10 ** decimal);
+    },
+    async loadTimestamps() {
+      try {
+        console.log("Loading timestamps...");
+        const liveData = await getLiveDataDevice(this.deviceNumber);
+        const timestamps = liveData.map(row => row.timestamp);
+        console.log("Timestamps loaded:", timestamps);
+        this.timestamps = timestamps;
+        console.log('console.log(this.timestamps):', this.timestamps)
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    addTeamMarkerPoint() {
+      this.addTeamMarker(this.deviceNumber, this.selectedTimestamp)
     },
     async addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
@@ -246,11 +305,64 @@ export default {
     },
     onRowSelect(event) {
       this.devices.push(event.data.id);
+      if (this.visuFunction)
+        this.visuFunction();
     },
     onRowUnselect(event) {
       this.devices = this.devices.filter(function (item) {
         return item !== event.data.id;
       })
+      if (this.visuFunction)
+        this.visuFunction();
+    },
+    onRowSelectAll(event) {
+      event.data.forEach(device => {
+        this.devices.push(device.id);
+      })
+
+      if (this.visuFunction)
+        this.visuFunction();
+    },
+    onRowUnselectAll() {
+      this.devices = [];
+
+      if (this.visuFunction)
+        this.visuFunction();
+    },
+    displayVisuSimple() {
+      this.toast.removeAllGroups();
+      this.visuFunction = this.displayVisuSimple;
+      this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
+      this.addItineraire(this.devices);
+    },
+    displayVisuEpaisseur() {
+      this.toast.removeAllGroups();
+      this.visuFunction = this.displayVisuEpaisseur;
+
+      if (this.devices.length > 1)
+        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
+      else
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
+
+      this.addItineraireEpaisseur(this.devices);
+    },
+    displayVisuMontagne() {
+      this.toast.removeAllGroups();
+      this.visuFunction = this.displayVisuMontagne;
+
+      if (this.devices.length > 1)
+        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
+      else
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
+
+      this.addItineraireSpeed3D(this.devices, this.dimension);
+    },
+    displayVisuMur() {
+      this.toast.removeAllGroups();
+      this.visuFunction = this.displayVisuMur;
+
+      this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
+      this.addItineraireSpeedWall(this.devices);
     }
   }
 }
@@ -313,11 +425,15 @@ body {
   max-height: 90vh;
 }
 
-#dimensionBtn {
+#dimensionBtnContainer {
   position: absolute;
   z-index: 2;
   bottom: 50px;
   right: 50px;
+}
+
+#dimensionBtn>.p-button.p-component:focus {
+  background-color: #A855F7 !important;
 }
 
 .font-bold {
@@ -362,5 +478,12 @@ body {
 
 .p-button.p-component.p-highlight {
   background-color: #A855F7 !important;
+}
+
+#resetCameraBtn {
+  position: absolute;
+  z-index: 2;
+  bottom: 50px;
+  left: 50px;
 }
 </style>

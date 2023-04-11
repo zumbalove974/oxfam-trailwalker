@@ -18,7 +18,7 @@ export const getLiveDataDevice = function getLiveDataDevice(deviceNumber) {
     })
         .then(response => response.json())
         .then(response => {
-        
+
             //console.log("bddConnection.response");
             //console.log(response);
 
@@ -26,13 +26,13 @@ export const getLiveDataDevice = function getLiveDataDevice(deviceNumber) {
         })
 }
 
+
 export const getControlPoints = async function getControlPoints() {
     return fetch(`http://localhost:5500/cp`, {
         method: 'GET'
     })
         .then(response => response.json())
         .then(response => {
-
             return response;
         })
 }
