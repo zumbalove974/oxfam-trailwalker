@@ -506,7 +506,6 @@ export const addItineraireEpaisseur = async function addItineraireEpaisseur(devi
 
   visu_function = addItineraireEpaisseur;
 
-  console.log(Math.max(...trace.map(t => t.speed)))
 }
 
 function createPoints2D(data, z) {
