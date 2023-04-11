@@ -86,3 +86,15 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  all-checks-passed:
+    image: hello-world
+    depends_on:
+      vue-ui:
+        condition: service_healthy
+      express-back:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+      container_test:
+        condition: service_completed_successfully
