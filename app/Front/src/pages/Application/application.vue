@@ -91,7 +91,7 @@
           <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
             <Checkbox v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
-              @click="category.function" />
+              @input="category.function($event)" />
             <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
           </div>
         </div>
@@ -124,7 +124,7 @@
 
 <script>
 
-import { init, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import { init, removeCPS, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
 import { getLiveDataDevice } from "../../client/bddConnexion";
 import { tronquer } from "../../client/mathUtils";
 
@@ -185,6 +185,7 @@ export default {
       addEventListeners: addEventListeners,
       getVitesseMoyenne: getVitesseMoyenne,
       resetCamera: resetCamera,
+      removeCPS: removeCPS,
       dimension: 2,
       toast: null,
       tabOpen: 1,
@@ -355,10 +356,14 @@ export default {
       this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
       this.addItineraire(this.devices);
     },
-    displayPDC() {
+    displayPDC(input) {
       this.toast.removeAllGroups();
-      this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
-      this.addCPs();
+      this.removeCPS();
+
+      if (input[input.length - 1] == "Points de contrôle") {
+        this.addCPs();
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
+      }
     },
     displayPosEquipe() {
       this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });

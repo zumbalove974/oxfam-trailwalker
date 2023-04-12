@@ -49,6 +49,7 @@ let line3d;
 let mesh;
 let wall;
 let dimension;
+let pdcs = [];
 
 const paramsWind = {
   center: vavinCenter,
@@ -334,8 +335,16 @@ export const addCPs = async function addCPs() {
     circle.position.y = worldCoords[1];
     circle.position.z = 0;
     controller.threeViewer.scene.add(circle);
+
+    pdcs.push(circle);
   })
 };
+
+export const removeCPS = function removeCPS() {
+  pdcs.forEach(pdc => {
+    disposeThreeMesh(pdc);
+  })
+}
 
 export const addTeamMarker = async function addTeamMarker(deviceNumber, timeStamp) {
   device = deviceNumber;
