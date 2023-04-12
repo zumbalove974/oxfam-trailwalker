@@ -92,7 +92,8 @@
             style="width:fit-content; margin-bottom: 1rem;">
             <Checkbox v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
               @input="category.function($event)" />
-            <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
+            <label :for="category.key" v-tooltip.bottom="category.detail" class="ml-2" style="margin-left: 1rem;">{{
+              category.name }}</label>
           </div>
         </div>
       </div>
@@ -215,8 +216,8 @@ export default {
 
       ],
       categoriesCheckbox: [
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
-        { name: 'Points de contrôle', key: '4', function: this.displayPDC }
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
+        { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
