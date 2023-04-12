@@ -284,7 +284,6 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
 }
 
 
-
 export const getVitesseMoyenne = async function getVitesseMoyenne(device) {
   const data = await getLiveDataDevice(device);
 
