@@ -113,19 +113,9 @@
     </div>
   </div>
 
-  <Fieldset legend="Légende" class="onglet bottom-left">
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-      aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-      sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-    </p>
+  <Fieldset legend="Légende" class="onglet bottom-left" :toggleable="true">
+    <div></div>
   </Fieldset>
-
-  <div id="resetCameraBtn" class="card flex justify-content-center">
-    <Button @click="resetCamera(dimension)" class="p-button-lg" :size="large" icon="pi pi-arrows-alt" text raised rounded
-      aria-label="Filter" />
-  </div>
 
   <div id="dimensionBtnContainer" class="card flex justify-content-center p-button-lg">
     <SelectButton id="dimensionBtn" @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
@@ -161,7 +151,6 @@ import "primeicons/primeicons.css";
 
 import { useToast } from "primevue/usetoast";
 //import { preventDefault } from 'ol/events/Event';
-
 
 
 export default {
@@ -213,19 +202,35 @@ export default {
       ],
       selectedCategory: 'Production',
       categories: [
-        { name: 'Trajectoire enregistrée', key: 'A', function: this.displayVisuSimple },
-        { name: 'Visu épaisseur', key: 'M', function: this.displayVisuEpaisseur },
-        { name: 'Visu colline', key: 'P', function: this.displayVisuMontagne },
-        { name: 'Points de contrôle', key: 'R', function: this.displayPDC },
-        { name: 'Position des équipes', key: 'R', function: this.displayPosEquipe },
-        { name: 'Visu Mur', key: 'R', function: this.displayVisuMur }
+        { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple },
+        { name: 'Visu épaisseur', key: '2', function: this.displayVisuEpaisseur },
+        { name: 'Visu colline', key: '3', function: this.displayVisuMontagne },
+        { name: 'Points de contrôle', key: '4', function: this.displayPDC },
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
+        { name: 'Visu Mur', key: '6', function: this.displayVisuMur }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
         { field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
         { field: 'vitesse', header: 'Vitesse moy.', headerStyle: "background-color: #A855F7; color: white", isSortable: true }
       ],
-      selectedProduct: null
+      selectedProduct: null,
+      items: [
+        {
+          label: 'Recentrer map',
+          icon: 'pi pi-arrows-alt',
+          command: () => {
+            this.resetCamera(this.dimension);
+          }
+        },
+        {
+          label: 'Info',
+          icon: 'pi pi-info-circle',
+          command: () => {
+            this.toast.add({ severity: 'warn', summary: 'Attention', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
+          }
+        }
+      ]
     }
   },
   async mounted() {
