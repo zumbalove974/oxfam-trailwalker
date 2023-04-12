@@ -381,6 +381,10 @@ export default {
         this.maxLegend = tronquer(res[1], 2);
       });
 
+
+      this.dimension = 3;
+      createDimensionEnvironment(3);
+
       this.isLegend = true;
     },
     displayVisuMur() {
@@ -394,6 +398,9 @@ export default {
         this.minLegend = tronquer(res[0], 2);
         this.maxLegend = tronquer(res[1], 2);
       });
+
+      this.dimension = 3;
+      createDimensionEnvironment(3);
 
       this.isLegend = true;
     }
