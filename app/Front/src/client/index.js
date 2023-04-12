@@ -24,7 +24,7 @@ const height = window.innerHeight; // this makes the 3D canvas full screen
 //let parisLatLon = [48.8534, 2.3488];
 //let parisCenter = proj4(proj4326, proj3857, [parisLatLon[1], parisLatLon[0]]);
 
-let vavinLatLon = [49.93825150, 1.21090698];
+let vavinLatLon = [49.868241, 1.069527];
 let vavinCenter = proj4(proj4326, proj3857, [vavinLatLon[1], vavinLatLon[0]]);
 
 /*
@@ -732,6 +732,8 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
 
     controller.threeViewer.scene.add(mesh);
   }
+
+  return [min, max];
 }
 
 async function getMoyenneDevice(devices) {
@@ -997,4 +999,6 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
     indexVisu++;
   })
+
+  return [min, max];
 }

@@ -92,18 +92,7 @@
       </div>
     </AccordionTab>
   </Accordion>
-  <!--
-  <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
-    class="onglet right">
-    <div class="card">
-      <div :style="{ position: 'relative', height: '350px' }">
-        <SpeedDial id="speedial" showIcon="pi pi-sliders-h" hideIcon="pi pi-times" :model="items"
-          buttonClass="p-button-help" direction="down" :tooltipOptions="{ position: 'left' }" mask
-          :style="{ right: 0, top: 0 }" />
-      </div>
-    </div>
-  </div>
--->
+
   <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }">
     <div class="card" style="top: 0px; position: absolute;">
       <div :style="{ position: 'relative', height: '100vh', width: '100vw' }">
@@ -113,8 +102,12 @@
     </div>
   </div>
 
-  <Fieldset legend="Légende" class="onglet bottom-left" :toggleable="true">
-    <div></div>
+  <Fieldset v-if="isLegend" legend="Légende" class="onglet bottom-left" :toggleable="true">
+
+    <div id="legend">
+      <label id="minLegend" for="">{{ minLegend }}</label>
+      <label id="maxLegend" for="">{{ maxLegend }}</label>
+    </div>
   </Fieldset>
 
   <div id="dimensionBtnContainer" class="card flex justify-content-center p-button-lg">
@@ -128,7 +121,7 @@
 
 import { init, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
 import { getLiveDataDevice } from "../../client/bddConnexion";
-
+import { tronquer } from "../../client/mathUtils";
 
 // Primevue components
 import Dropdown from 'primevue/dropdown';
@@ -200,6 +193,9 @@ export default {
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
       ],
+      isLegend: false,
+      minLegend: null,
+      maxLegend: null,
       selectedCategory: 'Production',
       categories: [
         { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple },
@@ -219,6 +215,7 @@ export default {
         {
           label: 'Recentrer map',
           icon: 'pi pi-arrows-alt',
+          id: 'speedial',
           command: () => {
             this.resetCamera(this.dimension);
           }
@@ -226,8 +223,9 @@ export default {
         {
           label: 'Info',
           icon: 'pi pi-info-circle',
+          id: 'speedial',
           command: () => {
-            this.toast.add({ severity: 'warn', summary: 'Attention', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
+            this.toast.add({ severity: 'success', summary: 'Info', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
           }
         }
       ]
@@ -246,18 +244,11 @@ export default {
 
     // Modification du style des bouton du speed dial 
     // On y a pas accès autrement que par le DOM
-    document.getElementById("speedial_0").children[0].innerHTML = "1";
-    document.getElementById("speedial_1").children[0].innerHTML = "2";
-    document.getElementById("speedial_2").children[0].innerHTML = "3";
-    document.getElementById("speedial_3").children[0].innerHTML = "4";
-    document.getElementById("speedial_4").children[0].innerHTML = "5";
-    document.getElementById("speedial_5").children[0].innerHTML = "6";
+    document.getElementById("speedial_0").children[0].innerHTML = "";
+    document.getElementById("speedial_1").children[0].innerHTML = "";
 
-    document.getElementById("speedial_1").children[0].style = "background-color: green";
-    document.getElementById("speedial_2").children[0].style = "background-color: cyan";
-    document.getElementById("speedial_3").children[0].style = "background-color: blue";
-    document.getElementById("speedial_4").children[0].style = "background-color: red";
-    document.getElementById("speedial_5").children[0].style = "background-color: yellow";
+    document.getElementById("speedial_0").children[0].style = "background-color: green";
+    document.getElementById("speedial_1").children[0].style = "background-color: cyan";
 
   },
   methods: {
@@ -374,6 +365,7 @@ export default {
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
 
       this.addItineraireEpaisseur(this.devices);
+      this.isLegend = true;
     },
     displayVisuMontagne() {
       this.toast.removeAllGroups();
@@ -384,7 +376,12 @@ export default {
       else
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
 
-      this.addItineraireSpeed3D(this.devices, this.dimension);
+      this.addItineraireSpeed3D(this.devices, this.dimension).then(res => {
+        this.minLegend = tronquer(res[0], 2);
+        this.maxLegend = tronquer(res[1], 2);
+      });
+
+      this.isLegend = true;
     },
     displayVisuMur() {
       this.toast.removeAllGroups();
@@ -392,6 +389,13 @@ export default {
 
       this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
       this.addItineraireSpeedWall(this.devices);
+
+      this.addItineraireSpeedWall(this.devices).then(res => {
+        this.minLegend = tronquer(res[0], 2);
+        this.maxLegend = tronquer(res[1], 2);
+      });
+
+      this.isLegend = true;
     }
   }
 }
@@ -455,7 +459,7 @@ body {
 .bottom-left {
   left: 30px;
   bottom: 30px;
-  width: 40vw;
+  width: fit-content;
   max-height: 40vw;
 }
 
@@ -519,5 +523,23 @@ body {
   z-index: 2;
   bottom: 50px;
   left: 50px;
+}
+
+#legend {
+  width: 200px;
+  height: 30px;
+  border: 1px solid black;
+  background: linear-gradient(90deg, rgb(0, 255, 51), rgb(255, 0, 51));
+  text-align: start;
+}
+
+#minLegend {
+  position: absolute;
+  transform: translate(-5px, -20px);
+}
+
+#maxLegend {
+  position: absolute;
+  transform: translate(185px, -20px);
 }
 </style>

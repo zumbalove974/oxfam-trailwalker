@@ -53,3 +53,8 @@ export const getEquationDroite3D = function getEquationDroite3D(x1, y1, z1, x2, 
 export const calculerDiffRotation = function calculerDiffRotation(rx, ry, rz) {
     return Math.sqrt(rx ** 2 + ry ** 2 + rz ** 2);
 }
+
+export const tronquer = function tronquer(nombre, decimal) {
+    return Math.round(nombre * (10 ** decimal)) / (10 ** decimal);
+}
+
