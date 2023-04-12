@@ -213,7 +213,7 @@ export class VTThreeViewer {
             let y1;
             //console.log(sphere.temps)
 
-            while (sphere.tempsBetweenPoints == 0 && sphere.running) {
+            while (sphere.tempsBetweenPoints == 0 && sphere.running && sphere.data.length > sphere.indexTraj + sphere.indexPoint) {
               //let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
               //let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
               x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[0];

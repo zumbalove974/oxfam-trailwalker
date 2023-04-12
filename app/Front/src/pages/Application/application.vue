@@ -67,7 +67,7 @@
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
       <DataTable v-model:selection="selectedProduct" @rowSelect="onRowSelect" @rowUnselect="onRowUnselect"
-        @rowSelectAll="onRowSelectAll" @rowUnselectAll="onRowUnselectAll" scrollHeight="80vh" style="max-height: 80vh;"
+        @rowSelectAll="onRowSelectAll" @rowUnselectAll="onRowUnselectAll" scrollHeight="40vh" style="max-height: 80vh;"
         :resizable-columns=true :row-hover=true :scrollable=true :value="devicesTab"
         tableStyle="min-width: 10rem; max-height: 10rem;">
         <Column :selected=true v-for="col of columns" :selection-mode="col.selectionMode" :headerStyle="col.headerStyle"
@@ -77,6 +77,22 @@
     </AccordionTab>
   </Accordion>
 
+  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet right" :activeIndex="tabOpen">
+    <AccordionTab>
+      <div class="card flex justify-content-center">
+        <div class="flex flex-column gap-3">
+          <div v-for="category in categories" :key="category.key" class="flex align-items-center"
+            style="width:fit-content; margin-bottom: 1rem;">
+            <RadioButton v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
+              @click="category.function" />
+            <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
+          </div>
+        </div>
+      </div>
+    </AccordionTab>
+  </Accordion>
+  <!--
   <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
     class="onglet right">
     <div class="card">
@@ -87,11 +103,19 @@
       </div>
     </div>
   </div>
-
-  <div id="resetCameraBtn" class="card flex justify-content-center">
-    <Button @click="resetCamera(dimension)" class="p-button-lg" :size="large" icon="pi pi-arrows-alt" text raised rounded
-      aria-label="Filter" />
+-->
+  <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }">
+    <div class="card" style="top: 0px; position: absolute;">
+      <div :style="{ position: 'relative', height: '100vh', width: '100vw' }">
+        <SpeedDial :model="items" :radius="80" type="semi-circle" direction="up"
+          :style="{ left: 'calc(50% - 2rem)', bottom: '30px' }" />
+      </div>
+    </div>
   </div>
+
+  <Fieldset legend="Légende" class="onglet bottom-left" :toggleable="true">
+    <div></div>
+  </Fieldset>
 
   <div id="dimensionBtnContainer" class="card flex justify-content-center p-button-lg">
     <SelectButton id="dimensionBtn" @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
@@ -117,6 +141,8 @@ import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toast from 'primevue/toast';
+import RadioButton from 'primevue/radiobutton';
+import Fieldset from 'primevue/fieldset';
 
 // Primevue css
 import "primevue/resources/themes/lara-light-indigo/theme.css";
@@ -125,7 +151,6 @@ import "primeicons/primeicons.css";
 
 import { useToast } from "primevue/usetoast";
 //import { preventDefault } from 'ol/events/Event';
-
 
 
 export default {
@@ -141,7 +166,9 @@ export default {
     Button,
     DataTable,
     Column,
-    Toast
+    Toast,
+    RadioButton,
+    Fieldset
   },
   data() {
     return {
@@ -173,54 +200,47 @@ export default {
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
       ],
-      items: [
-        {
-          label: 'Trajectoire simple',
-          command: () => this.displayVisuSimple()
-        },
-        {
-          label: 'Épaisseur de la ligne',
-          command: () => this.displayVisuEpaisseur()
-        },
-        {
-          label: '2D+1 vitesses axe verticale',
-          command: () => this.displayVisuMontagne()
-        },
-        {
-          label: 'Points de contrôle',
-          command: () => {
-            this.toast.removeAllGroups();
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
-            this.addCPs();
-          }
-        },
-        {
-          label: 'Position équipe',
-          command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
-            this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
-          }
-        },
-        {
-          label: 'Visualisation du mur',
-          command: () => this.displayVisuMur()
-        }
+      selectedCategory: 'Production',
+      categories: [
+        { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple },
+        { name: 'Visu épaisseur', key: '2', function: this.displayVisuEpaisseur },
+        { name: 'Visu colline', key: '3', function: this.displayVisuMontagne },
+        { name: 'Points de contrôle', key: '4', function: this.displayPDC },
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
+        { name: 'Visu Mur', key: '6', function: this.displayVisuMur }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
         { field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
         { field: 'vitesse', header: 'Vitesse moy.', headerStyle: "background-color: #A855F7; color: white", isSortable: true }
       ],
-      selectedProduct: null
+      selectedProduct: null,
+      items: [
+        {
+          label: 'Recentrer map',
+          icon: 'pi pi-arrows-alt',
+          command: () => {
+            this.resetCamera(this.dimension);
+          }
+        },
+        {
+          label: 'Info',
+          icon: 'pi pi-info-circle',
+          command: () => {
+            this.toast.add({ severity: 'warn', summary: 'Attention', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
+          }
+        }
+      ]
     }
   },
   async mounted() {
+    this.init();
+
     this.toast = useToast();
     if (this.deviceNumber) {
       await this.loadTimestamps();
     }
 
-    this.init();
     createDimensionEnvironment(this.dimension);
     //this.result = await this.getAllLiveData();
 
@@ -335,6 +355,15 @@ export default {
       this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
       this.addItineraire(this.devices);
     },
+    displayPDC() {
+      this.toast.removeAllGroups();
+      this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
+      this.addCPs();
+    },
+    displayPosEquipe() {
+      this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
+      this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+    },
     displayVisuEpaisseur() {
       this.toast.removeAllGroups();
       this.visuFunction = this.displayVisuEpaisseur;
@@ -421,8 +450,13 @@ body {
 .left {
   left: 30px;
   top: 30px;
-  height: 90vh;
-  max-height: 90vh;
+}
+
+.bottom-left {
+  left: 30px;
+  bottom: 30px;
+  width: 40vw;
+  max-height: 40vw;
 }
 
 #dimensionBtnContainer {
