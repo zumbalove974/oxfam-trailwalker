@@ -76,7 +76,6 @@
       </DataTable>
     </AccordionTab>
   </Accordion>
-
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet right" :activeIndex="tabOpen">
     <AccordionTab>
@@ -86,13 +85,15 @@
             style="width:fit-content; margin-bottom: 1rem;">
             <RadioButton v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
               @click="category.function" />
-            <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
+            <label :for="category.key" v-tooltip.bottom="category.detail" class="ml-2" style="margin-left: 1rem;">{{
+              category.name }}</label>
           </div>
           <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
             <Checkbox v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
               @input="category.function($event)" />
-            <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
+            <label :for="category.key" v-tooltip.bottom="category.detail" class="ml-2" style="margin-left: 1rem;">{{
+              category.name }}</label>
           </div>
         </div>
       </div>
@@ -139,6 +140,7 @@ import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
 import RadioButton from 'primevue/radiobutton';
 import Fieldset from 'primevue/fieldset';
 import Checkbox from 'primevue/checkbox';
@@ -148,9 +150,7 @@ import "primevue/resources/themes/lara-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 
-import { useToast } from "primevue/usetoast";
 //import { preventDefault } from 'ol/events/Event';
-
 
 export default {
   name: 'App',
@@ -172,6 +172,7 @@ export default {
   },
   data() {
     return {
+      active: false,
       init: init,
       addItineraire: addItineraire,
       addItineraireEpaisseur: addItineraireEpaisseur,
@@ -206,14 +207,17 @@ export default {
       maxLegend: null,
       selectedCategory: 'Production',
       categories: [
-        { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple },
-        { name: 'Visu épaisseur', key: '2', function: this.displayVisuEpaisseur },
-        { name: 'Visu colline', key: '3', function: this.displayVisuMontagne },
-        { name: 'Visu Mur', key: '6', function: this.displayVisuMur }
+        { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple, detail: "La trajectoire mesurée par le GPS est affichée." },
+        { name: 'Visu épaisseur', key: '2', function: this.displayVisuEpaisseur, detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide." },
+        { name: 'Visu colline', key: '3', function: this.displayVisuMontagne, detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain." },
+        { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." },
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
+        { name: 'Visu Mur', key: '6', function: this.displayVisuMur, detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes." }
+
       ],
       categoriesCheckbox: [
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
-        { name: 'Points de contrôle', key: '4', function: this.displayPDC }
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
+        { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
