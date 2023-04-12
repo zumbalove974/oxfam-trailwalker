@@ -262,8 +262,6 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     window.removeEventListener('keyup', onKeyUp, false);
 
     controller.threeViewer.controls.enabled = false;
-
-    //console.log(controller)
     controller.threeViewer.mapCenter = controller.olViewer.map.getView().getCenter();
     controller.threeViewer.isTransitioning = [true, true];
 
