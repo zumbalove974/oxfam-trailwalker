@@ -88,6 +88,12 @@
               @click="category.function" />
             <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
           </div>
+          <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
+            style="width:fit-content; margin-bottom: 1rem;">
+            <Checkbox v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
+              @click="category.function" />
+            <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
+          </div>
         </div>
       </div>
     </AccordionTab>
@@ -103,7 +109,6 @@
   </div>
 
   <Fieldset v-if="isLegend" legend="Légende" class="onglet bottom-left" :toggleable="true">
-
     <div id="legend">
       <label id="minLegend" for="">{{ minLegend }}</label>
       <label id="maxLegend" for="">{{ maxLegend }}</label>
@@ -136,6 +141,7 @@ import Column from 'primevue/column';
 import Toast from 'primevue/toast';
 import RadioButton from 'primevue/radiobutton';
 import Fieldset from 'primevue/fieldset';
+import Checkbox from 'primevue/checkbox';
 
 // Primevue css
 import "primevue/resources/themes/lara-light-indigo/theme.css";
@@ -161,7 +167,8 @@ export default {
     Column,
     Toast,
     RadioButton,
-    Fieldset
+    Fieldset,
+    Checkbox
   },
   data() {
     return {
@@ -201,9 +208,11 @@ export default {
         { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple },
         { name: 'Visu épaisseur', key: '2', function: this.displayVisuEpaisseur },
         { name: 'Visu colline', key: '3', function: this.displayVisuMontagne },
-        { name: 'Points de contrôle', key: '4', function: this.displayPDC },
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
         { name: 'Visu Mur', key: '6', function: this.displayVisuMur }
+      ],
+      categoriesCheckbox: [
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
+        { name: 'Points de contrôle', key: '4', function: this.displayPDC }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
