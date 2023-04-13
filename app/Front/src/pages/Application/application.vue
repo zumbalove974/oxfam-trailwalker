@@ -406,7 +406,7 @@ export default {
       this.toast.removeAllGroups();
       this.visuFunction = this.displayVisuNuit;
 
-      if (this.devices.length < 0)
+      if (this.devices.length === 0)
         this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
       else
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit.", life: 10000 });
@@ -439,7 +439,6 @@ export default {
       this.visuFunction = this.displayVisuMur;
 
       this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
-      this.addItineraireSpeedWall(this.devices);
 
       this.addItineraireSpeedWall(this.devices).then(res => {
         this.minLegend = tronquer(res[0], 2);
