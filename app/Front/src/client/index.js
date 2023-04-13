@@ -1008,3 +1008,143 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
   return [min, max];
 }
+
+export const addNightCoverage = async function addNightCoverage(deviceNumbers) {
+
+  devices = deviceNumbers;
+  visu_function = addNightCoverage;
+
+  const date_nuit = "2021-03-07T21:57:00.000Z";
+  const date_matin = "2021-04-07T05:53:00.000Z"
+
+  const devices_data = await Promise.all(deviceNumbers.map(d => getLiveDataDevice(d)));
+
+  const device_night = devices_data.map(t => {
+    let i_debut = 0;
+    for (let i = 0; i < t.length; i++) {
+      if (t[i].timestamp > date_nuit) {
+        i_debut = i;
+        break;
+      }
+    }
+    let i_fin = i_debut;
+    for (let i = i_debut; i < t.length; i++) {
+      if (t[i].timestamp > date_matin) {
+        i_fin = i;
+        break;
+      }
+    }
+    return { i_debut: i_debut, i_fin: i_fin }
+  })
+
+  const trace_night = []
+
+  for (let i = 0; i < devices_data[0].length; i++) {
+    let cpt = 0;
+    for (let j = 0; j < device_night.length; j++) {
+      if (i > device_night[j].i_debut && i < device_night[j].i_fin) {
+        cpt++;
+      }
+    }
+    trace_night.push(cpt);
+  }
+
+  const max_night = Math.max(...trace_night)
+
+  let trace = devices_data[0];
+
+  let shape = [];
+  let color = [];
+
+  for (let i = 0; i < trace.length - 2; i++) {
+
+    let xA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[0];
+    let yA = controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[1];
+    let xB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[0];
+    let yB = controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[1];
+    let xC = controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[0];
+    let yC = controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[1];
+    let d = 5;
+    let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+    let normBC = Math.sqrt(Math.pow(xB - xC, 2) + Math.pow(yB - yC, 2));
+
+    if (normAB === 0) { continue }
+
+    shape.push(
+      xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+      yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    shape.push(
+      xB + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+      yB - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    shape.push(
+      xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+      yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    color.push(
+      1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night)
+    color.push(
+      1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+    color.push(
+      1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+
+
+    shape.push(
+      xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+      yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    shape.push(
+      xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+      yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    shape.push(
+      xA - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+      yA + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+    color.push(
+      1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night)
+    color.push(
+      1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+    color.push(
+      1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night)
+
+
+    if (normAB != 0 && normBC != 0 && d != 0) {
+      shape.push(xB, yB, 0);
+      shape.push(
+        xB - d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+        yB + d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+      shape.push(
+        xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      color.push(
+        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+      color.push(
+        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+      color.push(
+        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+
+      shape.push(xB, yB, 0);
+      shape.push(
+        xB + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+        yB - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+      shape.push(
+        xB + d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+        yB - d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+      color.push(
+        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+      color.push(
+        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+      color.push(
+        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+    }
+
+  }
+
+  const material = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+  });
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
+
+  let visu_mesh = new THREE.Mesh(geometry, material);
+  visu_meshes.push(visu_mesh)
+  controller.threeViewer.scene.add(visu_mesh);
+
+}
