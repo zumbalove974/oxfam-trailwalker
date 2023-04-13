@@ -102,7 +102,7 @@
   <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }">
     <div class="card" style="top: 0px; position: absolute;">
       <div :style="{ position: 'relative', height: '100vh', width: '100vw' }">
-        <SpeedDial :model="items" :radius="80" type="semi-circle" direction="up"
+        <SpeedDial id="speedial" :model="items" :radius="80" type="semi-circle" direction="up"
           :style="{ left: 'calc(50% - 2rem)', bottom: '30px' }" />
       </div>
     </div>
@@ -229,7 +229,6 @@ export default {
         {
           label: 'Recentrer map',
           icon: 'pi pi-arrows-alt',
-          id: 'speedial',
           command: () => {
             this.resetCamera(this.dimension);
           }
@@ -237,7 +236,6 @@ export default {
         {
           label: 'Info',
           icon: 'pi pi-info-circle',
-          id: 'speedial',
           command: () => {
             this.toast.add({ severity: 'success', summary: 'Info', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
           }

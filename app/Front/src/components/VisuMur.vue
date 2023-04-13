@@ -60,7 +60,9 @@ export default {
         }
     },
     mounted() {
-        console.log(this.controller)
+        this.controller.then(res => {
+            this.controller = res
+        })
         this.toast = useToast();
     },
     methods: {
