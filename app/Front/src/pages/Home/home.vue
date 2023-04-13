@@ -1,15 +1,11 @@
 <template>
   <div id="app"> </div>
-  <MenuBar></MenuBar>
+  <MenuBar pageName='À propos' pageURL="about"></MenuBar>
   <a label="Go to app" href='/application'>
     <Button>
       Aller à la Visualisation </Button></a>
   <img src="../../assets/trailove.png" />
 </template>
-
-
-
-
 
 <script>
 // Primevue css
@@ -28,15 +24,7 @@ export default {
   components: {
     MenuBar,
     Button
-  },
-  // methods: {
-  //   allerPage2() {
-  //     this.$router.go('application');
-  //   }
-  // },
-  // mounted() {
-  //   console.log({ router: this.$router });
-  // }
+  }
 }
 </script>
 

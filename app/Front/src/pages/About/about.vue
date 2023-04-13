@@ -1,20 +1,13 @@
 <template>
     <div id="app"> </div>
-    <MenuBar></MenuBar>
-    <Button @click=allerPage2()>Click Me!</Button>
-    <img src="../../assets/trailove.png" />
+    <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
 </template>
-  
-  
-  
-  
   
 <script>
 // Primevue css
 import "primevue/resources/themes/lara-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
-import Button from 'primevue/button';
 
 // https://github.com/OmranEdoo/rasberryWeather974/tree/dev/Front/dist
 // avoir une page router
@@ -24,13 +17,7 @@ import MenuBar from '../../components/MenuBar.vue'
 export default {
     name: 'App',
     components: {
-        MenuBar,
-        Button
-    },
-    methods: {
-        allerPage2() {
-            this.$router.go('application');
-        }
+        MenuBar
     }
 }
 </script>

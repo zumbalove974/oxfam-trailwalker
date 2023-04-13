@@ -19,13 +19,17 @@ export default {
     components: {
         Menubar
     },
+    props: {
+        pageName: String,
+        pageURL: String
+    },
     data() {
         return {
             items: [
                 {
-                    label: 'À propos',
+                    label: this.pageName,
                     icon: 'pi pi-fw pi-info',
-                    url: 'about'
+                    url: this.pageURL
                 },
                 {
                     label: 'Dieppe',
