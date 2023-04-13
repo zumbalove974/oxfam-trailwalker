@@ -134,21 +134,21 @@ export class VTThreeViewer {
       let x1 = this.perspectiveCamera.position.x;
       let y1 = this.perspectiveCamera.position.y;
 
-      if (calculerDistance2D(x1, y1, x2, y2) > 10) {
+      if (calculerDistance2D(x1, y1, x2, y2) > 50) {
         const params = getEquationDroite2D(x1, y1, x2, y2);
 
         if (x2 > x1) {
-          this.perspectiveCamera.position.x += 5;
+          this.perspectiveCamera.position.x += 25;
         } else {
-          this.perspectiveCamera.position.x -= 5;
+          this.perspectiveCamera.position.x -= 25;
         }
 
         this.perspectiveCamera.position.y = params[0] * this.perspectiveCamera.position.x + params[1];
 
         if (this.perspectiveCamera.position.z > this.cameraZ) {
-          this.perspectiveCamera.position.z -= 5;
+          this.perspectiveCamera.position.z -= 25;
         } else {
-          this.perspectiveCamera.position.z += 5;
+          this.perspectiveCamera.position.z += 25;
         }
       } else {
         this.isTransitioning[0] = false;
@@ -165,26 +165,26 @@ export class VTThreeViewer {
       let rz = this.perspectiveCamera.rotation.z;
 
       if (calculerDiffRotation(rx, ry, rz) > 0.1 && (!this.counterEnd[0] || !this.counterEnd[1] || !this.counterEnd[2])) {
-        if (rx > 0.02) {
-          this.perspectiveCamera.rotation.x -= 0.01;
-        } else if (rx < -0.2) {
-          this.perspectiveCamera.rotation.x += 0.01;
+        if (rx > 0.1) {
+          this.perspectiveCamera.rotation.x -= 0.05;
+        } else if (rx < -0.1) {
+          this.perspectiveCamera.rotation.x += 0.05;
         } else {
           this.counterEnd[0] = true;
         }
 
-        if (ry > 0.02) {
-          this.perspectiveCamera.rotation.y -= 0.01;
-        } else if (ry < -0.02) {
-          this.perspectiveCamera.rotation.y += 0.01;
+        if (ry > 0.1) {
+          this.perspectiveCamera.rotation.y -= 0.05;
+        } else if (ry < -0.1) {
+          this.perspectiveCamera.rotation.y += 0.05;
         } else {
           this.counterEnd[1] = true;
         }
 
-        if (rz > 0.02) {
-          this.perspectiveCamera.rotation.z -= 0.01;
-        } else if (rz < -0.02) {
-          this.perspectiveCamera.rotation.z += 0.01;
+        if (rz > 0.1) {
+          this.perspectiveCamera.rotation.z -= 0.05;
+        } else if (rz < -0.1) {
+          this.perspectiveCamera.rotation.z += 0.05;
         } else {
           this.counterEnd[2] = true;
         }
@@ -213,7 +213,7 @@ export class VTThreeViewer {
             let y1;
             //console.log(sphere.temps)
 
-            while (sphere.tempsBetweenPoints == 0 && sphere.running) {
+            while (sphere.tempsBetweenPoints == 0 && sphere.running && sphere.data.length > sphere.indexTraj + sphere.indexPoint) {
               //let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
               //let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
               x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[0];

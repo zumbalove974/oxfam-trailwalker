@@ -24,7 +24,7 @@ const height = window.innerHeight; // this makes the 3D canvas full screen
 //let parisLatLon = [48.8534, 2.3488];
 //let parisCenter = proj4(proj4326, proj3857, [parisLatLon[1], parisLatLon[0]]);
 
-let vavinLatLon = [49.93825150, 1.21090698];
+let vavinLatLon = [49.868241, 1.069527];
 let vavinCenter = proj4(proj4326, proj3857, [vavinLatLon[1], vavinLatLon[0]]);
 
 /*
@@ -49,6 +49,7 @@ let line3d;
 let mesh;
 let wall;
 let dimension;
+let pdcs = [];
 
 const paramsWind = {
   center: vavinCenter,
@@ -262,7 +263,6 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     window.removeEventListener('keyup', onKeyUp, false);
 
     controller.threeViewer.controls.enabled = false;
-
     controller.threeViewer.mapCenter = controller.olViewer.map.getView().getCenter();
     controller.threeViewer.isTransitioning = [true, true];
 
@@ -282,7 +282,6 @@ export const createDimensionEnvironment = function createDimensionEnvironment(di
     removeEventListeners();
   }
 }
-
 
 
 export const getVitesseMoyenne = async function getVitesseMoyenne(device) {
@@ -335,8 +334,16 @@ export const addCPs = async function addCPs() {
     circle.position.y = worldCoords[1];
     circle.position.z = 0;
     controller.threeViewer.scene.add(circle);
+
+    pdcs.push(circle);
   })
 };
+
+export const removeCPS = function removeCPS() {
+  pdcs.forEach(pdc => {
+    disposeThreeMesh(pdc);
+  })
+}
 
 export const addTeamMarker = async function addTeamMarker(deviceNumber, timeStamp) {
   device = deviceNumber;
@@ -731,6 +738,8 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
 
     controller.threeViewer.scene.add(mesh);
   }
+
+  return [min, max];
 }
 
 async function getMoyenneDevice(devices) {
@@ -996,6 +1005,8 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
     indexVisu++;
   })
+
+  return [min, max];
 }
 
 export const addNightCoverage = async function addNightCoverage() {

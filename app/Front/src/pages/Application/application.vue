@@ -67,7 +67,7 @@
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
       <DataTable v-model:selection="selectedProduct" @rowSelect="onRowSelect" @rowUnselect="onRowUnselect"
-        @rowSelectAll="onRowSelectAll" @rowUnselectAll="onRowUnselectAll" scrollHeight="80vh" style="max-height: 80vh;"
+        @rowSelectAll="onRowSelectAll" @rowUnselectAll="onRowUnselectAll" scrollHeight="40vh" style="max-height: 80vh;"
         :resizable-columns=true :row-hover=true :scrollable=true :value="devicesTab"
         tableStyle="min-width: 10rem; max-height: 10rem;">
         <Column :selected=true v-for="col of columns" :selection-mode="col.selectionMode" :headerStyle="col.headerStyle"
@@ -76,22 +76,45 @@
       </DataTable>
     </AccordionTab>
   </Accordion>
+  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet right" :activeIndex="tabOpen">
+    <AccordionTab>
+      <div class="card flex justify-content-center">
+        <div class="flex flex-column gap-3">
+          <div v-for="category in categories" :key="category.key" class="flex align-items-center"
+            style="width:fit-content; margin-bottom: 1rem;">
+            <RadioButton v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
+              @click="category.function" />
+            <label :for="category.key" v-tooltip.bottom="category.detail" class="ml-2" style="margin-left: 1rem;">{{
+              category.name }}</label>
+          </div>
+          <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
+            style="width:fit-content; margin-bottom: 1rem;">
+            <Checkbox v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
+              @input="category.function($event)" />
+            <label :for="category.key" v-tooltip.bottom="category.detail" class="ml-2" style="margin-left: 1rem;">{{
+              category.name }}</label>
+          </div>
+        </div>
+      </div>
+    </AccordionTab>
+  </Accordion>
 
-  <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
-    class="onglet right">
-    <div class="card">
-      <div :style="{ position: 'relative', height: '350px' }">
-        <SpeedDial id="speedial" showIcon="pi pi-sliders-h" hideIcon="pi pi-times" :model="items"
-          buttonClass="p-button-help" direction="down" :tooltipOptions="{ position: 'left' }" mask
-          :style="{ right: 0, top: 0 }" />
+  <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }">
+    <div class="card" style="top: 0px; position: absolute;">
+      <div :style="{ position: 'relative', height: '100vh', width: '100vw' }">
+        <SpeedDial :model="items" :radius="80" type="semi-circle" direction="up"
+          :style="{ left: 'calc(50% - 2rem)', bottom: '30px' }" />
       </div>
     </div>
   </div>
 
-  <div id="resetCameraBtn" class="card flex justify-content-center">
-    <Button @click="resetCamera(dimension)" class="p-button-lg" :size="large" icon="pi pi-arrows-alt" text raised rounded
-      aria-label="Filter" />
-  </div>
+  <Fieldset v-if="isLegend" legend="Légende" class="onglet bottom-left" :toggleable="true">
+    <div id="legend">
+      <label id="minLegend" for="">{{ minLegend }}</label>
+      <label id="maxLegend" for="">{{ maxLegend }}</label>
+    </div>
+  </Fieldset>
 
   <div id="dimensionBtnContainer" class="card flex justify-content-center p-button-lg">
     <SelectButton id="dimensionBtn" @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
@@ -118,7 +141,7 @@ import {
   addNightCoverage
 } from '../../client/index.js'
 import { getLiveDataDevice } from "../../client/bddConnexion";
-
+import { tronquer } from "../../client/mathUtils";
 
 // Primevue components
 import Dropdown from 'primevue/dropdown';
@@ -131,16 +154,17 @@ import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
+import RadioButton from 'primevue/radiobutton';
+import Fieldset from 'primevue/fieldset';
+import Checkbox from 'primevue/checkbox';
 
 // Primevue css
 import "primevue/resources/themes/lara-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 
-import { useToast } from "primevue/usetoast";
 //import { preventDefault } from 'ol/events/Event';
-
-
 
 export default {
   name: 'App',
@@ -155,10 +179,14 @@ export default {
     Button,
     DataTable,
     Column,
-    Toast
+    Toast,
+    RadioButton,
+    Fieldset,
+    Checkbox
   },
   data() {
     return {
+      active: false,
       init: init,
       addItineraire: addItineraire,
       addItineraireEpaisseur: addItineraireEpaisseur,
@@ -173,6 +201,7 @@ export default {
       getVitesseMoyenne: getVitesseMoyenne,
       resetCamera: resetCamera,
       addNightCoverage: addNightCoverage,
+      removeCPS: removeCPS,
       dimension: 2,
       toast: null,
       tabOpen: 1,
@@ -188,75 +217,67 @@ export default {
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
       ],
-      items: [
-        {
-          label: 'Trajectoire simple',
-          command: () => this.displayVisuSimple()
-        },
-        {
-          label: 'Épaisseur de la ligne',
-          command: () => this.displayVisuEpaisseur()
-        },
-        {
-          label: '2D+1 vitesses axe verticale',
-          command: () => this.displayVisuMontagne()
-        },
-        {
-          label: 'Points de contrôle',
-          command: () => {
-            this.toast.removeAllGroups();
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
-            this.addCPs();
-          }
-        },
-        {
-          label: 'Position équipe',
-          command: () => {
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
-            this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
-          }
-        },
-        {
-          label: 'Visualisation du mur',
-          command: () => this.displayVisuMur()
-        },
-        {
-          label: "Visualisation de l'emprise de la nuit",
-          command: () => this.addNightCoverage()
-        }
+      isLegend: false,
+      minLegend: null,
+      maxLegend: null,
+      selectedCategory: 'Production',
+      categories: [
+        { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple, detail: "La trajectoire mesurée par le GPS est affichée." },
+        { name: 'Visu épaisseur', key: '2', function: this.displayVisuEpaisseur, detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide." },
+        { name: 'Visu colline', key: '3', function: this.displayVisuMontagne, detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain." },
+        { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." },
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
+        { name: 'Visu Mur', key: '6', function: this.displayVisuMur, detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes." }
+
+      ],
+      categoriesCheckbox: [
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
+        { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
         { field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
         { field: 'vitesse', header: 'Vitesse moy.', headerStyle: "background-color: #A855F7; color: white", isSortable: true }
       ],
-      selectedProduct: null
+      selectedProduct: null,
+      items: [
+        {
+          label: 'Recentrer map',
+          icon: 'pi pi-arrows-alt',
+          id: 'speedial',
+          command: () => {
+            this.resetCamera(this.dimension);
+          }
+        },
+        {
+          label: 'Info',
+          icon: 'pi pi-info-circle',
+          id: 'speedial',
+          command: () => {
+            this.toast.add({ severity: 'success', summary: 'Info', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
+          }
+        }
+      ]
     }
   },
   async mounted() {
+    this.init();
+
     this.toast = useToast();
     if (this.deviceNumber) {
       await this.loadTimestamps();
     }
 
-    this.init();
     createDimensionEnvironment(this.dimension);
     //this.result = await this.getAllLiveData();
 
     // Modification du style des bouton du speed dial 
     // On y a pas accès autrement que par le DOM
-    document.getElementById("speedial_0").children[0].innerHTML = "1";
-    document.getElementById("speedial_1").children[0].innerHTML = "2";
-    document.getElementById("speedial_2").children[0].innerHTML = "3";
-    document.getElementById("speedial_3").children[0].innerHTML = "4";
-    document.getElementById("speedial_4").children[0].innerHTML = "5";
-    document.getElementById("speedial_5").children[0].innerHTML = "6";
+    document.getElementById("speedial_0").children[0].innerHTML = "";
+    document.getElementById("speedial_1").children[0].innerHTML = "";
 
-    document.getElementById("speedial_1").children[0].style = "background-color: green";
-    document.getElementById("speedial_2").children[0].style = "background-color: cyan";
-    document.getElementById("speedial_3").children[0].style = "background-color: blue";
-    document.getElementById("speedial_4").children[0].style = "background-color: red";
-    document.getElementById("speedial_5").children[0].style = "background-color: yellow";
+    document.getElementById("speedial_0").children[0].style = "background-color: green";
+    document.getElementById("speedial_1").children[0].style = "background-color: cyan";
 
   },
   methods: {
@@ -354,6 +375,19 @@ export default {
       this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
       this.addItineraire(this.devices);
     },
+    displayPDC(input) {
+      this.toast.removeAllGroups();
+      this.removeCPS();
+
+      if (input[input.length - 1] == "Points de contrôle") {
+        this.addCPs();
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
+      }
+    },
+    displayPosEquipe() {
+      this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
+      this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+    },
     displayVisuEpaisseur() {
       this.toast.removeAllGroups();
       this.visuFunction = this.displayVisuEpaisseur;
@@ -364,6 +398,7 @@ export default {
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
 
       this.addItineraireEpaisseur(this.devices);
+      this.isLegend = true;
     },
     displayVisuMontagne() {
       this.toast.removeAllGroups();
@@ -374,7 +409,16 @@ export default {
       else
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
 
-      this.addItineraireSpeed3D(this.devices, this.dimension);
+      this.addItineraireSpeed3D(this.devices, this.dimension).then(res => {
+        this.minLegend = tronquer(res[0], 2);
+        this.maxLegend = tronquer(res[1], 2);
+      });
+
+
+      this.dimension = 3;
+      createDimensionEnvironment(3);
+
+      this.isLegend = true;
     },
     displayVisuMur() {
       this.toast.removeAllGroups();
@@ -382,6 +426,16 @@ export default {
 
       this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
       this.addItineraireSpeedWall(this.devices);
+
+      this.addItineraireSpeedWall(this.devices).then(res => {
+        this.minLegend = tronquer(res[0], 2);
+        this.maxLegend = tronquer(res[1], 2);
+      });
+
+      this.dimension = 3;
+      createDimensionEnvironment(3);
+
+      this.isLegend = true;
     }
   }
 }
@@ -440,8 +494,13 @@ body {
 .left {
   left: 30px;
   top: 30px;
-  height: 90vh;
-  max-height: 90vh;
+}
+
+.bottom-left {
+  left: 30px;
+  bottom: 30px;
+  width: fit-content;
+  max-height: 40vw;
 }
 
 #dimensionBtnContainer {
@@ -504,5 +563,23 @@ body {
   z-index: 2;
   bottom: 50px;
   left: 50px;
+}
+
+#legend {
+  width: 200px;
+  height: 30px;
+  border: 1px solid black;
+  background: linear-gradient(90deg, rgb(0, 255, 51), rgb(255, 0, 51));
+  text-align: start;
+}
+
+#minLegend {
+  position: absolute;
+  transform: translate(-5px, -20px);
+}
+
+#maxLegend {
+  position: absolute;
+  transform: translate(185px, -20px);
 }
 </style>
