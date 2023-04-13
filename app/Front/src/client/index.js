@@ -323,7 +323,9 @@ function addCursor() {
 
 
 export const addCPs = async function addCPs() {
+  console.log('aaaaaaaaaaaaaaaaaaaaa');
   cps = await getControlPoints();
+  console.log(cps);
   // Coordinates of the 10 points
   cps.forEach(async point => {
     let worldCoords = controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates

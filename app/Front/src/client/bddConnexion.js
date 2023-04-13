@@ -29,7 +29,7 @@ export const getLiveDataDevice = function getLiveDataDevice(deviceNumber) {
 
 export const getControlPoints = async function getControlPoints() {
     return fetch(`http://localhost:5500/pcp`, {
-        method: 'GET'
+        method: 'POST'
     })
         .then(response => response.json())
         .then(response => {
