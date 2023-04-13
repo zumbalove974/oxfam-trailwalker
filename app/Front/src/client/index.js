@@ -8,7 +8,7 @@ import proj4 from "proj4";
 import { proj4326, proj3857 } from "./Utils";
 import { ZOOM_RES_L93 } from "./Utils";
 
-import { getAllLiveData, getLiveDataDevice, getControlPoints } from "./bddConnexion";
+import { getLiveDataDevice, getControlPoints } from "./bddConnexion";
 
 import { asc, calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
 
@@ -1009,14 +1009,17 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
   return [min, max];
 }
 
-export const addNightCoverage = async function addNightCoverage() {
+export const addNightCoverage = async function addNightCoverage(deviceNumbers) {
+
+  devices = deviceNumbers;
+  visu_function = addNightCoverage;
 
   const date_nuit = "2021-03-07T21:57:00.000Z";
   const date_matin = "2021-04-07T05:53:00.000Z"
 
-  const devices = await getAllLiveData();
+  const devices_data = await Promise.all(deviceNumbers.map(d => getLiveDataDevice(d)));
 
-  const device_night = devices.map(t => {
+  const device_night = devices_data.map(t => {
     let i_debut = 0;
     for (let i = 0; i < t.length; i++) {
       if (t[i].timestamp > date_nuit) {
@@ -1034,11 +1037,9 @@ export const addNightCoverage = async function addNightCoverage() {
     return { i_debut: i_debut, i_fin: i_fin }
   })
 
-  console.log("device_night", device_night)
-
   const trace_night = []
 
-  for (let i = 0; i < devices[0].length; i++) {
+  for (let i = 0; i < devices_data[0].length; i++) {
     let cpt = 0;
     for (let j = 0; j < device_night.length; j++) {
       if (i > device_night[j].i_debut && i < device_night[j].i_fin) {
@@ -1048,14 +1049,9 @@ export const addNightCoverage = async function addNightCoverage() {
     trace_night.push(cpt);
   }
 
-  console.log("trace_night", trace_night)
-
   const max_night = Math.max(...trace_night)
 
-  console.log("max_night", max_night)
-
-
-  let trace = devices[0];
+  let trace = devices_data[0];
 
   let shape = [];
   let color = [];
@@ -1140,8 +1136,6 @@ export const addNightCoverage = async function addNightCoverage() {
 
   }
 
-  console.log(color)
-
   const material = new THREE.MeshBasicMaterial({
     vertexColors: true,
   });
@@ -1152,7 +1146,5 @@ export const addNightCoverage = async function addNightCoverage() {
   let visu_mesh = new THREE.Mesh(geometry, material);
   visu_meshes.push(visu_mesh)
   controller.threeViewer.scene.add(visu_mesh);
-
-  visu_function = addNightCoverage;
 
 }

@@ -135,6 +135,7 @@ import {
   addItineraireSpeedWall,
   createDimensionEnvironment,
   addCPs,
+  removeCPS,
   addTeamMarker,
   removeEventListeners,
   addEventListeners,
@@ -227,7 +228,8 @@ export default {
         { name: 'Visu colline', key: '3', function: this.displayVisuMontagne, detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain." },
         { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." },
         { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
-        { name: 'Visu Mur', key: '6', function: this.displayVisuMur, detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes." }
+        { name: 'Visu Mur', key: '6', function: this.displayVisuMur, detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes." },
+        { name: 'Visu Nuit', key: '7', function: this.displayVisuNuit, detail: "Visualisation 2D+1 qui permet d'obeserver le parcours realise la nuit." }
 
       ],
       categoriesCheckbox: [
@@ -398,6 +400,18 @@ export default {
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
 
       this.addItineraireEpaisseur(this.devices);
+      this.isLegend = true;
+    },
+    displayVisuNuit() {
+      this.toast.removeAllGroups();
+      this.visuFunction = this.displayVisuNuit;
+
+      if (this.devices.length < 0)
+        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
+      else
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit.", life: 10000 });
+
+      this.addNightCoverage(this.devices);
       this.isLegend = true;
     },
     displayVisuMontagne() {
