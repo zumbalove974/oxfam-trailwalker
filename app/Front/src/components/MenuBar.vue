@@ -23,30 +23,33 @@ export default {
         return {
             items: [
                 {
-                    label: 'About',
+                    label: 'À propos',
                     icon: 'pi pi-fw pi-info',
+                    href: 'about'
                 },
                 {
                     label: 'Dieppe',
                     icon: 'pi pi-fw pi-map-marker',
                     items: [
                         {
-                            label: 'Oxfam Official Website',
-                            icon: 'pi pi-fw pi-link'
+                            label: 'Site officiel Oxfam',
+                            icon: 'pi pi-fw pi-link',
+                            url: 'https://www.oxfamtrailwalker.fr/dieppe/accueil-dieppe/'
                         },
                         {
-                            label: 'Database',
+                            label: 'Base de données',
                             icon: 'pi pi-fw pi-database'
                         }
                     ]
                 },
                 {
-                    label: 'Team',
+                    label: 'Équipe',
                     icon: 'pi pi-fw pi-user'
                 },
                 {
                     label: 'Github',
-                    icon: 'pi pi-fw pi-github'
+                    icon: 'pi pi-fw pi-github',
+                    url: 'https://github.com/zumbalove974/oxfam-trailwalker'
                 }
             ]
         };

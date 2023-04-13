@@ -1,7 +1,8 @@
 <template>
   <div id="app"> </div>
   <MenuBar></MenuBar>
-  <Button @click=allerPage2()>Click Me!</Button>
+  <a label="Go to app" href='/application'><Button>
+      Aller à la Visualisation </Button></a>
   <img src="../../assets/trailove.png" />
 </template>
 
@@ -27,11 +28,14 @@ export default {
     MenuBar,
     Button
   },
-  methods: {
-    allerPage2() {
-      this.$router.go('application');
-    }
-  }
+  // methods: {
+  //   allerPage2() {
+  //     this.$router.go('application');
+  //   }
+  // },
+  // mounted() {
+  //   console.log({ router: this.$router });
+  // }
 }
 </script>
 
