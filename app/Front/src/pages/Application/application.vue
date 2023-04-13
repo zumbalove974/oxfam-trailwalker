@@ -232,10 +232,11 @@ export default {
         { name: 'Visu Nuit', key: '7', function: this.displayVisuNuit, detail: "Visualisation 2D+1 qui permet d'obeserver le parcours realise la nuit." }
 
       ],
+      /*
       categoriesCheckbox: [
         { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
         { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." }
-      ],
+      ],*/
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
         { field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
@@ -377,14 +378,13 @@ export default {
       this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
       this.addItineraire(this.devices);
     },
-    displayPDC(input) {
-      this.toast.removeAllGroups();
-      this.removeCPS();
-
-      if (input[input.length - 1] == "Points de contrôle") {
-        this.addCPs();
-        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
-      }
+    async displayPDC() {
+      await this.addCPs();
+      this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
+      // Delay the execution of the removeCPS() function
+      setTimeout(() => {
+        this.removeCPS();
+      }, 10000); // Remove the control points after 10 seconds
     },
     displayPosEquipe() {
       this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
