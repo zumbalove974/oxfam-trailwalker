@@ -9,7 +9,6 @@
 <script>
 
 import { toRaw } from 'vue';
-import { createDimensionEnvironment } from '../client/index.js';
 import { getLiveDataDevice } from "../client/bddConnexion";
 import { asc, calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "../client/mathUtils.js";
 
@@ -31,24 +30,21 @@ export default {
         devicesProps: Array,
         visu_functionProps: Function,
         dimensionProps: Number,
-        categoryProps: Object
+        categoryProps: Object,
+        visu_meshesProps: Array,
+        createDimensionEnvironmentProps: Function
     },
     emits: {
-        visu_function: Function
+        visu_meshes: THREE.Mesh,
     },
     data() {
         return {
             devices: this.devicesProps,
             visu_function: this.visu_functionProps,
             dimension: this.dimensionProps,
-            line3d: null,
-            line: null,
             controller: this.controllerProps,
-            visu_meshes: [],
-            mesh: null,
-            GPSvisu_mesh: null,
-            wall: null,
-            createDimensionEnvironment: createDimensionEnvironment,
+            visu_meshes: this.visu_meshesProps,
+            createDimensionEnvironment: this.createDimensionEnvironmentProps,
             selectedCategory: 'Production',
             category: this.categoryProps,
             functions: {
@@ -61,9 +57,10 @@ export default {
         }
     },
     mounted() {
+        /*
         this.controller.then(res => {
             this.controller = res
-        })
+        })*/
         this.toast = useToast();
     },
     methods: {
@@ -134,15 +131,15 @@ export default {
                 const points = this.createPoints2D(data, 0);
                 const colors = this.createColors2D(speeds);
 
-                this.line3d = this.createLineColor(points, colors);
-                this.line3d.computeLineDistances();
+                let line3d = this.createLineColor(points, colors);
+                line3d.computeLineDistances();
 
-                this.controller.threeViewer.scene.remove(this.line);
+                //this.controller.threeViewer.scene.remove(line);
 
-                this.visu_meshes.push(this.line3d);
+                this.visu_meshes.push(line3d);
 
                 // add line to scene so it can be rendered
-                this.controller.threeViewer.scene.add(this.line3d);
+                this.controller.threeViewer.scene.add(line3d);
             } else {
 
                 let geometry = new THREE.BufferGeometry();
@@ -267,11 +264,11 @@ export default {
                     opacity: 0.8
                 });
 
-                this.mesh = new THREE.Mesh(geometry, material);
+                let mesh = new THREE.Mesh(geometry, material);
 
-                this.visu_meshes.push(this.mesh);
+                this.visu_meshes.push(mesh);
 
-                this.controller.threeViewer.scene.add(this.mesh);
+                this.controller.threeViewer.scene.add(mesh);
             }
 
             return [min, max];
@@ -292,7 +289,7 @@ export default {
 
 
             this.dimension = 3;
-            createDimensionEnvironment(3);
+            this.createDimensionEnvironment(3);
 
             this.isLegend = true;
         },
@@ -534,12 +531,12 @@ export default {
                     points = this.createPoints2D(data, 0);
                     colors = this.createColors2D(speeds);
 
-                    this.line3d = this.createLineColor(points, colors);
-                    this.line3d.computeLineDistances();
+                    let line3d = this.createLineColor(points, colors);
+                    line3d.computeLineDistances();
 
-                    this.controller.threeViewer.scene.remove(this.line);
+                    //this.controller.threeViewer.scene.remove(line);
 
-                    this.visu_meshes.push(this.line3d);
+                    this.visu_meshes.push(line3d);
 
                     // add line to scene so it can be rendered
                     this.controller.threeViewer.scene.add(this.line3d);
@@ -548,15 +545,15 @@ export default {
                     pointsLine = this.createPoints2D(data, wallZtop);
                     colorsLine = this.createColors2D(speeds);
 
-                    this.line3d = this.createLineColor(pointsLine, colorsLine);
-                    this.line3d.computeLineDistances();
+                    let line3d = this.createLineColor(pointsLine, colorsLine);
+                    line3d.computeLineDistances();
 
-                    this.controller.threeViewer.scene.remove(this.line);
+                    //this.controller.threeViewer.scene.remove(line);
 
-                    this.visu_meshes.push(this.line3d);
+                    this.visu_meshes.push(line3d);
 
                     // add line to scene so it can be rendered
-                    this.controller.threeViewer.scene.add(this.line3d);
+                    this.controller.threeViewer.scene.add(line3d);
 
                     /* On dessine le mur */
                     let geometry = new THREE.BufferGeometry();
@@ -679,11 +676,11 @@ export default {
                         opacity: 0.8
                     });
 
-                    this.wall = new THREE.Mesh(geometry, material);
+                    let wall = new THREE.Mesh(geometry, material);
 
-                    this.visu_meshes.push(this.wall);
+                    this.visu_meshes.push(wall);
 
-                    this.controller.threeViewer.scene.add(this.wall);
+                    this.controller.threeViewer.scene.add(wall);
 
                     /* Création des sphères pour la simulation */
                     const geometrySphere = new THREE.SphereGeometry(7, 32, 16);
@@ -737,7 +734,7 @@ export default {
             });
 
             this.dimension = 3;
-            createDimensionEnvironment(3);
+            this.createDimensionEnvironment(3);
 
             this.isLegend = true;
         }

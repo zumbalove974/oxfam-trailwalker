@@ -84,8 +84,9 @@
         <div v-if="controller" class="flex flex-column gap-3">
           <div v-for="category in categories" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
-            <VisuMur @func="test" :controllerProps="controller" :devicesProps="devices"
-              :visu_functionProps="visu_function" :dimensionProps="dimension" :categoryProps="category">
+            <VisuMur @func="test" :createDimensionEnvironmentProps="createDimensionEnvironment"
+              :controllerProps="controller" :devicesProps="devices" :visu_functionProps="visu_function"
+              :dimensionProps="dimension" :visu_meshesProps="visu_meshes" :categoryProps="category">
             </VisuMur>
           </div>
           <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
@@ -124,9 +125,11 @@
 
 <script>
 
-import { init, removeCPS, getVitesseMoyenne, resetCamera/*, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall*/, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import { toRaw } from 'vue';
+
+import { init, vavinCenter } from '../../client/index.js'
 import VisuMur from './../../components/VisuMur.vue';
-import { getLiveDataDevice } from "../../client/bddConnexion";
+import { getLiveDataDevice, getControlPoints } from "../../client/bddConnexion";
 //import { tronquer } from "../../client/mathUtils";
 
 // Primevue components
@@ -152,6 +155,10 @@ import "primeicons/primeicons.css";
 import { useToast } from "primevue/usetoast";
 //import { preventDefault } from 'ol/events/Event';
 
+import * as THREE from "three";
+
+import { ZOOM_RES_L93 } from "../../client/Utils";
+
 
 export default {
   name: 'App',
@@ -174,27 +181,25 @@ export default {
   },
   data() {
     return {
-      init: init,
-      //addItineraire: addItineraire,
-      //addItineraireEpaisseur: addItineraireEpaisseur,
-      //addItineraireSpeed3D: addItineraireSpeed3D,
-      //addItineraireSpeedWall: addItineraireSpeedWall,
-      addCPs: addCPs,
       getLiveDataDevice: getLiveDataDevice,
-      addTeamMarker: addTeamMarker,
-      createDimensionEnvironment: createDimensionEnvironment,
-      removeEventListeners: removeEventListeners,
-      addEventListeners: addEventListeners,
-      getVitesseMoyenne: getVitesseMoyenne,
-      resetCamera: resetCamera,
-      removeCPS: removeCPS,
       dimension: 2,
+      cameraZ: 60,
+      initPointerX: null,
+      initPointerY: null,
+      lastPointerX: null,
+      lastPointerY: null,
+      newPointerX: null,
+      newPointerY: null,
+      zoomPas: 1,
       toast: null,
       tabOpen: 1,
       selectedTimestamp: '',
       timestamps: [],
       devices: [],
+      visu_meshes: [],
       devicesTab: [],
+      raycaster: new THREE.Raycaster(),
+      pointer: new THREE.Vector2(),
       deviceNumber: null,
       deviceNumberFrom: null,
       deviceNumberTo: null,
@@ -244,7 +249,12 @@ export default {
     }
   },
   async mounted() {
-    this.controller = this.init();
+    init().then(res => {
+      this.controller = res;
+      this.controller = toRaw(this.controller);
+
+      this.createDimensionEnvironment(this.dimension);
+    });
 
     console.log("________dfdfdfdf", this.controller)
     this.toast = useToast();
@@ -252,7 +262,6 @@ export default {
       await this.loadTimestamps();
     }
 
-    createDimensionEnvironment(this.dimension);
     //this.result = await this.getAllLiveData();
 
     // Modification du style des bouton du speed dial 
@@ -266,11 +275,11 @@ export default {
   },
   methods: {
     test: function (data) {
-      console.log("ttt ", data)
+      this.visu_meshes = data;
     },
     changerDeDimension() {
       this.dimension = this.dimension.value;
-      createDimensionEnvironment(this.dimension);
+      this.createDimensionEnvironment(this.dimension);
     },
     getValuesFromDevicesTab() {
       let res = [];
@@ -368,6 +377,261 @@ export default {
     displayPosEquipe() {
       this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
       this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+    },
+    clickUp() {
+      this.controller.threeViewer.controls.enabled = true;
+      this.pointerIsDown = false;
+
+      this.pointer.x = 0;
+      this.pointer.y = 0;
+
+      this.raycaster.setFromCamera(this.pointer, this.controller.threeViewer.perspectiveCamera);
+      let intersects = this.raycaster.intersectObjects(this.controller.threeViewer.planes.children);
+
+      if (intersects.length) {
+        let x = intersects[0].point.x * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[0];
+        let y = intersects[0].point.y * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[1];
+
+        this.controller.olViewer.map.getView().setCenter([x, y]);
+        this.controller.threeViewer.mapCenter = [x, y];
+      }
+
+      this.controller.threeViewer.controls.enabled = false;
+
+      this.controller.threeViewer.perspectiveCamera.position.set(0, 0, this.cameraZ);
+      this.controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
+      this.controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
+
+      this.controller.threeViewer.controls.enabled = true;
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
+
+      if (this.devices.length && this.visu_function)
+        this.visu_function(this.devices);
+      else
+        this.addItineraireReference();
+
+    },
+    clickDown(event) {
+      this.controller.threeViewer.controls.enabled = false;
+      this.pointerIsDown = true;
+
+      this.initPointerX = event.clientX;
+      this.initPointerY = event.clientY;
+
+      this.lastPointerX = event.clientX;
+      this.lastPointerY = event.clientY;
+    },
+    clickMove(event) {
+      if (this.pointerIsDown) {
+        this.newPointerX = event.clientX;
+        this.newPointerY = event.clientY;
+
+        this.controller.threeViewer.perspectiveCamera.position.x += (this.lastPointerX - this.newPointerX);
+        this.controller.threeViewer.perspectiveCamera.position.y += (this.newPointerY - this.lastPointerY);
+
+        this.lastPointerX = this.newPointerX;
+        this.lastPointerY = this.newPointerY;
+      }
+    },
+    scroll() {
+
+      const changeZ = this.controller.threeViewer.perspectiveCamera.position.z;
+
+      let zoom = this.controller.olViewer.map.getView().getZoom();
+
+      if (changeZ != this.cameraZ) {
+        if (changeZ < this.cameraZ) {
+          zoom += this.zoomPas;
+        } else if (changeZ > this.cameraZ) {
+          zoom -= this.zoomPas;
+        }
+
+        this.controller.olViewer.map.getView().setZoom(Math.round(zoom));
+        this.controller.threeViewer.perspectiveCamera.position.z = this.cameraZ;
+        this.controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
+
+        while (this.visu_meshes.length > 0) {
+          this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+        }
+
+        if (this.devices.length && this.visu_function)
+          this.visu_function(this.devices);
+        else
+          this.addItineraireReference();
+      }
+    },
+    /* Lorsqu'on est en 3D l'utilisateur peut déplacer la caméra avec les flèches directionnelles */
+    onKeyDown(event) {
+      switch (event.key) {
+        case 'ArrowUp':
+          event.preventDefault();
+          this.controller.threeViewer.translateZ = -5;
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          this.controller.threeViewer.translateZ = 5;
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          this.controller.threeViewer.translateX = 5;
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          this.controller.threeViewer.translateX = -5;
+          break;
+      }
+    },
+    onKeyUp() {
+      this.controller.threeViewer.translateX = 0;
+      this.controller.threeViewer.translateZ = 0;
+    },
+    resetCamera(dimension) {
+
+      //const worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+      //controller.threeViewer.perspectiveCamera.position.set(worldCoords[0], worldCoords[1], cameraZ);
+      this.controller.olViewer.map.getView().setCenter(vavinCenter);
+
+      this.createDimensionEnvironment(2)
+
+      if (dimension == 3) {
+        this.createDimensionEnvironment(3)
+      }
+    },
+    /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
+    addEventListeners() {
+      /* On désactive l'orbit control lors du click (drag) */
+      document.addEventListener("pointerup", this.clickUp, true);
+      document.addEventListener("pointerdown", this.clickDown, true);
+      document.addEventListener("pointermove", this.clickMove, true);
+      /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
+      this.controller.threeViewer.controls.addEventListener('change', this.scroll, true);
+    },
+    /* Supprime les évènements du scroll et du drag lorsqu'on passe en 3D */
+    removeEventListeners() {
+      document.removeEventListener("pointerup", this.clickUp, true);
+      document.removeEventListener("pointerdown", this.clickDown, true);
+      document.removeEventListener("pointermove", this.clickMove, true);
+      this.controller.threeViewer.controls.removeEventListener('change', this.scroll, true);
+    },
+    createDimensionEnvironment(dimensionNb) {
+
+      this.dimension = dimensionNb;
+
+      if (this.dimension == 2) {
+        console.log("___dimension 2___");
+
+        window.removeEventListener('keydown', this.onKeyDown, false);
+        window.removeEventListener('keyup', this.onKeyUp, false);
+
+        console.log("dddd ", this.controller);
+        this.controller.threeViewer.controls.enabled = false;
+
+        if (Object.keys(this.controller).length == 12)
+          this.controller.threeViewer.mapCenter = this.controller.olViewer.map.getView().getCenter();
+
+        this.controller.threeViewer.isTransitioning = [true, true];
+
+        this.addEventListeners();
+
+        //this.controller.threeViewer.scene.remove(wall);
+        //this.controller.threeViewer.scene.remove(mesh);
+
+        if (this.device && this.visu_function)
+          this.visu_function(this.devices);
+      } else {
+        console.log("___dimension 3___");
+
+        window.addEventListener('keydown', this.onKeyDown, false);
+        window.addEventListener('keyup', this.onKeyUp, false);
+
+        this.removeEventListeners();
+      }
+    },
+    async getVitesseMoyenne(device) {
+      const data = await getLiveDataDevice(device);
+
+      let somme = 0;
+
+      data.forEach(point => {
+        somme += point.speed;
+      })
+
+      return somme / data.length;
+    },
+    async addItineraireReference() {
+
+      const coords = await getLiveDataDevice(3843);
+
+      const GPSmaterial = new THREE.LineBasicMaterial({
+        color: 0xff0000
+      });
+
+      const GPSpoints = [];
+
+      for (let i = 0; i < coords.length; i++) {
+
+        GPSpoints.push(new THREE.Vector3(
+          this.controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
+          this.controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
+          0));
+      }
+
+      //console.log("GPSpoints", GPSpoints)
+
+      const GPSgeometry = new THREE.BufferGeometry().setFromPoints(GPSpoints);
+
+      let GPSvisu_mesh = new THREE.Line(GPSgeometry, GPSmaterial);
+      this.visu_meshes.push(GPSvisu_mesh);
+
+      this.controller.threeViewer.scene.add(GPSvisu_mesh);
+    },
+    async addCPs() {
+      let cps = await getControlPoints();
+      // Coordinates of the 10 points
+      cps.forEach(async point => {
+        let worldCoords = this.controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+        let geometry = new THREE.CircleGeometry(10, 32);
+        let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+        let circle = new THREE.Mesh(geometry, material);
+        circle.position.x = worldCoords[0];
+        circle.position.y = worldCoords[1];
+        circle.position.z = 0;
+        this.controller.threeViewer.scene.add(circle);
+
+        this.pdcs.push(circle);
+      })
+    },
+    disposeThreeMesh(mesh) {
+      mesh.geometry.dispose();
+      mesh.material.dispose();
+      this.controller.threeViewer.scene.remove(mesh);
+    },
+    removeCPS() {
+      this.pdcs.forEach(pdc => {
+        this.disposeThreeMesh(pdc);
+      })
+    },
+    async addTeamMarker(deviceNumber, timeStamp) {
+      this.device = deviceNumber;
+      this.time_stamp = timeStamp;
+      const teamPositions = await getLiveDataDevice(deviceNumber);
+      for (let i = 0; i < teamPositions.length; i++) {
+        if (teamPositions[i].timestamp === this.time_stamp) {
+          console.log(teamPositions[i].timestamp);
+          // Convert the team's position from Web Mercator to world coordinates
+          const worldCoords = this.controller.threeViewer.getWorldCoords([teamPositions[i].x, teamPositions[i].y]);
+          const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
+          const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
+          const sphere = new THREE.Mesh(geometry, material);
+          sphere.position.x = worldCoords[0];
+          sphere.position.y = worldCoords[1];
+          sphere.position.z = 0;
+          this.controller.threeViewer.scene.add(sphere);
+        }
+      }
     }
   }
 }
