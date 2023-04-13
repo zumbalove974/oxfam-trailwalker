@@ -1,31 +1,112 @@
-<template></template>
+<template>
+    <Toast position="bottom-center" />
+
+    <RadioButton v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
+        @click="test" /><!--functions[category.key]" />-->
+    <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
+</template>
 
 <script>
 
-import Menubar from 'primevue/menubar';
+import { toRaw } from 'vue';
+import { createDimensionEnvironment } from '../client/index.js';
+import { getLiveDataDevice } from "../client/bddConnexion";
+import { asc, calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "../client/mathUtils.js";
+
+import * as THREE from "three";
+
+import { tronquer } from "../client/mathUtils";
+
+import RadioButton from 'primevue/radiobutton';
+import Toast from 'primevue/toast';
+
+import { useToast } from "primevue/usetoast";
+
 
 export default {
     components: {
-
+        RadioButton,
+        Toast
+    },
+    props: {
+        controllerProps: Promise,
+        devicesProps: Array,
+        visu_functionProps: Function,
+        dimensionProps: Number,
+        categoryProps: Object
     },
     data() {
         return {
-            devices: [],
-            visu_function: null,
-            dimension: 2,
+            devices: this.devicesProps,
+            visu_function: this.visu_functionProps,
+            dimension: this.dimensionProps,
             line3d: null,
             line: null,
-            controller: null,
+            controller: this.controllerProps,
             visu_meshes: [],
-            mesh: null
+            mesh: null,
+            GPSvisu_mesh: null,
+            wall: null,
+            createDimensionEnvironment: createDimensionEnvironment,
+            selectedCategory: 'Production',
+            category: this.categoryProps,
+            functions: {
+                '1': this.displayVisuSimple,
+                '2': this.displayVisuEpaisseur,
+                '3': this.displayVisuMontagne,
+                '4': this.displayVisuMur
+            },
+            toast: null,
         }
     },
+    mounted() {
+        console.log(this.controller)
+        this.toast = useToast();
+    },
     methods: {
+        test() {
+            toRaw(this.functions[toRaw(this.category).key])();
+        },
+        createPoints2D(data, z) {
+            const points = [];
+
+            for (let i = 0; i < data.length; i++) {
+                points.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                points.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                points.push(z);
+            }
+
+            return points;
+        },
+        createColors2D(speeds) {
+            const colors = [];
+
+            for (let i = 0; i < speeds.length; i++) {
+                colors.push(speeds[i]);
+                colors.push(1.0 - speeds[i]);
+                colors.push(0.2);
+            }
+
+            return colors;
+        },
+        createLineColor(points, colors) {
+            const geometry = new THREE.BufferGeometry();
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+
+            // create material
+            const material = new THREE.MeshBasicMaterial({
+                vertexColors: true,
+            });
+
+            return new THREE.Line(geometry, material);
+        },
         async addItineraireSpeed3D(deviceNumbers) {
 
             this.devices = deviceNumbers;
             const device = this.devices[0];
-            this.visu_function = addItineraireSpeed3D;
+            this.visu_function = this.addItineraireSpeed3D;
 
             const data = await getLiveDataDevice(device);
 
@@ -44,10 +125,10 @@ export default {
             }
 
             if (this.dimension == 2) {
-                const points = createPoints2D(data, 0);
-                const colors = createColors2D(speeds);
+                const points = this.createPoints2D(data, 0);
+                const colors = this.createColors2D(speeds);
 
-                this.line3d = createLineColor(points, colors);
+                this.line3d = this.createLineColor(points, colors);
                 this.line3d.computeLineDistances();
 
                 this.controller.threeViewer.scene.remove(this.line);
@@ -55,7 +136,7 @@ export default {
                 this.visu_meshes.push(this.line3d);
 
                 // add line to scene so it can be rendered
-                this.controller.threeViewer.scene.add(line3d);
+                this.controller.threeViewer.scene.add(this.line3d);
             } else {
 
                 let geometry = new THREE.BufferGeometry();
@@ -67,53 +148,53 @@ export default {
 
                 for (let i = 0; i < (data.length - 1); i++) {
                     //Face 1
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                     vertices.push(data[i].speed / max * maxZ);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                     vertices.push(0);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                     vertices.push(0);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                     vertices.push(0);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                     vertices.push(data[i + 1].speed / max * maxZ);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                     vertices.push(data[i].speed / max * maxZ);
 
                     // Face 2
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                     vertices.push(data[i].speed / max * maxZ);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                     vertices.push(0);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                     vertices.push(0);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                     vertices.push(0);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                     vertices.push(data[i].speed / max * maxZ);
 
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                    vertices.push(controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                    vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                     vertices.push(data[i + 1].speed / max * maxZ);
                 }
 
@@ -180,14 +261,479 @@ export default {
                     opacity: 0.8
                 });
 
-                mesh = new THREE.Mesh(geometry, material);
+                this.mesh = new THREE.Mesh(geometry, material);
 
-                visu_meshes.push(mesh);
+                this.visu_meshes.push(this.mesh);
 
-                controller.threeViewer.scene.add(mesh);
+                this.controller.threeViewer.scene.add(this.mesh);
             }
 
             return [min, max];
+        },
+        displayVisuMontagne() {
+            this.toast.removeAllGroups();
+            this.visuFunction = this.displayVisuMontagne;
+
+            if (this.devices.length > 1)
+                this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
+            else
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
+
+            this.addItineraireSpeed3D(this.devices, this.dimension).then(res => {
+                this.minLegend = tronquer(res[0], 2);
+                this.maxLegend = tronquer(res[1], 2);
+            });
+
+
+            this.dimension = 3;
+            createDimensionEnvironment(3);
+
+            this.isLegend = true;
+        },
+        addItineraire(deviceNumbers) {
+
+            this.devices = deviceNumbers;
+            //device = devices[0]; //////temporaire
+            this.devices.forEach(async device => {
+                this.visu_function = this.addItineraire;
+
+                const coords = await getLiveDataDevice(device);
+
+                const material = new THREE.LineBasicMaterial({
+                    color: 0xff0000
+                });
+
+                const points = [];
+
+                for (let i = 0; i < coords.length; i++) {
+                    points.push(new THREE.Vector3(
+                        this.controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[0],
+                        this.controller.threeViewer.getWorldCoords([coords[i].x_GPS, coords[i].y_GPS])[1],
+                        0));
+                }
+
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+                let visu_mesh = new THREE.Line(geometry, material);
+                this.visu_meshes.push(visu_mesh);
+
+                this.controller.threeViewer.scene.add(visu_mesh);
+            })
+        },
+        async addItineraireEpaisseur(deviceNumbers) {
+
+            this.devices = deviceNumbers;
+            const device = this.devices[0];
+
+            const trace = await getLiveDataDevice(device);
+
+            const maxSpeed = Math.max(...trace.map(t => t.speed));
+
+            let shape = [];
+            let color = [];
+
+            for (let i = 0; i < trace.length - 2; i++) {
+                let xA = this.controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[0];
+                let yA = this.controller.threeViewer.getWorldCoords([trace[i].x, trace[i].y])[1];
+                let xB = this.controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[0];
+                let yB = this.controller.threeViewer.getWorldCoords([trace[i + 1].x, trace[i + 1].y])[1];
+                let xC = this.controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[0];
+                let yC = this.controller.threeViewer.getWorldCoords([trace[i + 2].x, trace[i + 2].y])[1];
+                let dA = (trace[i].speed ** 2) * 1.5;
+                let dB = (trace[i + 1].speed ** 2) * 1.5;
+                let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+                let normBC = Math.sqrt(Math.pow(xB - xC, 2) + Math.pow(yB - yC, 2));
+
+                if (normAB === 0) { continue }
+
+                if (dB != 0) {
+                    shape.push(
+                        xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA - dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    color.push(
+                        1 - trace[i].speed / maxSpeed, trace[i].speed / maxSpeed, 0.2)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+                }
+
+                if (dA != 0) {
+                    shape.push(
+                        xA + dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA - dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xA - dA * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA + dA * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    color.push(
+                        1 - trace[i].speed / maxSpeed, trace[i].speed / maxSpeed, 0.2)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+                    color.push(
+                        1 - trace[i].speed / maxSpeed, trace[i].speed / maxSpeed, 0.2)
+                }
+
+                if (normAB != 0 && normBC != 0 && dB != 0) {
+                    shape.push(xB, yB, 0);
+                    shape.push(
+                        xB - dB * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+                        yB + dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+                    shape.push(
+                        xB - dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+
+                    shape.push(xB, yB, 0);
+                    shape.push(
+                        xB + dB * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB - dB * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB + dB * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+                        yB - dB * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+                    color.push(
+                        1 - trace[i + 1].speed / maxSpeed, trace[i + 1].speed / maxSpeed, 0.2)
+                }
+
+            }
+            const material = new THREE.MeshBasicMaterial({
+                vertexColors: true,
+            });
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
+
+            let visu_mesh = new THREE.Mesh(geometry, material);
+            this.visu_meshes.push(visu_mesh)
+            this.controller.threeViewer.scene.add(visu_mesh);
+
+            this.visu_function = this.addItineraireEpaisseur;
+        },
+        async getMoyenneDevice(devices) {
+            let moyennes = [];
+            let moyennesDict = {};
+
+            for (let i = 0; i < devices.length; i++) {
+                let moyenne = await this.getVitesseMoyenne(devices[i]);
+
+                moyennes.push(moyenne);
+                moyennesDict[moyenne] = devices[i];
+            }
+
+            return [moyennes, moyennesDict];
+        },
+        disposeThreeMesh(mesh) {
+            mesh.geometry.dispose();
+            mesh.material.dispose();
+            this.controller.threeViewer.scene.remove(mesh);
+        },
+        async getVitesseMoyenne(device) {
+            const data = await getLiveDataDevice(device);
+
+            let somme = 0;
+
+            data.forEach(point => {
+                somme += point.speed;
+            })
+
+            return somme / data.length;
+        },
+        async addItineraireSpeedWall(deviceNumbers) {
+
+            this.controller.threeViewer.shperes.forEach(sphere => {
+                this.disposeThreeMesh(sphere.mesh);
+                this.disposeThreeMesh(sphere.wall);
+                this.disposeThreeMesh(sphere.line);
+            })
+
+            let indexVisu = 0;
+
+            this.visu_function = this.addItineraireSpeedWall;
+
+            this.devices = deviceNumbers;
+            let moyennes
+            let moyennesDict;
+
+            let res = await this.getMoyenneDevice(this.devices);
+
+            moyennes = res[0];
+            moyennesDict = res[1];
+
+            const medianMoyennes = asc(moyennes)[Math.round(moyennes.length / 2)];
+            const deviceMedian = moyennesDict[medianMoyennes];
+
+            const dataMedian = await getLiveDataDevice(deviceMedian);
+
+            let speedsDataSorted = [];
+
+            for (let i = 0; i < dataMedian.length; i++) {
+                speedsDataSorted.push(dataMedian[i].speed);
+            }
+
+            const min = Math.min(...speedsDataSorted);
+            const q1 = calculerPremierQuartile(speedsDataSorted);
+            const q2 = calculerMedian(speedsDataSorted);
+            const q3 = calculerTroisiemeQuartile(speedsDataSorted);
+            const max = Math.max(...speedsDataSorted);
+
+            this.devices.forEach(async device => {
+
+                const data = await getLiveDataDevice(device);
+
+                let points = [];
+                let pointsLine = [];
+                let colors = [];
+                let colorsLine = [];
+                let speedsData = [];
+
+                for (let i = 0; i < data.length; i++) {
+                    speedsData.push(data[i].speed);
+                }
+
+                let speeds = [];
+
+                for (let i = 0; i < speedsData.length; i++) {
+                    if (speedsData[i] < q1) {
+                        speeds.push((speedsData[i] - min) / (4 * (q1 - min)));
+                    } else if (speedsData[i] < q2) {
+                        speeds.push((speedsData[i] - q1) / (4 * (q2 - q1)) + 0.25);
+                    } else if (speedsData[i] < q3) {
+                        speeds.push((speedsData[i] - q2) / (4 * (q3 - q2)) + 0.5);
+                    } else {
+                        speeds.push((speedsData[i] - q3) / (4 * (max - q3)) + 0.75);
+                    }
+                }
+
+                const wallZtop = 20 * (indexVisu + 1);
+                const wallZbottom = 20 * indexVisu;
+
+                if (this.dimension == 2) {
+                    points = this.createPoints2D(data, 0);
+                    colors = this.createColors2D(speeds);
+
+                    this.line3d = this.createLineColor(points, colors);
+                    this.line3d.computeLineDistances();
+
+                    this.controller.threeViewer.scene.remove(this.line);
+
+                    this.visu_meshes.push(this.line3d);
+
+                    // add line to scene so it can be rendered
+                    this.controller.threeViewer.scene.add(this.line3d);
+                } else {
+                    /* On dessine les lignes qui vont séparer les différentes portion du mur */
+                    pointsLine = this.createPoints2D(data, wallZtop);
+                    colorsLine = this.createColors2D(speeds);
+
+                    this.line3d = this.createLineColor(pointsLine, colorsLine);
+                    this.line3d.computeLineDistances();
+
+                    this.controller.threeViewer.scene.remove(this.line);
+
+                    this.visu_meshes.push(this.line3d);
+
+                    // add line to scene so it can be rendered
+                    this.controller.threeViewer.scene.add(this.line3d);
+
+                    /* On dessine le mur */
+                    let geometry = new THREE.BufferGeometry();
+
+                    let vertices = [];
+                    let colors = [];
+
+                    for (let i = 0; i < (data.length - 1); i++) {
+                        //Face 1
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                        vertices.push(wallZtop);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                        vertices.push(wallZbottom);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                        vertices.push(wallZbottom);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                        vertices.push(wallZbottom);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                        vertices.push(wallZtop);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                        vertices.push(wallZtop);
+
+                        // Face 2
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                        vertices.push(wallZtop);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                        vertices.push(wallZbottom);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                        vertices.push(wallZbottom);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                        vertices.push(wallZbottom);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                        vertices.push(wallZtop);
+
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                        vertices.push(wallZtop);
+                    }
+
+                    for (let i = 0; i < (data.length - 1); i++) {
+                        // Face 1
+                        colors.push(1.0 - speeds[i]);
+                        colors.push(speeds[i]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i]);
+                        colors.push(speeds[i]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i + 1]);
+                        colors.push(speeds[i + 1]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i + 1]);
+                        colors.push(speeds[i + 1]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i + 1]);
+                        colors.push(speeds[i + 1]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i]);
+                        colors.push(speeds[i]);
+                        colors.push(0.0);
+
+                        //Face 2
+                        colors.push(1.0 - speeds[i]);
+                        colors.push(speeds[i]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i + 1]);
+                        colors.push(speeds[i + 1]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i + 1]);
+                        colors.push(speeds[i + 1]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i + 1]);
+                        colors.push(speeds[i + 1]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i]);
+                        colors.push(speeds[i]);
+                        colors.push(0.0);
+
+                        colors.push(1.0 - speeds[i + 1]);
+                        colors.push(speeds[i + 1]);
+                        colors.push(0.0);
+                    }
+
+                    // itemSize = 3 because there are 3 values (components) per vertex
+                    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+                    geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+
+                    // create material
+                    const material = new THREE.MeshBasicMaterial({
+                        vertexColors: true,
+                        transparent: true,
+                        opacity: 0.8
+                    });
+
+                    this.wall = new THREE.Mesh(geometry, material);
+
+                    this.visu_meshes.push(this.wall);
+
+                    this.controller.threeViewer.scene.add(this.wall);
+
+                    /* Création des sphères pour la simulation */
+                    const geometrySphere = new THREE.SphereGeometry(7, 32, 16);
+                    const materialSphere = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+                    const sphere = new THREE.Mesh(geometrySphere, materialSphere);
+
+                    sphere.position.x = this.controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[0];
+                    sphere.position.y = this.controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[1];
+                    sphere.position.z = (wallZbottom + wallZtop) / 2;
+
+                    this.controller.threeViewer.scene.add(sphere);
+
+                    this.controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0, wall: this.wall, line: this.line3d, running: true });
+                    this.controller.threeViewer.animeTrailer = true;
+                    this.controller.threeViewer.state.clock.start();
+                }
+
+                indexVisu++;
+            })
+
+            return [min, max];
+        },
+        displayVisuSimple() {
+            this.toast.removeAllGroups();
+            this.visuFunction = this.displayVisuSimple;
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
+            this.addItineraire(this.devices);
+        },
+        displayVisuEpaisseur() {
+            this.toast.removeAllGroups();
+            this.visuFunction = this.displayVisuEpaisseur;
+
+            if (this.devices.length > 1)
+                this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
+            else
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
+
+            this.addItineraireEpaisseur(this.devices);
+            this.isLegend = true;
+        },
+        displayVisuMur() {
+            this.toast.removeAllGroups();
+            this.visuFunction = this.displayVisuMur;
+
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
+            this.addItineraireSpeedWall(this.devices);
+
+            this.addItineraireSpeedWall(this.devices).then(res => {
+                this.minLegend = tronquer(res[0], 2);
+                this.maxLegend = tronquer(res[1], 2);
+            });
+
+            this.dimension = 3;
+            createDimensionEnvironment(3);
+
+            this.isLegend = true;
         }
     }
 };

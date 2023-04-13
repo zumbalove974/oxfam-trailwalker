@@ -10,7 +10,7 @@ import { ZOOM_RES_L93 } from "./Utils";
 
 import { getLiveDataDevice, getControlPoints } from "./bddConnexion";
 
-import { asc, calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
+//import { asc, calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile } from "./mathUtils.js";
 
 
 //data can be imported like this or read from the data folder
@@ -44,8 +44,9 @@ let devices = [];
 let time_stamp;
 let device;
 let GPSvisu_mesh;
+/*
 let line;
-let line3d;
+let line3d;*/
 let mesh;
 let wall;
 let dimension;
@@ -81,6 +82,8 @@ export const init = async function init() {
 
   controller.threeViewer.cameraZ = cameraZ;
   controller.threeViewer.vavinCenter = vavinCenter;
+
+  return controller;
 }
 
 const depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
@@ -391,9 +394,14 @@ async function addItineraireReference() {
   visu_meshes.push(GPSvisu_mesh);
 
   controller.threeViewer.scene.add(GPSvisu_mesh);
-
 }
 
+function disposeThreeMesh(mesh) {
+  mesh.geometry.dispose();
+  mesh.material.dispose();
+  controller.threeViewer.scene.remove(mesh);
+}
+/*
 export const addItineraire = function addItineraire(deviceNumbers) {
 
   devices = deviceNumbers;
@@ -590,7 +598,7 @@ export const addItineraireSpeed3D = async function addItineraireSpeed3D(deviceNu
   let min = Math.min(...speeds);
   let max = Math.max(...speeds);
 
-  /* Normalisation des vitesses pour les utiliser dans les couleurs */
+  /* Normalisation des vitesses pour les utiliser dans les couleurs /
   for (let i = 0; i < speeds.length; i++) {
     speeds[i] = (speeds[i] - min) / (max - min);
   }
@@ -756,13 +764,6 @@ async function getMoyenneDevice(devices) {
   return [moyennes, moyennesDict];
 }
 
-function disposeThreeMesh(mesh) {
-  mesh.geometry.dispose();
-  mesh.material.dispose();
-  controller.threeViewer.scene.remove(mesh);
-}
-
-
 export const addItineraireSpeedWall = async function addItineraireSpeedWall(deviceNumbers) {
 
   controller.threeViewer.shperes.forEach(sphere => {
@@ -846,7 +847,7 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       // add line to scene so it can be rendered
       controller.threeViewer.scene.add(line3d);
     } else {
-      /* On dessine les lignes qui vont séparer les différentes portion du mur */
+      /* On dessine les lignes qui vont séparer les différentes portion du mur /
       pointsLine = createPoints2D(data, wallZtop);
       colorsLine = createColors2D(speeds);
 
@@ -860,7 +861,7 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
       // add line to scene so it can be rendered
       controller.threeViewer.scene.add(line3d);
 
-      /* On dessine le mur */
+      /* On dessine le mur /
       let geometry = new THREE.BufferGeometry();
 
       let vertices = [];
@@ -987,7 +988,7 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
 
       controller.threeViewer.scene.add(wall);
 
-      /* Création des sphères pour la simulation */
+      /* Création des sphères pour la simulation /
       const geometrySphere = new THREE.SphereGeometry(7, 32, 16);
       const materialSphere = new THREE.MeshBasicMaterial({ color: 0x0000ff });
       const sphere = new THREE.Mesh(geometrySphere, materialSphere);
@@ -1007,4 +1008,4 @@ export const addItineraireSpeedWall = async function addItineraireSpeedWall(devi
   })
 
   return [min, max];
-}
+}*/

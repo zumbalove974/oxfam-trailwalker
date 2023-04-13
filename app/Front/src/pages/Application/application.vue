@@ -81,12 +81,12 @@
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet right" :activeIndex="tabOpen">
     <AccordionTab>
       <div class="card flex justify-content-center">
-        <div class="flex flex-column gap-3">
+        <div v-if="controller" class="flex flex-column gap-3">
           <div v-for="category in categories" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
-            <RadioButton v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
-              @click="category.function" />
-            <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
+            <VisuMur :controllerProps="controller" :devicesProps="devices" :visu_functionProps="visu_function"
+              :dimensionProps="dimension" :categoryProps="category">
+            </VisuMur>
           </div>
           <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
@@ -124,9 +124,10 @@
 
 <script>
 
-import { init, removeCPS, getVitesseMoyenne, resetCamera, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import { init, removeCPS, getVitesseMoyenne, resetCamera/*, addItineraire, addItineraireEpaisseur, addItineraireSpeed3D, addItineraireSpeedWall*/, createDimensionEnvironment, addCPs, addTeamMarker, removeEventListeners, addEventListeners } from '../../client/index.js'
+import VisuMur from './../../components/VisuMur.vue';
 import { getLiveDataDevice } from "../../client/bddConnexion";
-import { tronquer } from "../../client/mathUtils";
+//import { tronquer } from "../../client/mathUtils";
 
 // Primevue components
 import Dropdown from 'primevue/dropdown';
@@ -139,7 +140,7 @@ import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toast from 'primevue/toast';
-import RadioButton from 'primevue/radiobutton';
+//import RadioButton from 'primevue/radiobutton';
 import Fieldset from 'primevue/fieldset';
 import Checkbox from 'primevue/checkbox';
 
@@ -166,17 +167,18 @@ export default {
     DataTable,
     Column,
     Toast,
-    RadioButton,
+    //RadioButton,
     Fieldset,
-    Checkbox
+    Checkbox,
+    VisuMur
   },
   data() {
     return {
       init: init,
-      addItineraire: addItineraire,
-      addItineraireEpaisseur: addItineraireEpaisseur,
-      addItineraireSpeed3D: addItineraireSpeed3D,
-      addItineraireSpeedWall: addItineraireSpeedWall,
+      //addItineraire: addItineraire,
+      //addItineraireEpaisseur: addItineraireEpaisseur,
+      //addItineraireSpeed3D: addItineraireSpeed3D,
+      //addItineraireSpeedWall: addItineraireSpeedWall,
       addCPs: addCPs,
       getLiveDataDevice: getLiveDataDevice,
       addTeamMarker: addTeamMarker,
@@ -197,6 +199,8 @@ export default {
       deviceNumberFrom: null,
       deviceNumberTo: null,
       visuFunction: null,
+      controller: null,
+      visu_function: null,
       options: [
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
@@ -206,14 +210,14 @@ export default {
       maxLegend: null,
       selectedCategory: 'Production',
       categories: [
-        { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple },
-        { name: 'Visu épaisseur', key: '2', function: this.displayVisuEpaisseur },
-        { name: 'Visu colline', key: '3', function: this.displayVisuMontagne },
-        { name: 'Visu Mur', key: '6', function: this.displayVisuMur }
+        { name: 'Trajectoire enregistrée', key: '1' },
+        { name: 'Visu épaisseur', key: '2' },
+        { name: 'Visu colline', key: '3' },
+        { name: 'Visu Mur', key: '4' }
       ],
       categoriesCheckbox: [
         { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
-        { name: 'Points de contrôle', key: '4', function: this.displayPDC }
+        { name: 'Points de contrôle', key: '6', function: this.displayPDC }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
@@ -242,8 +246,9 @@ export default {
     }
   },
   async mounted() {
-    this.init();
+    this.controller = this.init();
 
+    console.log("________dfdfdfdf", this.controller)
     this.toast = useToast();
     if (this.deviceNumber) {
       await this.loadTimestamps();
@@ -350,12 +355,6 @@ export default {
       if (this.visuFunction)
         this.visuFunction();
     },
-    displayVisuSimple() {
-      this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuSimple;
-      this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
-      this.addItineraire(this.devices);
-    },
     displayPDC(input) {
       this.toast.removeAllGroups();
       this.removeCPS();
@@ -368,55 +367,6 @@ export default {
     displayPosEquipe() {
       this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
       this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
-    },
-    displayVisuEpaisseur() {
-      this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuEpaisseur;
-
-      if (this.devices.length > 1)
-        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-      else
-        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
-
-      this.addItineraireEpaisseur(this.devices);
-      this.isLegend = true;
-    },
-    displayVisuMontagne() {
-      this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuMontagne;
-
-      if (this.devices.length > 1)
-        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-      else
-        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
-
-      this.addItineraireSpeed3D(this.devices, this.dimension).then(res => {
-        this.minLegend = tronquer(res[0], 2);
-        this.maxLegend = tronquer(res[1], 2);
-      });
-
-
-      this.dimension = 3;
-      createDimensionEnvironment(3);
-
-      this.isLegend = true;
-    },
-    displayVisuMur() {
-      this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuMur;
-
-      this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
-      this.addItineraireSpeedWall(this.devices);
-
-      this.addItineraireSpeedWall(this.devices).then(res => {
-        this.minLegend = tronquer(res[0], 2);
-        this.maxLegend = tronquer(res[1], 2);
-      });
-
-      this.dimension = 3;
-      createDimensionEnvironment(3);
-
-      this.isLegend = true;
     }
   }
 }
