@@ -25,25 +25,26 @@ export default {
                 {
                     label: 'À propos',
                     icon: 'pi pi-fw pi-info',
-                    href: 'about'
+                    url: 'about'
                 },
                 {
                     label: 'Dieppe',
                     icon: 'pi pi-fw pi-map-marker',
                     items: [
                         {
-                            label: 'Site officiel Oxfam',
+                            label: 'Site officielOxfam',
                             icon: 'pi pi-fw pi-link',
                             url: 'https://www.oxfamtrailwalker.fr/dieppe/accueil-dieppe/'
                         },
                         {
                             label: 'Base de données',
-                            icon: 'pi pi-fw pi-database'
+                            icon: 'pi pi-fw pi-database',
+                            url: 'http://localhost:5500/inter/3643'
                         }
                     ]
                 },
                 {
-                    label: 'Équipe',
+                    label: 'Team',
                     icon: 'pi pi-fw pi-user'
                 },
                 {

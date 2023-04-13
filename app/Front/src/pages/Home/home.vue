@@ -1,7 +1,8 @@
 <template>
   <div id="app"> </div>
   <MenuBar></MenuBar>
-  <a label="Go to app" href='/application'><Button>
+  <a label="Go to app" href='/application'>
+    <Button>
       Aller à la Visualisation </Button></a>
   <img src="../../assets/trailove.png" />
 </template>
