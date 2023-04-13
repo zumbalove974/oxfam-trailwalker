@@ -1,8 +1,8 @@
 <template>
     <Toast position="bottom-center" />
 
-    <RadioButton v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
-        @click="test" /><!--functions[category.key]" />-->
+    <input type="radio" v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
+        @click="test" />
     <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
 </template>
 
@@ -17,7 +17,6 @@ import * as THREE from "three";
 
 import { tronquer } from "../client/mathUtils";
 
-import RadioButton from 'primevue/radiobutton';
 import Toast from 'primevue/toast';
 
 import { useToast } from "primevue/usetoast";
@@ -25,7 +24,6 @@ import { useToast } from "primevue/usetoast";
 
 export default {
     components: {
-        RadioButton,
         Toast
     },
     props: {
@@ -34,6 +32,9 @@ export default {
         visu_functionProps: Function,
         dimensionProps: Number,
         categoryProps: Object
+    },
+    emits: {
+        visu_function: Function
     },
     data() {
         return {
@@ -68,6 +69,7 @@ export default {
     methods: {
         test() {
             toRaw(this.functions[toRaw(this.category).key])();
+            this.$emit("func", this.visu_function);
         },
         createPoints2D(data, z) {
             const points = [];
@@ -109,6 +111,8 @@ export default {
             this.devices = deviceNumbers;
             const device = this.devices[0];
             this.visu_function = this.addItineraireSpeed3D;
+
+
 
             const data = await getLiveDataDevice(device);
 

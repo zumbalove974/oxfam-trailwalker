@@ -84,8 +84,8 @@
         <div v-if="controller" class="flex flex-column gap-3">
           <div v-for="category in categories" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
-            <VisuMur :controllerProps="controller" :devicesProps="devices" :visu_functionProps="visu_function"
-              :dimensionProps="dimension" :categoryProps="category">
+            <VisuMur @func="test" :controllerProps="controller" :devicesProps="devices"
+              :visu_functionProps="visu_function" :dimensionProps="dimension" :categoryProps="category">
             </VisuMur>
           </div>
           <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
@@ -265,6 +265,9 @@ export default {
 
   },
   methods: {
+    test: function (data) {
+      console.log("ttt ", data)
+    },
     changerDeDimension() {
       this.dimension = this.dimension.value;
       createDimensionEnvironment(this.dimension);
