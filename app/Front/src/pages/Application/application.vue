@@ -84,7 +84,7 @@
         <div v-if="controller" class="flex flex-column gap-3">
           <div v-for="category in categories" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
-            <VisuMur @func="test" :createDimensionEnvironmentProps="createDimensionEnvironment"
+            <VisuMur @data="test" :toastProps="toast" :createDimensionEnvironmentProps="createDimensionEnvironment"
               :controllerProps="controller" :devicesProps="devices" :visu_functionProps="visu_function"
               :dimensionProps="dimension" :visu_meshesProps="visu_meshes" :categoryProps="category">
             </VisuMur>
@@ -174,7 +174,6 @@ export default {
     DataTable,
     Column,
     Toast,
-    //RadioButton,
     Fieldset,
     Checkbox,
     VisuMur
@@ -183,7 +182,8 @@ export default {
     return {
       getLiveDataDevice: getLiveDataDevice,
       dimension: 2,
-      cameraZ: 60,
+      depht_s: Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0,
+      cameraZ: null,
       initPointerX: null,
       initPointerY: null,
       lastPointerX: null,
@@ -256,8 +256,11 @@ export default {
       this.createDimensionEnvironment(this.dimension);
     });
 
-    console.log("________dfdfdfdf", this.controller)
-    this.toast = useToast();
+    this.addItineraireReference();
+
+    this.cameraZ = window.innerHeight / this.depht_s,
+
+      this.toast = useToast();
     if (this.deviceNumber) {
       await this.loadTimestamps();
     }
@@ -275,7 +278,18 @@ export default {
   },
   methods: {
     test: function (data) {
-      this.visu_meshes = data;
+      this.visu_meshes = toRaw(data[0]);
+      this.visu_function = data[1];
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
+
+      if (this.devices.length && this.visu_function) {
+        this.visu_function(this.devices);
+      }
+      else
+        this.addItineraireReference();
     },
     changerDeDimension() {
       this.dimension = this.dimension.value;
@@ -408,8 +422,9 @@ export default {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.devices.length && this.visu_function)
+      if (this.devices.length && this.visu_function) {
         this.visu_function(this.devices);
+      }
       else
         this.addItineraireReference();
 
@@ -526,8 +541,9 @@ export default {
         window.removeEventListener('keydown', this.onKeyDown, false);
         window.removeEventListener('keyup', this.onKeyUp, false);
 
-        console.log("dddd ", this.controller);
         this.controller.threeViewer.controls.enabled = false;
+
+        console.log("eee", Object.keys(this.controller).length);
 
         if (Object.keys(this.controller).length == 12)
           this.controller.threeViewer.mapCenter = this.controller.olViewer.map.getView().getCenter();

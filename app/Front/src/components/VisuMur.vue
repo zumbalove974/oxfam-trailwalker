@@ -1,8 +1,6 @@
 <template>
-    <Toast position="bottom-center" />
-
-    <input type="radio" v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
-        @click="test" />
+    <input @click="display" type="radio" v-model="selectedCategory" :inputId="category.key" name="visualisation"
+        :value="category.name" />
     <label :for="category.key" class="ml-2" style="margin-left: 1rem;">{{ category.name }}</label>
 </template>
 
@@ -23,7 +21,6 @@ import { useToast } from "primevue/usetoast";
 
 export default {
     components: {
-        Toast
     },
     props: {
         controllerProps: Promise,
@@ -32,10 +29,11 @@ export default {
         dimensionProps: Number,
         categoryProps: Object,
         visu_meshesProps: Array,
+        toastProps: Toast,
         createDimensionEnvironmentProps: Function
     },
     emits: {
-        visu_meshes: THREE.Mesh,
+        data: Array,
     },
     data() {
         return {
@@ -47,13 +45,13 @@ export default {
             createDimensionEnvironment: this.createDimensionEnvironmentProps,
             selectedCategory: 'Production',
             category: this.categoryProps,
+            toast: this.toastProps,
             functions: {
                 '1': this.displayVisuSimple,
                 '2': this.displayVisuEpaisseur,
                 '3': this.displayVisuMontagne,
                 '4': this.displayVisuMur
             },
-            toast: null,
         }
     },
     mounted() {
@@ -64,9 +62,10 @@ export default {
         this.toast = useToast();
     },
     methods: {
-        test() {
+        display() {
             toRaw(this.functions[toRaw(this.category).key])();
-            this.$emit("func", this.visu_function);
+            this.visu_function = this.functions[toRaw(this.category).key];
+            this.$emit("data", [this.visu_meshes, this.visu_function]);
         },
         createPoints2D(data, z) {
             const points = [];
@@ -321,7 +320,7 @@ export default {
                 this.visu_meshes.push(visu_mesh);
 
                 this.controller.threeViewer.scene.add(visu_mesh);
-            })
+            });
         },
         async addItineraireEpaisseur(deviceNumbers) {
 
