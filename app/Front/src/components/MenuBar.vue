@@ -7,7 +7,9 @@
             <template #end>
                 <InputText placeholder="Search" type="text" />
             </template>
+
         </Menubar>
+
     </div>
 </template>
 

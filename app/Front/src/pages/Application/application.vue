@@ -1,6 +1,6 @@
 <template>
+  <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
   <div id="map" class="map"></div>
-
   <Toast position="bottom-center" />
 
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
@@ -462,6 +462,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  top: 200px;
 }
 
 #map {
