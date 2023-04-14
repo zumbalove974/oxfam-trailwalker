@@ -2,8 +2,8 @@
   <div id="app"> </div>
   <MenuBar pageName='À propos' pageURL="about"></MenuBar>
   <a label="Go to app" href='/application'>
-    <Button>
-      Aller à la Visualisation </Button></a>
+    <Button>Aller à la Visualisation </Button>
+  </a>
 </template>
 
 <script>
