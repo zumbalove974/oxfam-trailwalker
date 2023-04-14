@@ -34,17 +34,10 @@ services:
       - ./app/Front:/usr/src/app/Front
       - /usr/src/app/Front/node_modules
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "--fail",
-          "--ipv4",
-          "http://localhost:80/"
-        ]
-      interval: 1s
+      test: [ "CMD", "npm", "run", "test" ]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
       start_period: 30s
 
   container_test:
@@ -72,17 +65,10 @@ services:
     links:
       - "db:database"
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "--fail",
-          "--ipv4",
-          "http://express-back:3000/cp"
-        ]
-      interval: 20s
-      timeout: 20s
-      retries: 5
+      test: [ "CMD", "npm", "run", "test" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
       start_period: 20s
     depends_on:
       db:

@@ -3,7 +3,6 @@ WORKDIR /usr/src/app/Back
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run test
 RUN apk update && apk add curl
 EXPOSE 3000
 CMD ["npm", "start"]
