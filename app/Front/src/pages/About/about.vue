@@ -12,12 +12,12 @@
             occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </p>
     </div>
-    <img name="parcours" src="../../assets/parours.png" width="700" height="400" />
+    <img name="parcours" src="../../assets/parcours.png" width="700" height="400" />
 </template>
   
 <script>
 // Primevue css
-import "primevue/resources/themes/lara-dark-purple/theme.css";
+import "primevue/resources/themes/bootstrap4-dark-purple/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 
@@ -45,7 +45,7 @@ export default {
 }
 
 #myPresentation {
-    background-color: black;
+    background-color: ;
     color: white;
     padding: 40px;
     text-align: center;

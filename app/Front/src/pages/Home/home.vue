@@ -4,12 +4,11 @@
   <a label="Go to app" href='/application'>
     <Button>
       Aller à la Visualisation </Button></a>
-  <img src="../../assets/trailove.png" />
 </template>
 
 <script>
 // Primevue css
-import "primevue/resources/themes/lara-light-indigo/theme.css";
+import "primevue/resources/themes/bootstrap4-dark-purple/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import Button from 'primevue/button';
