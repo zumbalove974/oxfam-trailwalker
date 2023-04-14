@@ -1,17 +1,14 @@
 <template>
   <div id="app"> </div>
-  <MenuBar></MenuBar>
-  <Button @click=allerPage2()>Click Me!</Button>
-  <img src="../../assets/trailove.png" />
+  <MenuBar pageName='À propos' pageURL="about"></MenuBar>
+  <a label="Go to app" href='/application'>
+    <Button>Aller à la Visualisation </Button>
+  </a>
 </template>
-
-
-
-
 
 <script>
 // Primevue css
-import "primevue/resources/themes/lara-light-indigo/theme.css";
+import "primevue/resources/themes/bootstrap4-dark-purple/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import Button from 'primevue/button';
@@ -26,11 +23,6 @@ export default {
   components: {
     MenuBar,
     Button
-  },
-  methods: {
-    allerPage2() {
-      this.$router.go('application');
-    }
   }
 }
 </script>

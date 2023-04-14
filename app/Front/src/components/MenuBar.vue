@@ -7,7 +7,9 @@
             <template #end>
                 <InputText placeholder="Search" type="text" />
             </template>
+
         </Menubar>
+
     </div>
 </template>
 
@@ -19,24 +21,31 @@ export default {
     components: {
         Menubar
     },
+    props: {
+        pageName: String,
+        pageURL: String
+    },
     data() {
         return {
             items: [
                 {
-                    label: 'About',
+                    label: this.pageName,
                     icon: 'pi pi-fw pi-info',
+                    url: this.pageURL
                 },
                 {
                     label: 'Dieppe',
                     icon: 'pi pi-fw pi-map-marker',
                     items: [
                         {
-                            label: 'Oxfam Official Website',
-                            icon: 'pi pi-fw pi-link'
+                            label: 'Site officielOxfam',
+                            icon: 'pi pi-fw pi-link',
+                            url: 'https://www.oxfamtrailwalker.fr/dieppe/accueil-dieppe/'
                         },
                         {
-                            label: 'Database',
-                            icon: 'pi pi-fw pi-database'
+                            label: 'Base de données',
+                            icon: 'pi pi-fw pi-database',
+                            url: 'http://localhost:5500/inter/3643'
                         }
                     ]
                 },
@@ -46,7 +55,8 @@ export default {
                 },
                 {
                     label: 'Github',
-                    icon: 'pi pi-fw pi-github'
+                    icon: 'pi pi-fw pi-github',
+                    url: 'https://github.com/zumbalove974/oxfam-trailwalker'
                 }
             ]
         };

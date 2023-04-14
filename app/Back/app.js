@@ -7,8 +7,10 @@ var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var deviceRouter = require('./routes/device');
-var controlPointsRouter = require('./routes/cp')
+var controlPointsRouter = require('./routes/cp');
+var projectedControlPointsRouter = require('./routes/proj_cp');
 var interRouter = require('./routes/inter');
+var trajRouter = require('./routes/traj');
 
 var app = express();
 app.use(cors())
@@ -26,7 +28,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/device', deviceRouter);
 app.use('/cp', controlPointsRouter);
+app.use('/pcp', projectedControlPointsRouter);
 app.use('/inter', interRouter);
+app.use('/traj', trajRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
