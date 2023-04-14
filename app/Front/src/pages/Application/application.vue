@@ -197,6 +197,7 @@ export default {
       timestamps: [],
       devices: [],
       visu_meshes: [],
+      teamMarkers: [],
       devicesTab: [],
       raycaster: new THREE.Raycaster(),
       pointer: new THREE.Vector2(),
@@ -206,6 +207,7 @@ export default {
       visuFunction: null,
       controller: null,
       visu_function: null,
+      pdcs: [],
       options: [
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
@@ -388,9 +390,14 @@ export default {
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
       }
     },
-    displayPosEquipe() {
-      this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
-      this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+    displayPosEquipe(input) {
+      this.toast.removeAllGroups();
+      this.removeTeamMarkers();
+
+      if (input[input.length - 1] == "Position des équipes") {
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
+        this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+      }
     },
     clickUp() {
       this.controller.threeViewer.controls.enabled = true;
@@ -428,6 +435,11 @@ export default {
       else
         this.addItineraireReference();
 
+
+      if (toRaw(this.teamMarkers).length > 0) {
+        this.removeTeamMarkers();
+        this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+      }
     },
     clickDown(event) {
       this.controller.threeViewer.controls.enabled = false;
@@ -543,8 +555,6 @@ export default {
 
         this.controller.threeViewer.controls.enabled = false;
 
-        console.log("eee", Object.keys(this.controller).length);
-
         if (Object.keys(this.controller).length == 12)
           this.controller.threeViewer.mapCenter = this.controller.olViewer.map.getView().getCenter();
 
@@ -607,7 +617,7 @@ export default {
     async addCPs() {
       let cps = await getControlPoints();
       // Coordinates of the 10 points
-      cps.forEach(async point => {
+      cps.forEach(point => {
         let worldCoords = this.controller.threeViewer.getWorldCoords([point[0], point[1]]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
         let geometry = new THREE.CircleGeometry(10, 32);
         let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
@@ -628,15 +638,24 @@ export default {
     removeCPS() {
       this.pdcs.forEach(pdc => {
         this.disposeThreeMesh(pdc);
-      })
+      });
+
+      this.pdcs = [];
+    },
+    removeTeamMarkers() {
+      this.teamMarkers.forEach(teamMarker => {
+        this.disposeThreeMesh(teamMarker);
+      });
+
+      this.teamMarkers = [];
     },
     async addTeamMarker(deviceNumber, timeStamp) {
       this.device = deviceNumber;
       this.time_stamp = timeStamp;
       const teamPositions = await getLiveDataDevice(deviceNumber);
+
       for (let i = 0; i < teamPositions.length; i++) {
         if (teamPositions[i].timestamp === this.time_stamp) {
-          console.log(teamPositions[i].timestamp);
           // Convert the team's position from Web Mercator to world coordinates
           const worldCoords = this.controller.threeViewer.getWorldCoords([teamPositions[i].x, teamPositions[i].y]);
           const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
@@ -646,6 +665,8 @@ export default {
           sphere.position.y = worldCoords[1];
           sphere.position.z = 0;
           this.controller.threeViewer.scene.add(sphere);
+
+          this.teamMarkers.push(sphere);
         }
       }
     }
