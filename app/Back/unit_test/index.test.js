@@ -8,10 +8,10 @@ const truePool = router.pool;
 
 router.pool = new PgMock2();
 
-router.pool.add("SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Interpolation%';", [], {
+router.pool.add("SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Interpolation%'", [], {
     rowCount: 2,
     rows: [
-        "Interpolation_3883", "Interpolation_3843"
+        { "table_name": "Interpolation_3883" }, { "table_name": "Interpolation_3843" }
     ]
 })
 
@@ -76,11 +76,10 @@ describe("Test the index path", () => {
         const response = await request(app).get("/")
         expect(response.statusCode).toBe(200);
         const body = response.body;
-        console.log(body)
         expect(body).not.toBeNaN();
         expect(body).toHaveProperty('length', 2)
         expect(body[0]).toHaveProperty('length', 2)
-        expect(body[0][0]).toEqual({
+        expect(body[1][0]).toEqual({
             index: "10",
             x: 120558.7126364244,
             y: 6432977.242621139,
@@ -92,5 +91,3 @@ describe("Test the index path", () => {
         });
     })
 });
-
-router.pool = truePool;

@@ -12,7 +12,7 @@ router.pool.add('SELECT * FROM public."Interpolation_3883" ORDER BY "index"', []
     rowCount: 2,
     rows: [
         {
-            "index": "0",
+            "index": "10",
             "x": 120558.7126364244,
             "y": 6432977.242621139,
             "speed": 0,
@@ -45,7 +45,7 @@ describe("Test the inter path", () => {
         expect(body).not.toBeNaN();
         expect(body).toHaveProperty('length', 2)
         expect(body[0]).toEqual({
-            index: "0",
+            index: "10",
             x: 120558.7126364244,
             y: 6432977.242621139,
             speed: 0,
@@ -56,5 +56,3 @@ describe("Test the inter path", () => {
         });
     })
 });
-
-router.pool = truePool;

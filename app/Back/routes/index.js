@@ -14,9 +14,8 @@ router.connectDB = async (req, that) => {
   try {
 
     const info_schema = await that.pool.query(
-      "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Interpolation%';"
+      "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Interpolation%'"
     );
-
     let promise_array = [];
     info_schema.rows.forEach(async table => {
       promise_array.push(
