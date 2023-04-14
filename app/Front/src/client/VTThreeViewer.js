@@ -4,7 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils";
 import { getEquationDroite2D, calculerDistance2D, calculerDiffRotation } from "./mathUtils.js";
 import { calculerTempsTimestamp } from "./bddUtils.js";
-import { clickUp } from "./index.js";
+//import { clickUp } from "./index.js";
 
 export const mergedRender = "Merged";
 export const singleRender = "Single";
@@ -196,7 +196,7 @@ export class VTThreeViewer {
       if (!this.isTransitioning[0] && !this.isTransitioning[1]) {
         this.counterEnd = [false, false, false];
 
-        clickUp();
+        //clickUp();
       }
     }
 
