@@ -472,6 +472,7 @@ export default {
             this.devices = deviceNumbers;
 
             let devicesData = [];
+            let longueurData = null;
 
             this.devices.forEach(async device => {
 
@@ -480,13 +481,7 @@ export default {
                 devicesData.push(data);
             });
 
-
-            /* On dessine les lignes qui vont séparer les différentes portion du mur */
-            pointsLine = this.createPoints2D(data, wallZtop);
-            colorsLine = this.createColors2D(speeds);
-
-            let line3d = this.createLineColor(pointsLine, colorsLine);
-            line3d.computeLineDistances();
+            longueursData = devicesData[0].length;
 
             //this.controller.threeViewer.scene.remove(line);
 
@@ -560,56 +555,212 @@ export default {
                 vertices.push(wallZtop);
             }
 
-            for (let i = 0; i < (data.length - 1); i++) {
+            for (let i = 0; i < (longueursData - 1); i++) {
                 // Face 1
                 colors1.push(0.0);
                 colors1.push(1.0);
                 colors1.push(0.0);
 
                 colors1.push(0.2);
-                colors1.push(8.0);
-                colors1.push(0.2);
+                colors1.push(0.8);
+                colors1.push(0.0);
 
                 colors1.push(0.2);
-                colors1.push(8.0);
-                colors1.push(0.2);
+                colors1.push(0.8);
+                colors1.push(0.0);
 
                 colors1.push(0.0);
                 colors1.push(1.0);
                 colors1.push(0.0);
 
                 colors1.push(0.2);
-                colors1.push(8.0);
-                colors1.push(0.2);
+                colors1.push(0.8);
+                colors1.push(0.0);
 
                 colors1.push(0.0);
                 colors1.push(1.0);
                 colors1.push(0.0);
 
                 //Face 2
-                colors1.push(1.0 - speeds[i]);
-                colors1.push(speeds[i]);
+                colors1.push(0.0);
+                colors1.push(1.0);
                 colors1.push(0.0);
 
-                colors1.push(1.0 - speeds[i + 1]);
-                colors1.push(speeds[i + 1]);
+                colors1.push(0.2);
+                colors1.push(0.8);
                 colors1.push(0.0);
 
-                colors1.push(1.0 - speeds[i + 1]);
-                colors1.push(speeds[i + 1]);
+                colors1.push(0.2);
+                colors1.push(8.0);
                 colors1.push(0.0);
 
-                colors1.push(1.0 - speeds[i + 1]);
-                colors1.push(speeds[i + 1]);
+                colors1.push(0.0);
+                colors1.push(1.0);
                 colors1.push(0.0);
 
-                colors1.push(1.0 - speeds[i]);
-                colors1.push(speeds[i]);
+                colors1.push(0.2);
+                colors1.push(0.8);
                 colors1.push(0.0);
 
-                colors1.push(1.0 - speeds[i + 1]);
-                colors1.push(speeds[i + 1]);
                 colors1.push(0.0);
+                colors1.push(1.0);
+                colors1.push(0.0);
+            }
+
+            for (let i = 0; i < (longueursData - 1); i++) {
+                // Face 1
+                colors2.push(0.2);
+                colors2.push(0.8);
+                colors2.push(0.0);
+
+                colors2.push(0.4);
+                colors2.push(0.6);
+                colors2.push(0.0);
+
+                colors2.push(0.4);
+                colors2.push(0.6);
+                colors2.push(0.0);
+
+                colors2.push(0.2);
+                colors2.push(0.8);
+                colors2.push(0.0);
+
+                colors2.push(0.4);
+                colors2.push(0.6);
+                colors2.push(0.0);
+
+                colors2.push(0.2);
+                colors2.push(0.8);
+                colors2.push(0.0);
+
+                //Face 2
+                colors2.push(0.2);
+                colors2.push(0.8);
+                colors2.push(0.0);
+
+                colors2.push(0.4);
+                colors2.push(0.6);
+                colors2.push(0.0);
+
+                colors2.push(0.4);
+                colors2.push(0.6);
+                colors2.push(0.0);
+
+                colors2.push(0.2);
+                colors2.push(0.8);
+                colors2.push(0.0);
+
+                colors2.push(0.4);
+                colors2.push(0.6);
+                colors2.push(0.0);
+
+                colors2.push(0.2);
+                colors2.push(0.8);
+                colors2.push(0.0);
+            }
+
+            for (let i = 0; i < (longueursData - 1); i++) {
+                // Face 1
+                colors3.push(0.4);
+                colors3.push(0.6);
+                colors3.push(0.0);
+
+                colors3.push(0.6);
+                colors3.push(0.4);
+                colors3.push(0.0);
+
+                colors3.push(0.6);
+                colors3.push(0.4);
+                colors3.push(0.0);
+
+                colors3.push(0.4);
+                colors3.push(0.6);
+                colors3.push(0.0);
+
+                colors3.push(0.6);
+                colors3.push(0.4);
+                colors3.push(0.0);
+
+                colors3.push(0.4);
+                colors3.push(0.6);
+                colors3.push(0.0);
+
+                //Face 2
+                colors3.push(0.4);
+                colors3.push(0.6);
+                colors3.push(0.0);
+
+                colors3.push(0.6);
+                colors3.push(0.4);
+                colors3.push(0.0);
+
+                colors3.push(0.6);
+                colors3.push(0.4);
+                colors3.push(0.0);
+
+                colors3.push(0.4);
+                colors3.push(0.6);
+                colors3.push(0.0);
+
+                colors3.push(0.6);
+                colors3.push(0.4);
+                colors3.push(0.0);
+
+                colors3.push(0.4);
+                colors3.push(0.6);
+                colors3.push(0.0);
+            }
+
+            for (let i = 0; i < (longueursData - 1); i++) {
+                // Face 1
+                colors4.push(0.6);
+                colors4.push(0.4);
+                colors4.push(0.0);
+
+                colors4.push(0.8);
+                colors4.push(0.2);
+                colors4.push(0.0);
+
+                colors4.push(0.8);
+                colors4.push(0.2);
+                colors4.push(0.0);
+
+                colors4.push(0.6);
+                colors4.push(0.4);
+                colors4.push(0.0);
+
+                colors4.push(0.8);
+                colors4.push(0.2);
+                colors4.push(0.0);
+
+                colors4.push(0.6);
+                colors4.push(0.4);
+                colors4.push(0.0);
+
+                //Face 2
+                colors4.push(0.6);
+                colors4.push(0.4);
+                colors4.push(0.0);
+
+                colors4.push(0.8);
+                colors4.push(0.2);
+                colors4.push(0.0);
+
+                colors4.push(0.8);
+                colors4.push(0.2);
+                colors4.push(0.0);
+
+                colors4.push(0.6);
+                colors4.push(0.4);
+                colors4.push(0.0);
+
+                colors4.push(0.8);
+                colors4.push(0.2);
+                colors4.push(0.0);
+
+                colors4.push(0.6);
+                colors4.push(0.4);
+                colors4.push(0.0);
             }
 
             // itemSize = 3 because there are 3 values (components) per vertex
