@@ -109,8 +109,6 @@ export default {
             const device = this.devices[0];
             this.visu_function = this.addItineraireSpeed3D;
 
-
-
             const data = await getLiveDataDevice(device);
 
             let speeds = [];
@@ -149,6 +147,7 @@ export default {
                 let colors = [];
                 const maxZ = 50;
 
+                console.log("points", data)
                 for (let i = 0; i < (data.length - 1); i++) {
                     //Face 1
                     vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
