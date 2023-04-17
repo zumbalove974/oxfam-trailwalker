@@ -8,7 +8,7 @@ var cors = require('cors');
 var indexRouter = require('./routes/index');
 var deviceRouter = require('./routes/device');
 var controlPointsRouter = require('./routes/cp');
-var projectedControlPointsRouter = require('./routes/proj_cp');
+var projectedControlPointsRouter = require('./routes/proj_cp').router;
 var interRouter = require('./routes/inter');
 var trajRouter = require('./routes/traj');
 
