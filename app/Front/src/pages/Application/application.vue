@@ -80,13 +80,13 @@
     expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet right" :activeIndex="tabOpen">
     <AccordionTab>
       <div class="card flex justify-content-center">
-        <div class="flex flex-column gap-3">
+        <div v-if="controller" class="flex flex-column gap-3">
           <div v-for="category in categories" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
-            <RadioButton v-model="selectedCategory" :inputId="category.key" name="visualisation" :value="category.name"
-              @click="category.function" />
-            <label :for="category.key" v-tooltip.bottom="category.detail" class="ml-2" style="margin-left: 1rem;">{{
-              category.name }}</label>
+            <VisuMur @data="test" :toastProps="toast" :createDimensionEnvironmentProps="createDimensionEnvironment"
+              :controllerProps="controller" :devicesProps="devices" :visu_functionProps="visu_function"
+              :dimensionProps="dimension" :visu_meshesProps="visu_meshes" :categoryProps="category">
+            </VisuMur>
           </div>
           <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
@@ -103,7 +103,7 @@
   <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }">
     <div class="card" style="top: 0px; position: absolute;">
       <div :style="{ position: 'relative', height: '100vh', width: '100vw' }">
-        <SpeedDial :model="items" :radius="80" type="semi-circle" direction="up"
+        <SpeedDial id="speedial" :model="items" :radius="80" type="semi-circle" direction="up"
           :style="{ left: 'calc(50% - 2rem)', bottom: '30px' }" />
       </div>
     </div>
@@ -125,24 +125,12 @@
 
 <script>
 
-import {
-  init,
-  getVitesseMoyenne,
-  resetCamera,
-  addItineraire,
-  addItineraireEpaisseur,
-  addItineraireSpeed3D,
-  addItineraireSpeedWall,
-  createDimensionEnvironment,
-  addCPs,
-  removeCPS,
-  addTeamMarker,
-  removeEventListeners,
-  addEventListeners,
-  addNightCoverage
-} from '../../client/index.js'
-import { getLiveDataDevice } from "../../client/bddConnexion";
-import { tronquer } from "../../client/mathUtils";
+import { toRaw } from 'vue';
+
+import { init, vavinCenter } from '../../client/index.js'
+import VisuMur from './../../components/VisuMur.vue';
+import { getLiveDataDevice, getControlPoints } from "../../client/bddConnexion";
+//import { tronquer } from "../../client/mathUtils";
 
 // Primevue components
 import Dropdown from 'primevue/dropdown';
@@ -155,8 +143,8 @@ import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toast from 'primevue/toast';
+//import RadioButton from 'primevue/radiobutton';
 import { useToast } from "primevue/usetoast";
-import RadioButton from 'primevue/radiobutton';
 import Fieldset from 'primevue/fieldset';
 import Checkbox from 'primevue/checkbox';
 
@@ -166,6 +154,11 @@ import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 
 //import { preventDefault } from 'ol/events/Event';
+
+import * as THREE from "three";
+
+import { ZOOM_RES_L93 } from "../../client/Utils";
+
 
 export default {
   name: 'App',
@@ -181,39 +174,41 @@ export default {
     DataTable,
     Column,
     Toast,
-    RadioButton,
     Fieldset,
-    Checkbox
+    Checkbox,
+    VisuMur
   },
   data() {
     return {
       active: false,
-      init: init,
-      addItineraire: addItineraire,
-      addItineraireEpaisseur: addItineraireEpaisseur,
-      addItineraireSpeed3D: addItineraireSpeed3D,
-      addItineraireSpeedWall: addItineraireSpeedWall,
-      addCPs: addCPs,
       getLiveDataDevice: getLiveDataDevice,
-      addTeamMarker: addTeamMarker,
-      createDimensionEnvironment: createDimensionEnvironment,
-      removeEventListeners: removeEventListeners,
-      addEventListeners: addEventListeners,
-      getVitesseMoyenne: getVitesseMoyenne,
-      resetCamera: resetCamera,
-      addNightCoverage: addNightCoverage,
-      removeCPS: removeCPS,
       dimension: 2,
+      depht_s: Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0,
+      cameraZ: null,
+      initPointerX: null,
+      initPointerY: null,
+      lastPointerX: null,
+      lastPointerY: null,
+      newPointerX: null,
+      newPointerY: null,
+      zoomPas: 1,
       toast: null,
       tabOpen: 1,
       selectedTimestamp: '',
       timestamps: [],
       devices: [],
+      visu_meshes: [],
+      teamMarkers: [],
       devicesTab: [],
+      raycaster: new THREE.Raycaster(),
+      pointer: new THREE.Vector2(),
       deviceNumber: null,
       deviceNumberFrom: null,
       deviceNumberTo: null,
       visuFunction: null,
+      controller: null,
+      visu_function: null,
+      pdcs: [],
       options: [
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
@@ -223,20 +218,17 @@ export default {
       maxLegend: null,
       selectedCategory: 'Production',
       categories: [
-        { name: 'Trajectoire enregistrée', key: '1', function: this.displayVisuSimple, detail: "La trajectoire mesurée par le GPS est affichée." },
-        { name: 'Visu épaisseur', key: '2', function: this.displayVisuEpaisseur, detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide." },
-        { name: 'Visu colline', key: '3', function: this.displayVisuMontagne, detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain." },
-        { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." },
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
-        { name: 'Visu Mur', key: '6', function: this.displayVisuMur, detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes." },
-        { name: 'Visu Nuit', key: '7', function: this.displayVisuNuit, detail: "Visualisation 2D+1 qui permet d'obeserver le parcours realise la nuit." }
-
+        { name: 'Trajectoire enregistrée', key: '1' },
+        { name: 'Visu épaisseur', key: '2' },
+        { name: 'Visu colline', key: '3' },
+        { name: 'Visu Mur', key: '4' },
+        { name: 'Visu Nuit', key: '5' }
       ],
-      /*
+
       categoriesCheckbox: [
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe, detail: "Ajoute la position d'une équipe à un temp donné." },
-        { name: 'Points de contrôle', key: '4', function: this.displayPDC, detail: "Ajoute les points de contrôle du parcours." }
-      ],*/
+        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
+        { name: 'Points de contrôle', key: '6', function: this.displayPDC }
+      ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
         { field: 'id', header: 'ID', headerStyle: "background-color: #A855F7; color: white", isSortable: true },
@@ -247,7 +239,6 @@ export default {
         {
           label: 'Recentrer map',
           icon: 'pi pi-arrows-alt',
-          id: 'speedial',
           command: () => {
             this.resetCamera(this.dimension);
           }
@@ -255,7 +246,6 @@ export default {
         {
           label: 'Info',
           icon: 'pi pi-info-circle',
-          id: 'speedial',
           command: () => {
             this.toast.add({ severity: 'success', summary: 'Info', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
           }
@@ -264,14 +254,22 @@ export default {
     }
   },
   async mounted() {
-    this.init();
+    init().then(res => {
+      this.controller = res;
+      this.controller = toRaw(this.controller);
 
-    this.toast = useToast();
+      this.createDimensionEnvironment(this.dimension);
+    });
+
+    this.addItineraireReference();
+
+    this.cameraZ = window.innerHeight / this.depht_s,
+
+      this.toast = useToast();
     if (this.deviceNumber) {
       await this.loadTimestamps();
     }
 
-    createDimensionEnvironment(this.dimension);
     //this.result = await this.getAllLiveData();
 
     // Modification du style des bouton du speed dial 
@@ -284,9 +282,23 @@ export default {
 
   },
   methods: {
+    test: function (data) {
+      this.visu_meshes = toRaw(data[0]);
+      this.visu_function = data[1];
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
+
+      if (this.devices.length && this.visu_function) {
+        this.visu_function(this.devices);
+      }
+      else
+        this.addItineraireReference();
+    },
     changerDeDimension() {
       this.dimension = this.dimension.value;
-      createDimensionEnvironment(this.dimension);
+      this.createDimensionEnvironment(this.dimension);
     },
     getValuesFromDevicesTab() {
       let res = [];
@@ -372,83 +384,313 @@ export default {
       if (this.visuFunction)
         this.visuFunction();
     },
-    displayVisuSimple() {
+    displayPDC(input) {
       this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuSimple;
-      this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
-      this.addItineraire(this.devices);
+      this.removeCPS();
+      console.log("eee0")
+
+      if (input[input.length - 1] == "Points de contrôle") {
+        console.log("eee2")
+        this.addCPs();
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
+      }
     },
-    async displayPDC() {
-      await this.addCPs();
-      this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
-      // Delay the execution of the removeCPS() function
-      setTimeout(() => {
+    displayPosEquipe(input) {
+      this.toast.removeAllGroups();
+      this.removeTeamMarkers();
+
+      if (input[input.length - 1] == "Position des équipes") {
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
+        this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+      }
+    },
+    clickUp() {
+      this.controller.threeViewer.controls.enabled = true;
+      this.pointerIsDown = false;
+
+      this.pointer.x = 0;
+      this.pointer.y = 0;
+
+      this.raycaster.setFromCamera(this.pointer, this.controller.threeViewer.perspectiveCamera);
+      let intersects = this.raycaster.intersectObjects(this.controller.threeViewer.planes.children);
+
+      if (intersects.length) {
+        let x = intersects[0].point.x * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[0];
+        let y = intersects[0].point.y * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[1];
+
+        this.controller.olViewer.map.getView().setCenter([x, y]);
+        this.controller.threeViewer.mapCenter = [x, y];
+      }
+
+      this.controller.threeViewer.controls.enabled = false;
+
+      this.controller.threeViewer.perspectiveCamera.position.set(0, 0, this.cameraZ);
+      this.controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
+      this.controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
+
+      this.controller.threeViewer.controls.enabled = true;
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
+
+      if (this.devices.length && this.visu_function) {
+        this.visu_function(this.devices);
+      }
+      else
+        this.addItineraireReference();
+
+      if (toRaw(this.teamMarkers).length > 0) {
+        this.removeTeamMarkers();
+        this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+      }
+
+      if (toRaw(this.pdcs).length > 0) {
         this.removeCPS();
-      }, 10000); // Remove the control points after 10 seconds
+        this.addCPs();
+      }
     },
-    displayPosEquipe() {
-      this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
-      this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+    clickDown(event) {
+      this.controller.threeViewer.controls.enabled = false;
+      this.pointerIsDown = true;
+
+      this.initPointerX = event.clientX;
+      this.initPointerY = event.clientY;
+
+      this.lastPointerX = event.clientX;
+      this.lastPointerY = event.clientY;
     },
-    displayVisuEpaisseur() {
-      this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuEpaisseur;
+    clickMove(event) {
+      if (this.pointerIsDown) {
+        this.newPointerX = event.clientX;
+        this.newPointerY = event.clientY;
 
-      if (this.devices.length > 1)
-        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-      else
-        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
+        this.controller.threeViewer.perspectiveCamera.position.x += (this.lastPointerX - this.newPointerX);
+        this.controller.threeViewer.perspectiveCamera.position.y += (this.newPointerY - this.lastPointerY);
 
-      this.addItineraireEpaisseur(this.devices);
-      this.isLegend = true;
+        this.lastPointerX = this.newPointerX;
+        this.lastPointerY = this.newPointerY;
+      }
     },
-    displayVisuNuit() {
-      this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuNuit;
+    scroll() {
 
-      if (this.devices.length === 0)
-        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
-      else
-        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit.", life: 10000 });
+      const changeZ = this.controller.threeViewer.perspectiveCamera.position.z;
 
-      this.addNightCoverage(this.devices);
-      this.isLegend = true;
+      let zoom = this.controller.olViewer.map.getView().getZoom();
+
+      if (changeZ != this.cameraZ) {
+        if (changeZ < this.cameraZ) {
+          zoom += this.zoomPas;
+        } else if (changeZ > this.cameraZ) {
+          zoom -= this.zoomPas;
+        }
+
+        this.controller.olViewer.map.getView().setZoom(Math.round(zoom));
+        this.controller.threeViewer.perspectiveCamera.position.z = this.cameraZ;
+        this.controller.threeViewer.zoomFactor = ZOOM_RES_L93[Math.round(zoom)];
+
+        while (this.visu_meshes.length > 0) {
+          this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+        }
+
+        if (this.devices.length && this.visu_function)
+          this.visu_function(this.devices);
+        else
+          this.addItineraireReference();
+      }
+
+      if (toRaw(this.teamMarkers).length > 0) {
+        this.removeTeamMarkers();
+        this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+      }
+
+      if (toRaw(this.pdcs).length > 0) {
+        this.removeCPS();
+        this.addCPs();
+      }
     },
-    displayVisuMontagne() {
-      this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuMontagne;
+    /* Lorsqu'on est en 3D l'utilisateur peut déplacer la caméra avec les flèches directionnelles */
+    onKeyDown(event) {
+      switch (event.key) {
+        case 'ArrowUp':
+          event.preventDefault();
+          this.controller.threeViewer.translateZ = -5;
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          this.controller.threeViewer.translateZ = 5;
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          this.controller.threeViewer.translateX = 5;
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          this.controller.threeViewer.translateX = -5;
+          break;
+      }
+    },
+    onKeyUp() {
+      this.controller.threeViewer.translateX = 0;
+      this.controller.threeViewer.translateZ = 0;
+    },
+    resetCamera(dimension) {
 
-      if (this.devices.length > 1)
-        this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-      else
-        this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
+      //const worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+      //controller.threeViewer.perspectiveCamera.position.set(worldCoords[0], worldCoords[1], cameraZ);
+      this.controller.olViewer.map.getView().setCenter(vavinCenter);
 
-      this.addItineraireSpeed3D(this.devices, this.dimension).then(res => {
-        this.minLegend = tronquer(res[0], 2);
-        this.maxLegend = tronquer(res[1], 2);
+      this.createDimensionEnvironment(2)
+
+      if (dimension == 3) {
+        this.createDimensionEnvironment(3)
+      }
+    },
+    /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
+    addEventListeners() {
+      /* On désactive l'orbit control lors du click (drag) */
+      document.addEventListener("pointerup", this.clickUp, true);
+      document.addEventListener("pointerdown", this.clickDown, true);
+      document.addEventListener("pointermove", this.clickMove, true);
+      /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
+      this.controller.threeViewer.controls.addEventListener('change', this.scroll, true);
+    },
+    /* Supprime les évènements du scroll et du drag lorsqu'on passe en 3D */
+    removeEventListeners() {
+      document.removeEventListener("pointerup", this.clickUp, true);
+      document.removeEventListener("pointerdown", this.clickDown, true);
+      document.removeEventListener("pointermove", this.clickMove, true);
+      this.controller.threeViewer.controls.removeEventListener('change', this.scroll, true);
+    },
+    createDimensionEnvironment(dimensionNb) {
+
+      this.dimension = dimensionNb;
+
+      if (this.dimension == 2) {
+        console.log("___dimension 2___");
+
+        window.removeEventListener('keydown', this.onKeyDown, false);
+        window.removeEventListener('keyup', this.onKeyUp, false);
+
+        this.controller.threeViewer.controls.enabled = false;
+
+        if (Object.keys(this.controller).length == 12)
+          this.controller.threeViewer.mapCenter = this.controller.olViewer.map.getView().getCenter();
+
+        this.controller.threeViewer.isTransitioning = [true, true];
+
+        this.addEventListeners();
+
+        //this.controller.threeViewer.scene.remove(wall);
+        //this.controller.threeViewer.scene.remove(mesh);
+
+        if (this.device && this.visu_function)
+          this.visu_function(this.devices);
+      } else {
+        console.log("___dimension 3___");
+
+        window.addEventListener('keydown', this.onKeyDown, false);
+        window.addEventListener('keyup', this.onKeyUp, false);
+
+        this.removeEventListeners();
+      }
+    },
+    async getVitesseMoyenne(device) {
+      const data = await getLiveDataDevice(device);
+
+      let somme = 0;
+
+      data.forEach(point => {
+        somme += point.speed;
+      })
+
+      return somme / data.length;
+    },
+    async addItineraireReference() {
+
+      const coords = await getLiveDataDevice(3843);
+
+      const GPSmaterial = new THREE.LineBasicMaterial({
+        color: 0xff0000
       });
 
+      const GPSpoints = [];
 
-      this.dimension = 3;
-      createDimensionEnvironment(3);
+      for (let i = 0; i < coords.length; i++) {
 
-      this.isLegend = true;
+        GPSpoints.push(new THREE.Vector3(
+          this.controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[0],
+          this.controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
+          0));
+      }
+
+      //console.log("GPSpoints", GPSpoints)
+
+      const GPSgeometry = new THREE.BufferGeometry().setFromPoints(GPSpoints);
+
+      let GPSvisu_mesh = new THREE.Line(GPSgeometry, GPSmaterial);
+      this.visu_meshes.push(GPSvisu_mesh);
+
+      this.controller.threeViewer.scene.add(GPSvisu_mesh);
     },
-    displayVisuMur() {
-      this.toast.removeAllGroups();
-      this.visuFunction = this.displayVisuMur;
+    async addCPs() {
+      let cps = await getControlPoints();
 
-      this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
+      // Coordinates of the 10 points
+      cps.forEach(point => {
+        let worldCoords = toRaw(this.controller).threeViewer.getWorldCoords([point.x, point.y]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
+        let geometry = new THREE.CircleGeometry(10, 32);
+        let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+        let circle = new THREE.Mesh(geometry, material);
+        circle.position.x = worldCoords[0];
+        circle.position.y = worldCoords[1];
+        circle.position.z = 0;
+        this.controller.threeViewer.scene.add(circle);
+        console.log("eee2", point)
 
-      this.addItineraireSpeedWall(this.devices).then(res => {
-        this.minLegend = tronquer(res[0], 2);
-        this.maxLegend = tronquer(res[1], 2);
+
+        this.pdcs.push(circle);
+      })
+    },
+    disposeThreeMesh(mesh) {
+      mesh.geometry.dispose();
+      mesh.material.dispose();
+      this.controller.threeViewer.scene.remove(mesh);
+    },
+    removeCPS() {
+      this.pdcs.forEach(pdc => {
+        this.disposeThreeMesh(pdc);
       });
 
-      this.dimension = 3;
-      createDimensionEnvironment(3);
+      this.pdcs = [];
+    },
+    removeTeamMarkers() {
+      this.teamMarkers.forEach(teamMarker => {
+        this.disposeThreeMesh(teamMarker);
+      });
 
-      this.isLegend = true;
+      this.teamMarkers = [];
+    },
+    async addTeamMarker(deviceNumber, timeStamp) {
+      this.device = deviceNumber;
+      this.time_stamp = timeStamp;
+      const teamPositions = await getLiveDataDevice(deviceNumber);
+
+      for (let i = 0; i < teamPositions.length; i++) {
+        if (teamPositions[i].timestamp === this.time_stamp) {
+          // Convert the team's position from Web Mercator to world coordinates
+          const worldCoords = this.controller.threeViewer.getWorldCoords([teamPositions[i].x, teamPositions[i].y]);
+          const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
+          const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
+          const sphere = new THREE.Mesh(geometry, material);
+          sphere.position.x = worldCoords[0];
+          sphere.position.y = worldCoords[1];
+          sphere.position.z = 0;
+          this.controller.threeViewer.scene.add(sphere);
+
+          this.teamMarkers.push(sphere);
+        }
+      }
     }
   }
 }
