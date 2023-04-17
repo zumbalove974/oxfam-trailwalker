@@ -451,6 +451,7 @@ export default {
       this.visu_meshes.push(this.limitsMesh);
     },
     verifyView(center) {
+        console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
 
       let x = center[0];
       let y = center[1];
@@ -483,7 +484,6 @@ export default {
         let x = intersects[0].point.x * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[0];
         let y = intersects[0].point.y * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[1];
 
-        console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
         let verifiedCoords = this.verifyView([x, y]);
         this.controller.olViewer.map.getView().setCenter(verifiedCoords);
         this.controller.threeViewer.mapCenter = verifiedCoords;
