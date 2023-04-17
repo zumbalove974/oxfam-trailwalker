@@ -493,6 +493,12 @@ export default {
             /* On dessine le mur */
             let geometry = new THREE.BufferGeometry();
 
+            const min = Math.min(...speedsDataSorted);
+            const q1 = calculerPremierQuartile(speedsDataSorted);
+            const q2 = calculerMedian(speedsDataSorted);
+            const q3 = calculerTroisiemeQuartile(speedsDataSorted);
+            const max = Math.max(...speedsDataSorted);
+
             let vertices1 = [];
             let vertices2 = [];
             let vertices3 = [];
@@ -504,54 +510,212 @@ export default {
             let colors4 = [];
 
             for (let i = 0; i < (data.length - 1); i++) {
+                let speed = data[i].speed;
+                const q3 = calculerTroisiemeQuartile(speed);
+                const max = Math.max(speed);
+
                 //Face 1
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices.push(wallZtop);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices1.push(wallZtop);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices.push(wallZbottom);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices1.push(wallZbottom);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices.push(wallZbottom);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices1.push(wallZbottom);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices.push(wallZbottom);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices1.push(wallZbottom);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices.push(wallZtop);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices1.push(wallZtop);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices.push(wallZtop);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices1.push(wallZtop);
 
                 // Face 2
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices.push(wallZtop);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices1.push(wallZtop);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices.push(wallZbottom);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices1.push(wallZbottom);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices.push(wallZbottom);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices1.push(wallZbottom);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices.push(wallZbottom);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices1.push(wallZbottom);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices.push(wallZtop);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices1.push(wallZtop);
 
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices1.push(wallZtop);
+            }
+            for (let i = 0; i < (data.length - 1); i++) {
+                //Face 1
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices2.push(wallZtop);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices2.push(wallZbottom);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices2.push(wallZbottom);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices2.push(wallZbottom);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices2.push(wallZtop);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices2.push(wallZtop);
+
+                // Face 2
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices2.push(wallZtop);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices2.push(wallZbottom);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices2.push(wallZbottom);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices2.push(wallZbottom);
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices2.push(wallZtop);
+
+
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices2.push(wallZtop);
+            }
+            for (let i = 0; i < (data.length - 1); i++) {
+                //Face 1
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices3.push(wallZtop);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices3.push(wallZbottom);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices3.push(wallZbottom);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices3.push(wallZbottom);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices3.push(wallZtop);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices3.push(wallZtop);
+
+                // Face 2
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices3.push(wallZtop);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices3.push(wallZbottom);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices3.push(wallZbottom);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices3.push(wallZbottom);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices3.push(wallZtop);
+
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices3.push(wallZtop);
+            }
+            for (let i = 0; i < (data.length - 1); i++) {
+                // Face 1
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices4.push(wallZtop);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices4.push(wallZbottom);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices4.push(wallZbottom);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices4.push(wallZbottom);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices4.push(wallZtop);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices4.push(wallZtop);
+
+                // Face 2
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices4.push(wallZtop);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices4.push(wallZbottom);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices4.push(wallZbottom);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices4.push(wallZbottom);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices4.push(wallZtop);
+
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices.push(wallZtop);
             }
 
