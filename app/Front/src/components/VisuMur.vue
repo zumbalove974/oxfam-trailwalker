@@ -498,6 +498,16 @@ export default {
             let colors4 = [];
 
             for (let i = 0; i < (data.length - 1); i++) {
+                let liste = [];
+
+                devicesData.forEach(data => {
+                    liste.push(data[i].speed);
+                })
+
+                const q1 = calculerPremierQuartile(liste)
+                const q2 = calculerMedian(liste)
+                const q3 = calculerTroisiemeQuartile(liste)
+
                 let speed = data[i].speed;
                 const q3 = calculerTroisiemeQuartile(speed);
                 const max = Math.max(speed);
