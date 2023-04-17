@@ -562,54 +562,54 @@ export default {
 
             for (let i = 0; i < (data.length - 1); i++) {
                 // Face 1
-                colors.push(1.0 - speeds[i]);
-                colors.push(speeds[i]);
-                colors.push(0.0);
+                colors1.push(0.0);
+                colors1.push(1.0);
+                colors1.push(0.0);
 
-                colors.push(1.0 - speeds[i]);
-                colors.push(speeds[i]);
-                colors.push(0.0);
+                colors1.push(0.2);
+                colors1.push(8.0);
+                colors1.push(0.2);
 
-                colors.push(1.0 - speeds[i + 1]);
-                colors.push(speeds[i + 1]);
-                colors.push(0.0);
+                colors1.push(0.2);
+                colors1.push(8.0);
+                colors1.push(0.2);
 
-                colors.push(1.0 - speeds[i + 1]);
-                colors.push(speeds[i + 1]);
-                colors.push(0.0);
+                colors1.push(0.0);
+                colors1.push(1.0);
+                colors1.push(0.0);
 
-                colors.push(1.0 - speeds[i + 1]);
-                colors.push(speeds[i + 1]);
-                colors.push(0.0);
+                colors1.push(0.2);
+                colors1.push(8.0);
+                colors1.push(0.2);
 
-                colors.push(1.0 - speeds[i]);
-                colors.push(speeds[i]);
-                colors.push(0.0);
+                colors1.push(0.0);
+                colors1.push(1.0);
+                colors1.push(0.0);
 
                 //Face 2
-                colors.push(1.0 - speeds[i]);
-                colors.push(speeds[i]);
-                colors.push(0.0);
+                colors1.push(1.0 - speeds[i]);
+                colors1.push(speeds[i]);
+                colors1.push(0.0);
 
-                colors.push(1.0 - speeds[i + 1]);
-                colors.push(speeds[i + 1]);
-                colors.push(0.0);
+                colors1.push(1.0 - speeds[i + 1]);
+                colors1.push(speeds[i + 1]);
+                colors1.push(0.0);
 
-                colors.push(1.0 - speeds[i + 1]);
-                colors.push(speeds[i + 1]);
-                colors.push(0.0);
+                colors1.push(1.0 - speeds[i + 1]);
+                colors1.push(speeds[i + 1]);
+                colors1.push(0.0);
 
-                colors.push(1.0 - speeds[i + 1]);
-                colors.push(speeds[i + 1]);
-                colors.push(0.0);
+                colors1.push(1.0 - speeds[i + 1]);
+                colors1.push(speeds[i + 1]);
+                colors1.push(0.0);
 
-                colors.push(1.0 - speeds[i]);
-                colors.push(speeds[i]);
-                colors.push(0.0);
+                colors1.push(1.0 - speeds[i]);
+                colors1.push(speeds[i]);
+                colors1.push(0.0);
 
-                colors.push(1.0 - speeds[i + 1]);
-                colors.push(speeds[i + 1]);
-                colors.push(0.0);
+                colors1.push(1.0 - speeds[i + 1]);
+                colors1.push(speeds[i + 1]);
+                colors1.push(0.0);
             }
 
             // itemSize = 3 because there are 3 values (components) per vertex
