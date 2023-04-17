@@ -1,8 +1,8 @@
 const { describe, expect, test } = require('@jest/globals');
 
-describe("Test the application path", () => {
-    test("It should respond with the correct obj", async () => {
-        const response = await fetch(`http://oxfam-trailwalker-vue-ui-1:80/`, {
+describe("Test the home path", () => {
+    test("It should respond with 200 status", async () => {
+        const response = await fetch(`http://oxfam-trailwalker-vue-ui-1:80/home`, {
             method: 'GET'
         })
         expect(response).not.toBeNaN();
