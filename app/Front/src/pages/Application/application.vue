@@ -451,6 +451,7 @@ export default {
       this.visu_meshes.push(this.limitsMesh);
     },
     verifyView(center) {
+        console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
 
       let x = center[0];
       let y = center[1];
