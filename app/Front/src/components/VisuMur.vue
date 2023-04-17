@@ -457,7 +457,7 @@ export default {
 
             return somme / data.length;
         },
-        async addItineraireSpeedWall(deviceNumbers) {
+        async addItineraireMoustache(deviceNumbers) {
 
             this.controller.threeViewer.shperes.forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
@@ -467,7 +467,7 @@ export default {
 
             let indexVisu = 0;
 
-            this.visu_function = this.addItineraireSpeedWall;
+            this.visu_function = this.addItineraireMoustache;
 
             this.devices = deviceNumbers;
 
@@ -648,11 +648,11 @@ export default {
 
             return [min, max];
         },
-        async addItineraireMoustache(deviceNumbers) {
+        async addItineraireSpeedWall(deviceNumbers) {
 
             let indexVisu = 0;
 
-            this.visu_function = this.addItineraireMoustache;
+            this.visu_function = this.addItineraireSpeedWall;
 
             this.devices = deviceNumbers;
             let moyennes
