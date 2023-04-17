@@ -83,7 +83,7 @@
         <div v-if="controller" class="flex flex-column gap-3">
           <div v-for="category in categories" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
-            <VisuMur @data="test" :toastProps="toast" :createDimensionEnvironmentProps="createDimensionEnvironment"
+            <VisuMur @data="actualiser" :toastProps="toast" :createDimensionEnvironmentProps="createDimensionEnvironment"
               :controllerProps="controller" :devicesProps="devices" :visu_functionProps="visu_function"
               :dimensionProps="dimension" :visu_meshesProps="visu_meshes" :categoryProps="category">
             </VisuMur>
@@ -191,6 +191,8 @@ export default {
       lastPointerY: null,
       newPointerX: null,
       newPointerY: null,
+      upLeft: [77759.67642890716, 6453645.108348264],
+      bottomRight: [162041.48828865882, 6394327.021226578],
       zoomPas: 1,
       toast: null,
       tabOpen: 1,
@@ -198,6 +200,7 @@ export default {
       timestamps: [],
       devices: [],
       visu_meshes: [],
+      limitsMesh: null,
       teamMarkers: [],
       devicesTab: [],
       raycaster: new THREE.Raycaster(),
@@ -224,7 +227,6 @@ export default {
         { name: 'Visu Mur', key: '4' },
         { name: 'Visu Nuit', key: '5' }
       ],
-
       categoriesCheckbox: [
         { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
         { name: 'Points de contrôle', key: '6', function: this.displayPDC }
@@ -258,6 +260,7 @@ export default {
       this.controller = res;
       this.controller = toRaw(this.controller);
 
+      this.createBoundingLimit();
       this.createDimensionEnvironment(this.dimension);
     });
 
@@ -270,8 +273,6 @@ export default {
       await this.loadTimestamps();
     }
 
-    //this.result = await this.getAllLiveData();
-
     // Modification du style des bouton du speed dial 
     // On y a pas accès autrement que par le DOM
     document.getElementById("speedial_0").children[0].innerHTML = "";
@@ -282,7 +283,7 @@ export default {
 
   },
   methods: {
-    test: function (data) {
+    actualiser: function (data) {
       this.visu_meshes = toRaw(data[0]);
       this.visu_function = data[1];
 
@@ -387,10 +388,8 @@ export default {
     displayPDC(input) {
       this.toast.removeAllGroups();
       this.removeCPS();
-      console.log("eee0")
 
       if (input[input.length - 1] == "Points de contrôle") {
-        console.log("eee2")
         this.addCPs();
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
       }
@@ -403,6 +402,72 @@ export default {
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
         this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
       }
+    },
+    createBoundingLimit() {
+
+      let points = [];
+
+      points.push(new THREE.Vector3(
+        this.controller.threeViewer.getWorldCoords(this.upLeft)[0],
+        this.controller.threeViewer.getWorldCoords(this.upLeft)[1],
+        0)
+      );
+
+      points.push(new THREE.Vector3(
+        this.controller.threeViewer.getWorldCoords(this.bottomRight)[0],
+        this.controller.threeViewer.getWorldCoords(this.upLeft)[1],
+        0)
+      );
+
+      points.push(new THREE.Vector3(
+        this.controller.threeViewer.getWorldCoords(this.bottomRight)[0],
+        this.controller.threeViewer.getWorldCoords(this.bottomRight)[1],
+        0)
+      );
+
+      points.push(new THREE.Vector3(
+        this.controller.threeViewer.getWorldCoords(this.upLeft)[0],
+        this.controller.threeViewer.getWorldCoords(this.bottomRight)[1],
+        0)
+      );
+
+      points.push(new THREE.Vector3(
+        this.controller.threeViewer.getWorldCoords(this.upLeft)[0],
+        this.controller.threeViewer.getWorldCoords(this.upLeft)[1],
+        0)
+      );
+
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+      const material = new THREE.LineBasicMaterial({
+        color: 0xff0000
+      });
+
+      this.limitsMesh = new THREE.Line(geometry, material);
+
+      this.controller.threeViewer.scene.add(this.limitsMesh);
+
+      console.log("this.limitsMesh", this.limitsMesh)
+      this.visu_meshes.push(this.limitsMesh);
+    },
+    verifyView(center) {
+
+      let x = center[0];
+      let y = center[1];
+
+      if (x < this.upLeft[0]) {
+        x = this.upLeft[0];
+      } else if (x > this.bottomRight[0]) {
+        x = this.bottomRight[0];
+      }
+
+      if (y < this.bottomRight[1]) {
+        y = this.bottomRight[1];
+      } else if (y > this.upLeft[1]) {
+        y = this.upLeft[1];
+      }
+
+      return [x, y];
     },
     clickUp() {
       this.controller.threeViewer.controls.enabled = true;
@@ -418,8 +483,10 @@ export default {
         let x = intersects[0].point.x * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[0];
         let y = intersects[0].point.y * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[1];
 
-        this.controller.olViewer.map.getView().setCenter([x, y]);
-        this.controller.threeViewer.mapCenter = [x, y];
+        console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
+        let verifiedCoords = this.verifyView([x, y]);
+        this.controller.olViewer.map.getView().setCenter(verifiedCoords);
+        this.controller.threeViewer.mapCenter = verifiedCoords;
       }
 
       this.controller.threeViewer.controls.enabled = false;
@@ -449,6 +516,8 @@ export default {
         this.removeCPS();
         this.addCPs();
       }
+
+      this.createBoundingLimit();
     },
     clickDown(event) {
       this.controller.threeViewer.controls.enabled = false;
@@ -508,6 +577,8 @@ export default {
         this.removeCPS();
         this.addCPs();
       }
+
+      this.createBoundingLimit();
     },
     /* Lorsqu'on est en 3D l'utilisateur peut déplacer la caméra avec les flèches directionnelles */
     onKeyDown(event) {
