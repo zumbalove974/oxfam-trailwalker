@@ -774,30 +774,11 @@ export default {
                 opacity: 0.8
             });
 
-            let wall = new THREE.Mesh(geometry, material);
+            let moustache = new THREE.Mesh(geometry, material);
 
-            this.visu_meshes.push(wall);
+            this.visu_meshes.push(moustache);
 
-            this.controller.threeViewer.scene.add(wall);
-
-            /* Création des sphères pour la simulation */
-            const geometrySphere = new THREE.SphereGeometry(7, 32, 16);
-            const materialSphere = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-            const sphere = new THREE.Mesh(geometrySphere, materialSphere);
-
-            sphere.position.x = this.controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[0];
-            sphere.position.y = this.controller.threeViewer.getWorldCoords([data[0].x, data[0].y])[1];
-            sphere.position.z = (wallZbottom + wallZtop) / 2;
-
-            this.controller.threeViewer.scene.add(sphere);
-
-            this.controller.threeViewer.shperes.push({ mesh: sphere, data: data, temps: 0, indexTraj: 0, indexPoint: 1, tempsBetweenPoints: 0, wall: this.wall, line: this.line3d, running: true });
-            this.controller.threeViewer.animeTrailer = true;
-            this.controller.threeViewer.state.clock.start();
-
-            indexVisu++;
-
-            return [min, max];
+            this.controller.threeViewer.scene.add(moustache);
         },
         async addItineraireSpeedWall(deviceNumbers) {
 
