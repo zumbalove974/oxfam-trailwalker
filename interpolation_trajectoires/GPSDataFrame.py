@@ -1,12 +1,14 @@
-# Example python program to read data from a PostgreSQL table
-# and load into a pandas DataFrame
+""" Package servant d'interface entre le programme et la base de donnees """
 
 import psycopg2
 import pandas as pd
 import sys
 from sqlalchemy import create_engine
 
+
 def connect():
+    # Connection a la base de donnees
+    # Returns: psycopg2 connection object
 
     conn = None
     try:
@@ -25,6 +27,7 @@ def connect():
 
 
 def sql_to_df(conn, query, column_names):
+    # Transforme une requete SQL en DataFrame
 
     cursor = conn.cursor()
 
@@ -44,23 +47,20 @@ def sql_to_df(conn, query, column_names):
 
 
 def deviceList():
+    # Liste les tables de donnees initiales
 
     query = """
         SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Device%';
         """
-    # creating a list with columns names to pass into the function
     column_names = ["table_name"]
-    # opening the connection
     conn = connect()
-    # loading our dataframe
     df = sql_to_df(conn, query, column_names)
-    # closing the connection
     conn.close()
-    # Let’s see if we loaded the df successfully
     return df
 
 
 def deviceDF(tableName):
+    # R
 
     query = """
         SELECT "timestamp","x", "y" 
@@ -78,14 +78,15 @@ def deviceDF(tableName):
     # Let’s see if we loaded the df successfully
     return df
 
+
 def df_to_sql(df, table_name):
 
     engine = create_engine(
         'postgresql://postgres_user:postgres_password@localhost:6500/postgres_user'
-        )
+    )
     df.to_sql(
-            table_name,
-            con=engine,
-            method='multi', 
-            if_exists='replace')
+        table_name,
+        con=engine,
+        method='multi',
+        if_exists='replace')
     engine.dispose()

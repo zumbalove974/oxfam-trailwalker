@@ -25,6 +25,7 @@ def main():
         df_speed = Interpolation.calculateSpeeds(df_moy)
         df_ip = Interpolation.interpolationDF(df_speed, df_ref)
 
+        """ Exporter le resultat dans la base de donnees """
         if Interpolation.validateInterpolation(df_ip, error_max):
             GPSDataFrame.df_to_sql(
                 df_ip, device.replace('Device', 'Interpolation'))
