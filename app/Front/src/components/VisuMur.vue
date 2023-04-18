@@ -808,12 +808,12 @@ export default {
                 colors1.push(0.8);
                 colors1.push(0.0);
 
-                colors1.push(0.0);
-                colors1.push(1.0);
-                colors1.push(0.0);
-
                 colors1.push(0.2);
                 colors1.push(0.8);
+                colors1.push(0.0);
+
+                colors1.push(0.0);
+                colors1.push(1.0);
                 colors1.push(0.0);
 
                 colors1.push(0.0);
@@ -833,10 +833,6 @@ export default {
                 colors1.push(8.0);
                 colors1.push(0.0);
 
-                colors1.push(0.0);
-                colors1.push(1.0);
-                colors1.push(0.0);
-
                 colors1.push(0.2);
                 colors1.push(0.8);
                 colors1.push(0.0);
@@ -845,6 +841,10 @@ export default {
                 colors1.push(1.0);
                 colors1.push(0.0);
 
+                colors1.push(0.0);
+                colors1.push(1.0);
+                colors1.push(0.0);
+
                 // Face 1
                 colors2.push(0.2);
                 colors2.push(0.8);
@@ -858,12 +858,12 @@ export default {
                 colors2.push(0.6);
                 colors2.push(0.0);
 
-                colors2.push(0.2);
-                colors2.push(0.8);
-                colors2.push(0.0);
-
                 colors2.push(0.4);
                 colors2.push(0.6);
+                colors2.push(0.0);
+
+                colors2.push(0.2);
+                colors2.push(0.8);
                 colors2.push(0.0);
 
                 colors2.push(0.2);
@@ -883,10 +883,6 @@ export default {
                 colors2.push(0.6);
                 colors2.push(0.0);
 
-                colors2.push(0.2);
-                colors2.push(0.8);
-                colors2.push(0.0);
-
                 colors2.push(0.4);
                 colors2.push(0.6);
                 colors2.push(0.0);
@@ -895,6 +891,10 @@ export default {
                 colors2.push(0.8);
                 colors2.push(0.0);
 
+                colors2.push(0.2);
+                colors2.push(0.8);
+                colors2.push(0.0);
+
                 // Face 1
                 colors3.push(0.4);
                 colors3.push(0.6);
@@ -908,12 +908,12 @@ export default {
                 colors3.push(0.4);
                 colors3.push(0.0);
 
-                colors3.push(0.4);
                 colors3.push(0.6);
+                colors3.push(0.4);
                 colors3.push(0.0);
 
-                colors3.push(0.6);
                 colors3.push(0.4);
+                colors3.push(0.6);
                 colors3.push(0.0);
 
                 colors3.push(0.4);
@@ -933,12 +933,12 @@ export default {
                 colors3.push(0.4);
                 colors3.push(0.0);
 
-                colors3.push(0.4);
                 colors3.push(0.6);
+                colors3.push(0.4);
                 colors3.push(0.0);
 
-                colors3.push(0.6);
                 colors3.push(0.4);
+                colors3.push(0.6);
                 colors3.push(0.0);
 
                 colors3.push(0.4);
@@ -958,12 +958,12 @@ export default {
                 colors4.push(0.2);
                 colors4.push(0.0);
 
-                colors4.push(0.6);
-                colors4.push(0.4);
-                colors4.push(0.0);
-
                 colors4.push(0.8);
                 colors4.push(0.2);
+                colors4.push(0.0);
+
+                colors4.push(0.6);
+                colors4.push(0.4);
                 colors4.push(0.0);
 
                 colors4.push(0.6);
@@ -983,12 +983,12 @@ export default {
                 colors4.push(0.2);
                 colors4.push(0.0);
 
-                colors4.push(0.6);
-                colors4.push(0.4);
-                colors4.push(0.0);
-
                 colors4.push(0.8);
                 colors4.push(0.2);
+                colors4.push(0.0);
+
+                colors4.push(0.6);
+                colors4.push(0.4);
                 colors4.push(0.0);
 
                 colors4.push(0.6);
