@@ -462,25 +462,21 @@ export default {
 
             let devicesData = [];
 
-            this.devices.forEach(async device => {
-
-                const data = await getLiveDataDevice(device);
+            for (let i = 0; i < this.devices.length; i++) {
+                const data = await getLiveDataDevice(this.devices[i]);
 
                 devicesData.push(data);
-            });
+            }
 
-            longueursData = devicesData[0].length;
+            const longueursData = devicesData[0].length;
 
             //this.controller.threeViewer.scene.remove(line);
 
-            this.visu_meshes.push(line3d);
-
-            // add line to scene so it can be rendered
-            this.controller.threeViewer.scene.add(line3d);
-
             /* On dessine le mur */
-            let geometry = new THREE.BufferGeometry();
-
+            let geometry1 = new THREE.BufferGeometry();
+            let geometry2 = new THREE.BufferGeometry();
+            let geometry3 = new THREE.BufferGeometry();
+            let geometry4 = new THREE.BufferGeometry();
 
             let vertices1 = [];
             let vertices2 = [];
@@ -492,7 +488,7 @@ export default {
             let colors3 = [];
             let colors4 = [];
 
-            for (let i = 0; i < (data.length - 1); i++) {
+            for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
                 let listeplus1 = [];
 
@@ -506,18 +502,19 @@ export default {
                 const q2 = calculerMedian(liste);
                 const q3 = calculerTroisiemeQuartile(liste);
                 const max = Math.max(...liste);
-                
+
                 const minplus1 = Math.min(...listeplus1);
                 const q1plus1 = calculerPremierQuartile(listeplus1);
                 const q2plus1 = calculerMedian(listeplus1);
                 const q3plus1 = calculerTroisiemeQuartile(listeplus1);
                 const maxplus1 = Math.max(...listeplus1);
 
-                let wallZtop = max+q3+q2+q1+min;
-                let wallZbottom = q3+q2+q1+min;
-                let wallZtoplus1= q3plus1+q2plus1+q1plus1+minplus1;
-                let wallZbottomplus1 = maxplus1+q3plus1+q2plus1+q1plus1+minplus1;
+                let wallZtop = max + q3 + q2 + q1 + min;
+                let wallZbottom = q3 + q2 + q1 + min;
+                let wallZtoplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
+                let wallZbottomplus1 = maxplus1 + q3plus1 + q2plus1 + q1plus1 + minplus1;
 
+                let data = devicesData[0];
                 //Face 1
                 vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
                 vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
@@ -568,7 +565,7 @@ export default {
                 vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices1.push(wallZtoplus1);
             }
-            for (let i = 0; i < (data.length - 1); i++) {
+            for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
                 let listeplus1 = [];
 
@@ -581,16 +578,18 @@ export default {
                 const q1 = calculerPremierQuartile(liste);
                 const q2 = calculerMedian(liste);
                 const q3 = calculerTroisiemeQuartile(liste);
-                
+
                 const minplus1 = Math.min(...listeplus1);
                 const q1plus1 = calculerPremierQuartile(listeplus1);
                 const q2plus1 = calculerMedian(listeplus1);
                 const q3plus1 = calculerTroisiemeQuartile(listeplus1);
 
-                let wallZtop = q3+q2+q1+min;
-                let wallZbottom = q2+q1+min;
-                let wallZtoplus1= q2plus1+q1plus1+minplus1;
-                let wallZbottomplus1 = q3plus1+q2plus1+q1plus1+minplus1;
+                let wallZtop = q3 + q2 + q1 + min;
+                let wallZbottom = q2 + q1 + min;
+                let wallZtoplus1 = q2plus1 + q1plus1 + minplus1;
+                let wallZbottomplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
+
+                let data = devicesData[0];
 
                 // Face 1
                 vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -642,7 +641,7 @@ export default {
                 vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices2.push(wallZtoplus1);
             }
-            for (let i = 0; i < (data.length - 1); i++) {
+            for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
                 let listeplus1 = [];
 
@@ -654,17 +653,19 @@ export default {
                 const min = Math.min(...liste);
                 const q1 = calculerPremierQuartile(liste);
                 const q2 = calculerMedian(liste);
-                const q3 = calculerTroisiemeQuartile(liste);
-                
+                //const q3 = calculerTroisiemeQuartile(liste);
+
                 const minplus1 = Math.min(...listeplus1);
                 const q1plus1 = calculerPremierQuartile(listeplus1);
                 const q2plus1 = calculerMedian(listeplus1);
-                const q3plus1 = calculerTroisiemeQuartile(listeplus1);
+                //const q3plus1 = calculerTroisiemeQuartile(listeplus1);
 
-                let wallZtop = q2+q1+min;
-                let wallZbottom = q1+min;
-                let wallZtoplus1= q1plus1+minplus1;
-                let wallZbottomplus1 = q2plus1+q1plus1+minplus1;
+                let wallZtop = q2 + q1 + min;
+                let wallZbottom = q1 + min;
+                let wallZtoplus1 = q1plus1 + minplus1;
+                let wallZbottomplus1 = q2plus1 + q1plus1 + minplus1;
+
+                let data = devicesData[0];
 
                 //Face 1
                 vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -716,7 +717,7 @@ export default {
                 vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices3.push(wallZtoplus1);
             }
-            for (let i = 0; i < (data.length - 1); i++) {
+            for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
                 let listeplus1 = [];
 
@@ -727,18 +728,20 @@ export default {
 
                 const min = Math.min(...liste);
                 const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                const q3 = calculerTroisiemeQuartile(liste);
-                
+                //const q2 = calculerMedian(liste);
+                //const q3 = calculerTroisiemeQuartile(liste);
+
                 const minplus1 = Math.min(...listeplus1);
                 const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                const q3plus1 = calculerTroisiemeQuartile(listeplus1);
+                //const q2plus1 = calculerMedian(listeplus1);
+                //const q3plus1 = calculerTroisiemeQuartile(listeplus1);
 
-                let wallZtop = q1+min;
+                let wallZtop = q1 + min;
                 let wallZbottom = min;
-                let wallZtoplus1= minplus1;
-                let wallZbottomplus1 = q1plus1+minplus1;
+                let wallZtoplus1 = minplus1;
+                let wallZbottomplus1 = q1plus1 + minplus1;
+
+                let data = devicesData[0];
 
                 //Face 1
                 vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -994,8 +997,17 @@ export default {
             }
 
             // itemSize = 3 because there are 3 values (components) per vertex
-            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+            geometry1.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices1), 3));
+            geometry1.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors1), 3));
+
+            geometry2.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices2), 3));
+            geometry2.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors2), 3));
+
+            geometry3.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices3), 3));
+            geometry3.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors3), 3));
+
+            geometry4.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices4), 3));
+            geometry4.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors4), 3));
 
             // create material
             const material = new THREE.MeshBasicMaterial({
@@ -1004,11 +1016,20 @@ export default {
                 opacity: 0.8
             });
 
-            let moustache = new THREE.Mesh(geometry, material);
+            let moustache1 = new THREE.Mesh(geometry1, material);
+            let moustache2 = new THREE.Mesh(geometry2, material);
+            let moustache3 = new THREE.Mesh(geometry3, material);
+            let moustache4 = new THREE.Mesh(geometry4, material);
 
-            this.visu_meshes.push(moustache);
+            this.visu_meshes.push(moustache1);
+            this.visu_meshes.push(moustache2);
+            this.visu_meshes.push(moustache3);
+            this.visu_meshes.push(moustache4);
 
-            this.controller.threeViewer.scene.add(moustache);
+            this.controller.threeViewer.scene.add(moustache1);
+            this.controller.threeViewer.scene.add(moustache2);
+            this.controller.threeViewer.scene.add(moustache3);
+            this.controller.threeViewer.scene.add(moustache4);
         },
         async addItineraireSpeedWall(deviceNumbers) {
 
