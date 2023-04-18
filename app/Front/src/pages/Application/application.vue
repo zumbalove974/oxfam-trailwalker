@@ -481,7 +481,9 @@ export default {
 
       this.raycaster.setFromCamera(this.pointer, this.controller.threeViewer.perspectiveCamera);
       let intersects = this.raycaster.intersectObjects(this.controller.threeViewer.planes.children);
+      let intersect_scene = this.raycaster.intersectObjects(this.controller.threeViewer.scene.children);
 
+      console.log("intersects =", intersect_scene)
       if (intersects.length) {
         let x = intersects[0].point.x * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[0];
         let y = intersects[0].point.y * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[1];
@@ -719,7 +721,6 @@ export default {
         circle.position.y = worldCoords[1];
         circle.position.z = 0;
         this.controller.threeViewer.scene.add(circle);
-        console.log("eee2", point)
 
 
         this.pdcs.push(circle);
