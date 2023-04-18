@@ -51,7 +51,8 @@ export default {
                 '2': this.displayVisuEpaisseur,
                 '3': this.displayVisuMontagne,
                 '4': this.displayVisuMur,
-                '5': this.displayVisuNuit
+                '5': this.displayVisuNuit,
+                '6': this.displayDifficultyInfo
             },
         }
     },
@@ -885,6 +886,144 @@ export default {
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit.", life: 10000 });
 
             this.addNightCoverage(this.devices);
+            this.isLegend = true;
+        },
+
+        async addDifficultyInfo(deviceNumbers) {
+
+            this.devices = deviceNumbers;
+            this.visu_function = this.addDifficultyInfo;
+
+            const traj_data = await fetch(`http://localhost:5500/traj`, {
+                method: 'GET'
+            }).then(response => response.json())
+            const cp_data = await fetch(`http://localhost:5500/cp`, {
+                method: 'GET'
+            }).then(response => response.json())
+
+            // Detection CP
+            const cp_points = [];
+            for (let c = 0; c < cp_data.length - 1; c++) {
+                let cp = [];
+                for (let t = 0; t < traj_data.length; t++) {
+                    if (t > cp_data[c][5] && t < cp_data[c + 1][4]) {
+                        cp.push(t);
+                    }
+                }
+                cp_points.push(cp)
+            }
+            for (let c = 0; c < cp_points.length; c++) {
+
+                let shape = [];
+                let color = [];
+
+                for (let j = 0; j < cp_points[c].length - 2; j++) {
+                    let i = cp_points[c][j];
+
+                    let xA = this.controller.threeViewer.getWorldCoords([traj_data[i].x, traj_data[i].y])[0];
+                    let yA = this.controller.threeViewer.getWorldCoords([traj_data[i].x, traj_data[i].y])[1];
+                    let xB = this.controller.threeViewer.getWorldCoords([traj_data[i + 1].x, traj_data[i + 1].y])[0];
+                    let yB = this.controller.threeViewer.getWorldCoords([traj_data[i + 1].x, traj_data[i + 1].y])[1];
+                    let xC = this.controller.threeViewer.getWorldCoords([traj_data[i + 2].x, traj_data[i + 2].y])[0];
+                    let yC = this.controller.threeViewer.getWorldCoords([traj_data[i + 2].x, traj_data[i + 2].y])[1];
+                    let d = 5;
+                    let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+                    let normBC = Math.sqrt(Math.pow(xB - xC, 2) + Math.pow(yB - yC, 2));
+
+                    if (normAB === 0) { continue }
+
+                    shape.push(
+                        xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+                    for (let k = 0; k < 3; k++) {
+                        color.push(
+                            1,
+                            1 - (cp_data[c][6] + 1) / 6,
+                            1 - (cp_data[c][6] + 1) / 6
+                        )
+                    }
+
+                    shape.push(
+                        xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xA - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+                    for (let k = 0; k < 3; k++) {
+                        color.push(
+                            1,
+                            1 - (cp_data[c][6] + 1) / 6,
+                            1 - (cp_data[c][6] + 1) / 6
+                        )
+                    }
+
+                    if (normAB != 0 && normBC != 0 && d != 0) {
+                        shape.push(xB, yB, 0);
+                        shape.push(
+                            xB - d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+                            yB + d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+                        shape.push(
+                            xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                            yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                        for (let k = 0; k < 3; k++) {
+                            color.push(
+                                1,
+                                1 - (cp_data[c][6] + 1) / 6,
+                                1 - (cp_data[c][6] + 1) / 6
+                            )
+                        }
+
+                        shape.push(xB, yB, 0);
+                        shape.push(
+                            xB + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                            yB - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                        shape.push(
+                            xB + d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+                            yB - d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+                        for (let k = 0; k < 3; k++) {
+                            color.push(
+                                1,
+                                1 - (cp_data[c][6] + 1) / 6,
+                                1 - (cp_data[c][6] + 1) / 6
+                            )
+                        }
+                    }
+                }
+
+                let material = new THREE.MeshBasicMaterial({
+                    vertexColors: true,
+                });
+                let geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
+
+                let visu_mesh = new THREE.Mesh(geometry, material);
+                visu_mesh.cp = c;
+                this.visu_meshes.push(visu_mesh)
+                this.controller.threeViewer.scene.add(visu_mesh);
+            }
+        },
+        displayDifficultyInfo() {
+            this.toast.removeAllGroups();
+            this.visuFunction = this.displayDifficultyInfo;
+
+            if (this.devices.length === 0)
+                this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
+            else
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit.", life: 10000 });
+
+            this.addDifficultyInfo(this.devices);
             this.isLegend = true;
         },
     }

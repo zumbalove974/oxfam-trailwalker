@@ -225,7 +225,8 @@ export default {
         { name: 'Visu épaisseur', key: '2' },
         { name: 'Visu colline', key: '3' },
         { name: 'Visu Mur', key: '4' },
-        { name: 'Visu Nuit', key: '5' }
+        { name: 'Visu Nuit', key: '5' },
+        { name: 'Visu Difficulte', key: '6' }
       ],
       categoriesCheckbox: [
         { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
@@ -291,11 +292,12 @@ export default {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.devices.length && this.visu_function) {
+      if (this.visu_function) {
         this.visu_function(this.devices);
       }
-      else
+      else {
         this.addItineraireReference();
+      }
     },
     changerDeDimension() {
       this.dimension = this.dimension.value;
@@ -451,7 +453,7 @@ export default {
       this.visu_meshes.push(this.limitsMesh);
     },
     verifyView(center) {
-        console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
+      console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
 
       let x = center[0];
       let y = center[1];
