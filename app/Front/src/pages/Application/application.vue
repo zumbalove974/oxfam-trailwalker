@@ -157,7 +157,7 @@ import "primeicons/primeicons.css";
 
 import * as THREE from "three";
 
-import { ZOOM_RES_L93 } from "../../client/Utils";
+import { ZOOM_RES_L93, bounds } from "../../client/Utils";
 
 
 export default {
@@ -260,8 +260,8 @@ export default {
       this.controller = res;
       this.controller = toRaw(this.controller);
 
-      this.createBoundingLimit();
       this.createDimensionEnvironment(this.dimension);
+      this.createBoundingLimit();
     });
 
     this.addItineraireReference();
@@ -407,6 +407,10 @@ export default {
 
       let points = [];
 
+      console.log("lll", this.controller.threeViewer.zoomFactor);
+      this.upLeft = bounds[this.controller.threeViewer.zoomFactor][0];
+      this.bottomRight = bounds[this.controller.threeViewer.zoomFactor][1];
+
       points.push(new THREE.Vector3(
         this.controller.threeViewer.getWorldCoords(this.upLeft)[0],
         this.controller.threeViewer.getWorldCoords(this.upLeft)[1],
@@ -451,7 +455,6 @@ export default {
       this.visu_meshes.push(this.limitsMesh);
     },
     verifyView(center) {
-        console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
 
       let x = center[0];
       let y = center[1];
