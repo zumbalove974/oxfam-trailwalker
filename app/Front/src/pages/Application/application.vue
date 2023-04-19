@@ -355,8 +355,6 @@ export default {
           if (this.deviceNumberFrom < this.deviceNumberTo) {
             for (let i = this.deviceNumberFrom; i <= this.deviceNumberTo; i++) {
               const ids = this.getValuesFromDevicesTab();
-              console.log("__noms0", i.toString());
-              console.log("__noms1", toRaw(this.devicesName).includes(i.toString()));
               if (!ids.includes(i) && toRaw(this.devicesName).includes(i.toString())) {
                 const moyenne = await this.getVitesseMoyenne(i);
                 this.devicesTab.push({ id: i, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
