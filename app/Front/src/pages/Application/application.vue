@@ -714,12 +714,13 @@ export default {
       // Coordinates of the 10 points
       cps.forEach(point => {
         let worldCoords = toRaw(this.controller).threeViewer.getWorldCoords([point.x, point.y]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-        let geometry = new THREE.CircleGeometry(10, 32);
-        let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+        let geometry = new THREE.CylinderGeometry(10, 10, 70, 70);
+        let material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
         let circle = new THREE.Mesh(geometry, material);
         circle.position.x = worldCoords[0];
         circle.position.y = worldCoords[1];
-        circle.position.z = 0;
+        circle.position.z = 35;
+        circle.rotation.x = Math.PI / 2;
         this.controller.threeViewer.scene.add(circle);
         console.log("eee2", point)
 
