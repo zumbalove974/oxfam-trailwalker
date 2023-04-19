@@ -480,8 +480,14 @@ export default {
             let geometry4 = new THREE.BufferGeometry();
             let geometry5 = new THREE.BufferGeometry();
 
-            //let geometryLine2 = new THREE.BufferGeometry();
-            const materialBase = new THREE.MeshPhongMaterial({ color: 0xFF0000 });
+            const materialQ2 = new THREE.MeshPhongMaterial({ color: 0xFF0000 });
+            const materialQ = new THREE.LineBasicMaterial({
+                color: 0xff5500,
+                linewidth: 1,
+                linecap: 'round', //ignored by WebGLRenderer
+                linejoin: 'round' //ignored by WebGLRenderer
+            });
+
             let lineQ2;
             let geometriesQ2 = [];
 
@@ -898,204 +904,204 @@ export default {
 
             for (let i = 0; i < (longueursData - 1); i++) {
                 // Face 1
-                colors1.push(0.0);
-                colors1.push(1.0);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
                 colors1.push(0.2);
-                colors1.push(0.8);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
                 colors1.push(0.2);
-                colors1.push(0.8);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
                 colors1.push(0.2);
-                colors1.push(0.8);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
-                colors1.push(0.0);
-                colors1.push(1.0);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
-                colors1.push(0.0);
-                colors1.push(1.0);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
                 //Face 2
-                colors1.push(0.0);
-                colors1.push(1.0);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
                 colors1.push(0.2);
-                colors1.push(0.8);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
                 colors1.push(0.2);
-                colors1.push(0.8);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
                 colors1.push(0.2);
-                colors1.push(0.8);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
-                colors1.push(0.0);
-                colors1.push(1.0);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
-                colors1.push(0.0);
-                colors1.push(1.0);
-                colors1.push(0.0);
+                colors1.push(0.2);
+                colors1.push(0.2);
+                colors1.push(0.2);
 
                 // Face 1
+                colors2.push(0.5);
                 colors2.push(0.2);
-                colors2.push(0.8);
-                colors2.push(0.0);
-
-                colors2.push(0.4);
-                colors2.push(0.6);
-                colors2.push(0.0);
-
-                colors2.push(0.4);
-                colors2.push(0.6);
-                colors2.push(0.0);
-
-                colors2.push(0.4);
-                colors2.push(0.6);
-                colors2.push(0.0);
-
                 colors2.push(0.2);
-                colors2.push(0.8);
-                colors2.push(0.0);
 
-                colors2.push(0.2);
                 colors2.push(0.8);
-                colors2.push(0.0);
+                colors2.push(0.2);
+                colors2.push(0.2);
+
+                colors2.push(0.8);
+                colors2.push(0.2);
+                colors2.push(0.2);
+
+                colors2.push(0.8);
+                colors2.push(0.2);
+                colors2.push(0.2);
+
+                colors2.push(0.5);
+                colors2.push(0.2);
+                colors2.push(0.2);
+
+                colors2.push(0.5);
+                colors2.push(0.2);
+                colors2.push(0.2);
 
                 //Face 2
+                colors2.push(0.5);
                 colors2.push(0.2);
-                colors2.push(0.8);
-                colors2.push(0.0);
-
-                colors2.push(0.4);
-                colors2.push(0.6);
-                colors2.push(0.0);
-
-                colors2.push(0.4);
-                colors2.push(0.6);
-                colors2.push(0.0);
-
-                colors2.push(0.4);
-                colors2.push(0.6);
-                colors2.push(0.0);
-
                 colors2.push(0.2);
-                colors2.push(0.8);
-                colors2.push(0.0);
 
-                colors2.push(0.2);
                 colors2.push(0.8);
-                colors2.push(0.0);
+                colors2.push(0.2);
+                colors2.push(0.2);
+
+                colors2.push(0.8);
+                colors2.push(0.2);
+                colors2.push(0.2);
+
+                colors2.push(0.8);
+                colors2.push(0.2);
+                colors2.push(0.2);
+
+                colors2.push(0.5);
+                colors2.push(0.2);
+                colors2.push(0.2);
+
+                colors2.push(0.5);
+                colors2.push(0.2);
+                colors2.push(0.2);
 
                 // Face 1
-                colors3.push(0.4);
-                colors3.push(0.6);
-                colors3.push(0.0);
+                colors3.push(0.8);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.6);
-                colors3.push(0.4);
-                colors3.push(0.0);
+                colors3.push(0.5);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.6);
-                colors3.push(0.4);
-                colors3.push(0.0);
+                colors3.push(0.5);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.6);
-                colors3.push(0.4);
-                colors3.push(0.0);
+                colors3.push(0.5);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.4);
-                colors3.push(0.6);
-                colors3.push(0.0);
+                colors3.push(0.8);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.4);
-                colors3.push(0.6);
-                colors3.push(0.0);
+                colors3.push(0.8);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
                 //Face 2
-                colors3.push(0.4);
-                colors3.push(0.6);
-                colors3.push(0.0);
+                colors3.push(0.8);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.6);
-                colors3.push(0.4);
-                colors3.push(0.0);
+                colors3.push(0.5);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.6);
-                colors3.push(0.4);
-                colors3.push(0.0);
+                colors3.push(0.5);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.6);
-                colors3.push(0.4);
-                colors3.push(0.0);
+                colors3.push(0.5);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.4);
-                colors3.push(0.6);
-                colors3.push(0.0);
+                colors3.push(0.8);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
-                colors3.push(0.4);
-                colors3.push(0.6);
-                colors3.push(0.0);
+                colors3.push(0.8);
+                colors3.push(0.2);
+                colors3.push(0.2);
 
                 // Face 1
-                colors4.push(0.6);
-                colors4.push(0.4);
-                colors4.push(0.0);
-
-                colors4.push(0.8);
                 colors4.push(0.2);
-                colors4.push(0.0);
-
-                colors4.push(0.8);
                 colors4.push(0.2);
-                colors4.push(0.0);
-
-                colors4.push(0.8);
                 colors4.push(0.2);
-                colors4.push(0.0);
 
-                colors4.push(0.6);
-                colors4.push(0.4);
-                colors4.push(0.0);
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
 
-                colors4.push(0.6);
-                colors4.push(0.4);
-                colors4.push(0.0);
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
+
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
+
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
+
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
 
                 //Face 2
-                colors4.push(0.6);
-                colors4.push(0.4);
-                colors4.push(0.0);
-
-                colors4.push(0.8);
                 colors4.push(0.2);
-                colors4.push(0.0);
-
-                colors4.push(0.8);
                 colors4.push(0.2);
-                colors4.push(0.0);
-
-                colors4.push(0.8);
                 colors4.push(0.2);
-                colors4.push(0.0);
 
-                colors4.push(0.6);
-                colors4.push(0.4);
-                colors4.push(0.0);
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
 
-                colors4.push(0.6);
-                colors4.push(0.4);
-                colors4.push(0.0);
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
+
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
+
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
+
+                colors4.push(0.2);
+                colors4.push(0.2);
+                colors4.push(0.2);
             }
 
             // itemSize = 3 because there are 3 values (components) per vertex
@@ -1123,12 +1129,9 @@ export default {
             const material = new THREE.MeshBasicMaterial({
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.8
+                opacity: 0.8,
+                color: '0xFF5500'
             });
-            /*
-                        const materialQ2 = new THREE.MeshBasicMaterial({
-                            color: '0xFF0000'
-                        });*/
 
             let moustache1 = new THREE.Mesh(geometry1, material);
             let moustache2 = new THREE.Mesh(geometry2, material);
@@ -1136,12 +1139,10 @@ export default {
             let moustache4 = new THREE.Mesh(geometry4, material);
             let moustache5 = new THREE.Mesh(geometry5, material);
 
-            let lineQ3 = new THREE.Line(geometryLine1, material);
-            //let lineQ2 = new THREE.Line(geometryLine2, materialQ2);
-            console.log(geometriesQ2)
-            lineQ2 = new THREE.Mesh(BufferGeometryUtils.mergeBufferGeometries(geometriesQ2, false), materialBase);
+            let lineQ3 = new THREE.Line(geometryLine1, materialQ);
+            lineQ2 = new THREE.Mesh(BufferGeometryUtils.mergeBufferGeometries(geometriesQ2, false), materialQ2);
 
-            let lineQ1 = new THREE.Line(geometryLine3, material);
+            let lineQ1 = new THREE.Line(geometryLine3, materialQ);
             let lineQ0 = new THREE.Line(geometryLine4, material);
 
             this.visu_meshes.push(moustache1);
