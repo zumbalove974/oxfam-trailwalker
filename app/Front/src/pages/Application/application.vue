@@ -225,11 +225,12 @@ export default {
         { name: 'Visu épaisseur', key: '2' },
         { name: 'Visu colline', key: '3' },
         { name: 'Visu Mur', key: '4' },
-        { name: 'Visu Nuit', key: '5' }
+        { name: 'Visu Nuit', key: '5' },
+        { name: 'Visu Moustache', key: '6' }
       ],
       categoriesCheckbox: [
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
-        { name: 'Points de contrôle', key: '6', function: this.displayPDC }
+        { name: 'Position des équipes', key: '7', function: this.displayPosEquipe },
+        { name: 'Points de contrôle', key: '8', function: this.displayPDC }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
@@ -713,12 +714,13 @@ export default {
       // Coordinates of the 10 points
       cps.forEach(point => {
         let worldCoords = toRaw(this.controller).threeViewer.getWorldCoords([point.x, point.y]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-        let geometry = new THREE.CircleGeometry(10, 32);
-        let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+        let geometry = new THREE.CylinderGeometry(10, 10, 70, 70);
+        let material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
         let circle = new THREE.Mesh(geometry, material);
         circle.position.x = worldCoords[0];
         circle.position.y = worldCoords[1];
-        circle.position.z = 0;
+        circle.position.z = 35;
+        circle.rotation.x = Math.PI / 2;
         this.controller.threeViewer.scene.add(circle);
         console.log("eee2", point)
 
