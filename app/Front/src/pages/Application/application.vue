@@ -129,7 +129,7 @@ import { toRaw } from 'vue';
 
 import { init, vavinCenter } from '../../client/index.js'
 import VisuMur from './../../components/VisuMur.vue';
-import { getLiveDataDevice, getControlPoints } from "../../client/bddConnexion";
+import { getLiveDataDevice, getControlPoints, getNoms } from "../../client/bddConnexion";
 //import { tronquer } from "../../client/mathUtils";
 
 // Primevue components
@@ -182,6 +182,7 @@ export default {
     return {
       active: false,
       getLiveDataDevice: getLiveDataDevice,
+      getNoms: getNoms,
       dimension: 2,
       depht_s: Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0,
       cameraZ: null,
@@ -203,6 +204,7 @@ export default {
       limitsMesh: null,
       teamMarkers: [],
       devicesTab: [],
+      devicesName: [],
       raycaster: new THREE.Raycaster(),
       pointer: new THREE.Vector2(),
       deviceNumber: null,
@@ -263,6 +265,12 @@ export default {
 
       this.createDimensionEnvironment(this.dimension);
       this.createBoundingLimit();
+    });
+
+    const noms = await this.getNoms();
+    noms.forEach(element => {
+      console.log(this.getDeviceName(element['table_name']));
+      this.devicesName.push(this.getDeviceName(element['table_name']));
     });
 
     this.addItineraireReference();
@@ -335,7 +343,8 @@ export default {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
         if (this.deviceNumber) {
           const ids = this.getValuesFromDevicesTab();
-          if (!ids.includes(this.deviceNumber)) {
+          console.log("__noms", this.devicesName);
+          if (!ids.includes(this.deviceNumber) && this.devicesName.includes(this.deviceNumber)) {
             const moyenne = await this.getVitesseMoyenne(this.deviceNumber);
             this.devicesTab.push({ id: this.deviceNumber, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
             this.tabOpen = 0;
@@ -346,7 +355,9 @@ export default {
           if (this.deviceNumberFrom < this.deviceNumberTo) {
             for (let i = this.deviceNumberFrom; i <= this.deviceNumberTo; i++) {
               const ids = this.getValuesFromDevicesTab();
-              if (!ids.includes(i)) {
+              console.log("__noms0", i.toString());
+              console.log("__noms1", toRaw(this.devicesName).includes(i.toString()));
+              if (!ids.includes(i) && toRaw(this.devicesName).includes(i.toString())) {
                 const moyenne = await this.getVitesseMoyenne(i);
                 this.devicesTab.push({ id: i, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
                 this.tabOpen = 0;
@@ -385,6 +396,9 @@ export default {
 
       if (this.visuFunction)
         this.visuFunction();
+    },
+    getDeviceName(tableName) {
+      return tableName.split('_')[1];
     },
     displayPDC(input) {
       this.toast.removeAllGroups();
