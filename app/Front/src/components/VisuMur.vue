@@ -478,6 +478,11 @@ export default {
             let geometry3 = new THREE.BufferGeometry();
             let geometry4 = new THREE.BufferGeometry();
 
+            let geometryLine1 = new THREE.BufferGeometry();
+            let geometryLine2 = new THREE.BufferGeometry();
+            let geometryLine3 = new THREE.BufferGeometry();
+            let geometryLine4 = new THREE.BufferGeometry();
+
             let vertices1 = [];
             let vertices2 = [];
             let vertices3 = [];
@@ -487,6 +492,11 @@ export default {
             let colors2 = [];
             let colors3 = [];
             let colors4 = [];
+
+            let line1 = [];
+            let line2 = [];
+            let line3 = [];
+            let line4 = [];
 
             for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
@@ -511,8 +521,8 @@ export default {
 
                 let wallZtop = max + q3 + q2 + q1 + min;
                 let wallZbottom = q3 + q2 + q1 + min;
-                let wallZtoplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = maxplus1 + q3plus1 + q2plus1 + q1plus1 + minplus1;
+                let wallZtoplus1 = maxplus1 + q3plus1 + q2plus1 + q1plus1 + minplus1;
+                let wallZbottomplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
 
                 let data = devicesData[0];
                 //Face 1
@@ -564,6 +574,13 @@ export default {
                 vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
                 vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices1.push(wallZtoplus1);
+
+                // Ligne du troisième quartile
+                line1.push(new THREE.Vector3(
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
+                    wallZbottom)
+                );
             }
             for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
@@ -586,8 +603,8 @@ export default {
 
                 let wallZtop = q3 + q2 + q1 + min;
                 let wallZbottom = q2 + q1 + min;
-                let wallZtoplus1 = q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
+                let wallZtoplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
+                let wallZbottomplus1 = q2plus1 + q1plus1 + minplus1;
 
                 let data = devicesData[0];
 
@@ -640,6 +657,13 @@ export default {
                 vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
                 vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices2.push(wallZtoplus1);
+
+                // Ligne de la médiane
+                line2.push(new THREE.Vector3(
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
+                    wallZbottom)
+                );
             }
             for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
@@ -662,8 +686,8 @@ export default {
 
                 let wallZtop = q2 + q1 + min;
                 let wallZbottom = q1 + min;
-                let wallZtoplus1 = q1plus1 + minplus1;
-                let wallZbottomplus1 = q2plus1 + q1plus1 + minplus1;
+                let wallZtoplus1 = q2plus1 + q1plus1 + minplus1;
+                let wallZbottomplus1 = q1plus1 + minplus1;
 
                 let data = devicesData[0];
 
@@ -716,6 +740,13 @@ export default {
                 vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
                 vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices3.push(wallZtoplus1);
+
+                // Ligne du premier quartile
+                line3.push(new THREE.Vector3(
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
+                    wallZbottom)
+                );
             }
             for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
@@ -738,8 +769,8 @@ export default {
 
                 let wallZtop = q1 + min;
                 let wallZbottom = min;
-                let wallZtoplus1 = minplus1;
-                let wallZbottomplus1 = q1plus1 + minplus1;
+                let wallZtoplus1 = q1plus1 + minplus1;
+                let wallZbottomplus1 = minplus1;
 
                 let data = devicesData[0];
 
@@ -792,6 +823,13 @@ export default {
                 vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
                 vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices4.push(wallZtoplus1);
+
+                // Ligne du min
+                line4.push(new THREE.Vector3(
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
+                    wallZbottom)
+                );
             }
 
             for (let i = 0; i < (longueursData - 1); i++) {
@@ -830,7 +868,7 @@ export default {
                 colors1.push(0.0);
 
                 colors1.push(0.2);
-                colors1.push(8.0);
+                colors1.push(0.8);
                 colors1.push(0.0);
 
                 colors1.push(0.2);
@@ -1009,6 +1047,11 @@ export default {
             geometry4.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices4), 3));
             geometry4.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors4), 3));
 
+            geometryLine1.setFromPoints(line1);
+            geometryLine2.setFromPoints(line2);
+            geometryLine3.setFromPoints(line3);
+            geometryLine4.setFromPoints(line4);
+
             // create material
             const material = new THREE.MeshBasicMaterial({
                 vertexColors: true,
@@ -1021,15 +1064,30 @@ export default {
             let moustache3 = new THREE.Mesh(geometry3, material);
             let moustache4 = new THREE.Mesh(geometry4, material);
 
+            let lineQ3 = new THREE.Line(geometryLine1, material);
+            let lineQ2 = new THREE.Line(geometryLine2, material);
+            let lineQ1 = new THREE.Line(geometryLine3, material);
+            let lineQ0 = new THREE.Line(geometryLine4, material);
+
             this.visu_meshes.push(moustache1);
             this.visu_meshes.push(moustache2);
             this.visu_meshes.push(moustache3);
             this.visu_meshes.push(moustache4);
 
+            this.visu_meshes.push(lineQ3);
+            this.visu_meshes.push(lineQ2);
+            this.visu_meshes.push(lineQ1);
+            this.visu_meshes.push(lineQ0);
+
             this.controller.threeViewer.scene.add(moustache1);
             this.controller.threeViewer.scene.add(moustache2);
             this.controller.threeViewer.scene.add(moustache3);
             this.controller.threeViewer.scene.add(moustache4);
+
+            this.controller.threeViewer.scene.add(lineQ3);
+            this.controller.threeViewer.scene.add(lineQ2);
+            this.controller.threeViewer.scene.add(lineQ1);
+            this.controller.threeViewer.scene.add(lineQ0);
         },
         async addItineraireSpeedWall(deviceNumbers) {
 
