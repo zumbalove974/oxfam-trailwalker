@@ -13,6 +13,7 @@ import { getLiveDataDevice } from "../client/bddConnexion";
 import { asc, calculerPremierQuartile, calculerMedian, calculerTroisiemeQuartile, tronquer } from "../client/mathUtils.js";
 
 import * as THREE from "three";
+import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
 // les toasts sont des onglets comportant un texte qui s'affiche durant un temps limité
 import Toast from 'primevue/toast';
@@ -479,10 +480,10 @@ export default {
             let geometry4 = new THREE.BufferGeometry();
             let geometry5 = new THREE.BufferGeometry();
 
-            let geometryLine1 = new THREE.BufferGeometry();
-            let geometryLine2 = new THREE.BufferGeometry();
-            let geometryLine3 = new THREE.BufferGeometry();
-            let geometryLine4 = new THREE.BufferGeometry();
+            //let geometryLine2 = new THREE.BufferGeometry();
+            const materialBase = new THREE.MeshPhongMaterial({ color: 0xFF0000 });
+            let lineQ2;
+            let geometriesQ2 = [];
 
             let vertices1 = [];
             let vertices2 = [];
@@ -666,6 +667,17 @@ export default {
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
                     wallZbottom)
                 );
+
+                let tube = new THREE.LineCurve3(new THREE.Vector3(
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
+                    this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
+                    wallZbottom),
+                    new THREE.Vector3(
+                        this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0],
+                        this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1],
+                        wallZbottomplus1));
+
+                geometriesQ2.push(new THREE.TubeGeometry(tube, 100, 0.2, 20, false));
             }
             for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
@@ -1101,10 +1113,11 @@ export default {
 
             geometry5.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices5), 3));
 
-            geometryLine1.setFromPoints(line1);
-            geometryLine2.setFromPoints(line2);
-            geometryLine3.setFromPoints(line3);
-            geometryLine4.setFromPoints(line4);
+
+            let geometryLine1 = new THREE.BufferGeometry().setFromPoints(line1);
+            //let geometryLine2 = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(line2), 20, 2, 8, false);
+            let geometryLine3 = new THREE.BufferGeometry().setFromPoints(line3);
+            let geometryLine4 = new THREE.BufferGeometry().setFromPoints(line4);
 
             // create material
             const material = new THREE.MeshBasicMaterial({
@@ -1112,6 +1125,10 @@ export default {
                 transparent: true,
                 opacity: 0.8
             });
+            /*
+                        const materialQ2 = new THREE.MeshBasicMaterial({
+                            color: '0xFF0000'
+                        });*/
 
             let moustache1 = new THREE.Mesh(geometry1, material);
             let moustache2 = new THREE.Mesh(geometry2, material);
@@ -1120,7 +1137,10 @@ export default {
             let moustache5 = new THREE.Mesh(geometry5, material);
 
             let lineQ3 = new THREE.Line(geometryLine1, material);
-            let lineQ2 = new THREE.Line(geometryLine2, material);
+            //let lineQ2 = new THREE.Line(geometryLine2, materialQ2);
+            console.log(geometriesQ2)
+            lineQ2 = new THREE.Mesh(BufferGeometryUtils.mergeBufferGeometries(geometriesQ2, false), materialBase);
+
             let lineQ1 = new THREE.Line(geometryLine3, material);
             let lineQ0 = new THREE.Line(geometryLine4, material);
 
