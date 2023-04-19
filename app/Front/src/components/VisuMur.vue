@@ -477,6 +477,7 @@ export default {
             let geometry2 = new THREE.BufferGeometry();
             let geometry3 = new THREE.BufferGeometry();
             let geometry4 = new THREE.BufferGeometry();
+            let geometry5 = new THREE.BufferGeometry();
 
             let geometryLine1 = new THREE.BufferGeometry();
             let geometryLine2 = new THREE.BufferGeometry();
@@ -487,6 +488,7 @@ export default {
             let vertices2 = [];
             let vertices3 = [];
             let vertices4 = [];
+            let vertices5 = [];
 
             let colors1 = [];
             let colors2 = [];
@@ -824,6 +826,56 @@ export default {
                 vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
                 vertices4.push(wallZtoplus1);
 
+                //Face 1
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices5.push(wallZbottom);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices5.push(0);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices5.push(0);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices5.push(0);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices5.push(wallZbottomplus1);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices5.push(wallZbottom);
+
+                // Face 2
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices5.push(wallZbottom);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices5.push(0);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices5.push(0);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices5.push(0);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
+                vertices5.push(wallZbottom);
+
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
+                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
+                vertices5.push(wallZbottomplus1);
+
                 // Ligne du min
                 line4.push(new THREE.Vector3(
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
@@ -1047,6 +1099,8 @@ export default {
             geometry4.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices4), 3));
             geometry4.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors4), 3));
 
+            geometry5.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices5), 3));
+
             geometryLine1.setFromPoints(line1);
             geometryLine2.setFromPoints(line2);
             geometryLine3.setFromPoints(line3);
@@ -1063,6 +1117,7 @@ export default {
             let moustache2 = new THREE.Mesh(geometry2, material);
             let moustache3 = new THREE.Mesh(geometry3, material);
             let moustache4 = new THREE.Mesh(geometry4, material);
+            let moustache5 = new THREE.Mesh(geometry5, material);
 
             let lineQ3 = new THREE.Line(geometryLine1, material);
             let lineQ2 = new THREE.Line(geometryLine2, material);
@@ -1073,6 +1128,7 @@ export default {
             this.visu_meshes.push(moustache2);
             this.visu_meshes.push(moustache3);
             this.visu_meshes.push(moustache4);
+            this.visu_meshes.push(moustache5);
 
             this.visu_meshes.push(lineQ3);
             this.visu_meshes.push(lineQ2);
@@ -1083,6 +1139,7 @@ export default {
             this.controller.threeViewer.scene.add(moustache2);
             this.controller.threeViewer.scene.add(moustache3);
             this.controller.threeViewer.scene.add(moustache4);
+            this.controller.threeViewer.scene.add(moustache5);
 
             this.controller.threeViewer.scene.add(lineQ3);
             this.controller.threeViewer.scene.add(lineQ2);
