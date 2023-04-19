@@ -69,6 +69,7 @@ export default {
             this.visu_function = this.functions[toRaw(this.category).key];
             this.$emit("data", [this.visu_meshes, this.visu_function]);
         },
+
         createPoints2D(data, z) {
             const points = [];
 
@@ -894,7 +895,8 @@ export default {
             this.devices = deviceNumbers;
             this.visu_function = this.addDifficultyInfo;
 
-            this.controller.threeViewer.traj_parts.clear();
+            //this.controller.threeViewer.traj_parts.clear();
+            //this.controller.threeViewer.scene.add(this.controller.threeViewer.traj_parts)
 
             const traj_data = await fetch(`http://localhost:5500/traj`, {
                 method: 'GET'
@@ -917,7 +919,6 @@ export default {
             for (let c = 0; c < cp_points.length; c++) {
 
                 let shape = [];
-                let color = [];
 
                 for (let j = 0; j < cp_points[c].length - 2; j++) {
                     let i = cp_points[c][j];
@@ -944,14 +945,6 @@ export default {
                         xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
                         yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
 
-                    for (let k = 0; k < 3; k++) {
-                        color.push(
-                            1,
-                            1 - (cp_data[c][6] + 1) / 6,
-                            1 - (cp_data[c][6] + 1) / 6
-                        )
-                    }
-
                     shape.push(
                         xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
                         yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
@@ -962,14 +955,6 @@ export default {
                         xA - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
                         yA + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
 
-                    for (let k = 0; k < 3; k++) {
-                        color.push(
-                            1,
-                            1 - (cp_data[c][6] + 1) / 6,
-                            1 - (cp_data[c][6] + 1) / 6
-                        )
-                    }
-
                     if (normAB != 0 && normBC != 0 && d != 0) {
                         shape.push(xB, yB, 0);
                         shape.push(
@@ -978,13 +963,6 @@ export default {
                         shape.push(
                             xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
                             yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
-                        for (let k = 0; k < 3; k++) {
-                            color.push(
-                                1,
-                                1 - (cp_data[c][6] + 1) / 6,
-                                1 - (cp_data[c][6] + 1) / 6
-                            )
-                        }
 
                         shape.push(xB, yB, 0);
                         shape.push(
@@ -993,28 +971,19 @@ export default {
                         shape.push(
                             xB + d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
                             yB - d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
-                        for (let k = 0; k < 3; k++) {
-                            color.push(
-                                1,
-                                1 - (cp_data[c][6] + 1) / 6,
-                                1 - (cp_data[c][6] + 1) / 6
-                            )
-                        }
                     }
                 }
 
-                let material = new THREE.MeshBasicMaterial({
-                    vertexColors: true,
-                });
+                let material = new THREE.MeshBasicMaterial();
+                material.color.setRGB(1, 1 - (cp_data[c][6] + 1) / 6, 1 - (cp_data[c][6] + 1) / 6)
                 let geometry = new THREE.BufferGeometry();
                 geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
-                geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
 
                 let visu_mesh = new THREE.Mesh(geometry, material);
                 visu_mesh.cp = c;
                 this.controller.threeViewer.traj_parts.add(visu_mesh);
             }
-            this.visu_meshes.push(this.controller.threeViewer.traj_parts)
+            //this.visu_meshes.push(this.controller.threeViewer.traj_parts)
         },
         displayDifficultyInfo() {
             this.toast.removeAllGroups();
@@ -1027,6 +996,9 @@ export default {
 
             this.addDifficultyInfo(this.devices);
             this.isLegend = true;
+
+            this.$emit("EventChangeDiffPart", [this.changeDiffPart]);
+
         },
     }
 };

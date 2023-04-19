@@ -507,9 +507,9 @@ export default {
 
       this.controller.threeViewer.controls.enabled = true;
 
-      if (intersected_traj_part.length) {
-        this.displayPartInfo(intersected_traj_part[0].object)
-      }
+      intersected_traj_part.forEach(intersection => {
+        this.changeDiffPart(intersection.object)
+      })
 
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
@@ -775,7 +775,25 @@ export default {
           this.teamMarkers.push(sphere);
         }
       }
-    }
+    },
+    async changeDiffPart(obj) {
+      obj.material.color.setHex(0x0000ff)
+      console.log("objui", obj.material)
+      const diff_data = await fetch(`http://localhost:5500/diff`, {
+        method: 'GET'
+      }).then(response => response.json())
+      console.log("three.cp", obj.cp)
+      console.log("diff", diff_data[obj.cp])
+      this.toast.add(
+        {
+          severity: 'success',
+          summary: 'Description',
+          detail: " ID de la zone = " + diff_data[obj.cp].id + " Dénivelé + = " + diff_data[obj.cp].denivele_positif + " m, Dénivelé - = " + diff_data[obj.cp].denivele_negatif + " m, Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance + " km, Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee + " km, niveau de difficulté = " + diff_data[obj.cp].niveau_diff,
+          life: 5000
+        }
+      );
+
+    },
   }
 }
 </script>
