@@ -225,11 +225,12 @@ export default {
         { name: 'Visu épaisseur', key: '2' },
         { name: 'Visu colline', key: '3' },
         { name: 'Visu Mur', key: '4' },
-        { name: 'Visu Nuit', key: '5' }
+        { name: 'Visu Nuit', key: '5' },
+        { name: 'Visu Moustache', key: '6' }
       ],
       categoriesCheckbox: [
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
-        { name: 'Points de contrôle', key: '6', function: this.displayPDC }
+        { name: 'Position des équipes', key: '7', function: this.displayPosEquipe },
+        { name: 'Points de contrôle', key: '8', function: this.displayPDC }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
