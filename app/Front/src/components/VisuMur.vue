@@ -1414,25 +1414,23 @@ export default {
                 if (indiceNuit < 0.4) {
                     ri = indiceNuit / 0.4;
                     bi = 1.0 - indiceNuit / 0.4;
-                    gi = 1.0 - indiceNuit / 0.6 / 1.5;
-                } else {
-                    ri = 1.0 - (indiceNuit - 0.4) / 0.6;
-                }
-
-                if (0.4 < indiceNuit < 0.6) {
+                    gi = (1.0 - indiceNuit / 0.6) / 1.5;
+                } else if (0.4 < indiceNuit < 0.6) {
                     gi = 1.0 - indiceNuit / 0.6;
+                    ri = 1.0;
+                } else {
+                    ri = 1.0 - (indiceNuit - 0.6) / 0.4;
                 }
 
                 if (indiceNuitPlus1 < 0.4) {
                     ri2 = indiceNuitPlus1 / 0.4;
                     bi2 = 1.0 - indiceNuitPlus1 / 0.4;
-                    gi = 1.0 - indiceNuitPlus1 / 0.6 / 1.5;
-                } else {
-                    ri = 1.0 - (indiceNuitPlus1 - 0.4) / 0.6;
-                }
-
-                if (0.4 < indiceNuitPlus1 < 0.6) {
+                    gi2 = (1.0 - indiceNuitPlus1 / 0.6) / 1.5;
+                } else if (0.4 < indiceNuitPlus1 < 0.6) {
+                    ri2 = 1.0;
                     gi2 = 1.0 - indiceNuitPlus1 / 0.6;
+                } else {
+                    ri2 = 1.0 - (indiceNuitPlus1 - 0.6) / 0.4;
                 }
 
                 shape.push(
