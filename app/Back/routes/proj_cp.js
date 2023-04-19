@@ -49,7 +49,7 @@ fetch(`http://localhost:3000/cp`, {
                 res.json(projectedPoints);
             }));
     });
-module.exports = router;
+
 
 // Returns the distance between a point and a line segment
 function closestPointOnLine(point, pt1, pt2) {
@@ -95,3 +95,5 @@ function pointToLineDistance(point, pt1, pt2) {
 
     return distance;
 }
+
+module.exports = { router, pointToLineDistance, closestPointOnLine };
