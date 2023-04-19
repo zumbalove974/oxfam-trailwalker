@@ -904,54 +904,54 @@ export default {
 
             for (let i = 0; i < (longueursData - 1); i++) {
                 // Face 1
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
                 //Face 2
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
-                colors1.push(0.2);
-                colors1.push(0.2);
-                colors1.push(0.2);
+                colors1.push(0.5);
+                colors1.push(0.5);
+                colors1.push(0.5);
 
                 // Face 1
                 colors2.push(0.5);
@@ -1054,54 +1054,54 @@ export default {
                 colors3.push(0.2);
 
                 // Face 1
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
                 //Face 2
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
 
-                colors4.push(0.2);
-                colors4.push(0.2);
-                colors4.push(0.2);
+                colors4.push(0.5);
+                colors4.push(0.5);
+                colors4.push(0.5);
             }
 
             // itemSize = 3 because there are 3 values (components) per vertex
