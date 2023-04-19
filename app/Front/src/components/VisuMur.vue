@@ -1400,6 +1400,39 @@ export default {
 
                 if (normAB === 0) { continue }
 
+                let ri = 0.0;
+                let gi = 0.0;
+                let bi = 0.0;
+
+                let ri2 = 0.0;
+                let gi2 = 0.0;
+                let bi2 = 0.0;
+
+                let indiceNuit = trace_night[i] / max_night;
+                let indiceNuitPlus1 = trace_night[i + 1] / max_night;
+
+                if (indiceNuit < 0.4) {
+                    ri = indiceNuit / 0.4;
+                    bi = 1.0 - indiceNuit / 0.4;
+                    gi = (1.0 - indiceNuit / 0.6) / 1.5;
+                } else if (0.4 < indiceNuit < 0.6) {
+                    gi = 1.0 - indiceNuit / 0.6;
+                    ri = 1.0;
+                } else {
+                    ri = 1.0 - (indiceNuit - 0.6) / 0.4;
+                }
+
+                if (indiceNuitPlus1 < 0.4) {
+                    ri2 = indiceNuitPlus1 / 0.4;
+                    bi2 = 1.0 - indiceNuitPlus1 / 0.4;
+                    gi2 = (1.0 - indiceNuitPlus1 / 0.6) / 1.5;
+                } else if (0.4 < indiceNuitPlus1 < 0.6) {
+                    ri2 = 1.0;
+                    gi2 = 1.0 - indiceNuitPlus1 / 0.6;
+                } else {
+                    ri2 = 1.0 - (indiceNuitPlus1 - 0.6) / 0.4;
+                }
+
                 shape.push(
                     xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
                     yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
@@ -1409,12 +1442,9 @@ export default {
                 shape.push(
                     xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
                     yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
-                color.push(
-                    1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night)
-                color.push(
-                    1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
-                color.push(
-                    1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+                color.push(ri, gi, bi)
+                color.push(ri2, gi2, bi2)
+                color.push(ri2, gi2, bi2)
 
 
                 shape.push(
@@ -1426,12 +1456,9 @@ export default {
                 shape.push(
                     xA - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
                     yA + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
-                color.push(
-                    1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night)
-                color.push(
-                    1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
-                color.push(
-                    1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night, 1 - trace_night[i] / max_night)
+                color.push(ri, gi, bi)
+                color.push(ri2, gi2, bi2)
+                color.push(ri, gi, bi)
 
 
                 if (normAB != 0 && normBC != 0 && d != 0) {
@@ -1442,12 +1469,9 @@ export default {
                     shape.push(
                         xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
                         yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
-                    color.push(
-                        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
-                    color.push(
-                        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
-                    color.push(
-                        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+                    color.push(ri2, gi2, bi2)
+                    color.push(ri2, gi2, bi2)
+                    color.push(ri2, gi2, bi2)
 
                     shape.push(xB, yB, 0);
                     shape.push(
@@ -1456,14 +1480,10 @@ export default {
                     shape.push(
                         xB + d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
                         yB - d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
-                    color.push(
-                        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
-                    color.push(
-                        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
-                    color.push(
-                        1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night, 1 - trace_night[i + 1] / max_night)
+                    color.push(ri2, gi2, bi2)
+                    color.push(ri2, gi2, bi2)
+                    color.push(ri2, gi2, bi2)
                 }
-
             }
 
             const material = new THREE.MeshBasicMaterial({
