@@ -1011,7 +1011,7 @@ export default {
                 let visu_mesh = new THREE.Mesh(geometry, material);
                 visu_mesh.cp = c;
                 this.visu_meshes.push(visu_mesh)
-                this.controller.threeViewer.scene.add(visu_mesh);
+                this.controller.threeViewer.traj_parts.add(visu_mesh);
             }
         },
         displayDifficultyInfo() {

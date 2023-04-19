@@ -476,6 +476,15 @@ export default {
       this.controller.threeViewer.controls.enabled = true;
       this.pointerIsDown = false;
 
+      let mouse = {
+        x: (this.lastPointerX / window.innerWidth) * 2 - 1,
+        y: -(this.lastPointerY / window.innerHeight) * 2 + 1
+      }
+      console.log(mouse)
+
+      this.raycaster.setFromCamera(mouse, this.controller.threeViewer.perspectiveCamera);
+      let intersected_traj_part = this.raycaster.intersectObjects(this.controller.threeViewer.traj_parts.children);
+
       this.pointer.x = 0;
       this.pointer.y = 0;
 
@@ -498,6 +507,10 @@ export default {
       this.controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
 
       this.controller.threeViewer.controls.enabled = true;
+
+      if (intersected_traj_part.length) {
+        console.log("intersected_traj_part", intersected_traj_part)
+      }
 
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
