@@ -480,7 +480,6 @@ export default {
         x: (this.lastPointerX / window.innerWidth) * 2 - 1,
         y: -(this.lastPointerY / window.innerHeight) * 2 + 1
       }
-      console.log(mouse)
 
       this.raycaster.setFromCamera(mouse, this.controller.threeViewer.perspectiveCamera);
       let intersected_traj_part = this.raycaster.intersectObjects(this.controller.threeViewer.traj_parts.children);
@@ -490,9 +489,7 @@ export default {
 
       this.raycaster.setFromCamera(this.pointer, this.controller.threeViewer.perspectiveCamera);
       let intersects = this.raycaster.intersectObjects(this.controller.threeViewer.planes.children);
-      let intersect_scene = this.raycaster.intersectObjects(this.controller.threeViewer.scene.children);
 
-      console.log("intersects =", intersect_scene)
       if (intersects.length) {
         let x = intersects[0].point.x * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[0];
         let y = intersects[0].point.y * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[1];
@@ -511,7 +508,7 @@ export default {
       this.controller.threeViewer.controls.enabled = true;
 
       if (intersected_traj_part.length) {
-        console.log("intersected_traj_part", intersected_traj_part)
+        this.displayPartInfo(intersected_traj_part[0].object)
       }
 
       while (this.visu_meshes.length > 0) {
@@ -579,7 +576,7 @@ export default {
           this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
         }
 
-        if (this.devices.length && this.visu_function)
+        if (this.visu_function)
           this.visu_function(this.devices);
         else
           this.addItineraireReference();
@@ -672,7 +669,7 @@ export default {
         //this.controller.threeViewer.scene.remove(wall);
         //this.controller.threeViewer.scene.remove(mesh);
 
-        if (this.device && this.visu_function)
+        if (this.visu_function)
           this.visu_function(this.devices);
       } else {
         console.log("___dimension 3___");

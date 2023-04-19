@@ -894,6 +894,8 @@ export default {
             this.devices = deviceNumbers;
             this.visu_function = this.addDifficultyInfo;
 
+            this.controller.threeViewer.traj_parts.clear();
+
             const traj_data = await fetch(`http://localhost:5500/traj`, {
                 method: 'GET'
             }).then(response => response.json())
@@ -1010,9 +1012,9 @@ export default {
 
                 let visu_mesh = new THREE.Mesh(geometry, material);
                 visu_mesh.cp = c;
-                this.visu_meshes.push(visu_mesh)
                 this.controller.threeViewer.traj_parts.add(visu_mesh);
             }
+            this.visu_meshes.push(this.controller.threeViewer.traj_parts)
         },
         displayDifficultyInfo() {
             this.toast.removeAllGroups();
