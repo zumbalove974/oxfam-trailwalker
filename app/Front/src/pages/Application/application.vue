@@ -230,7 +230,7 @@ export default {
         { name: 'Visu Mur', key: '4' },
         { name: 'Visu Nuit', key: '5' },
         { name: 'Visu Moustache', key: '6' },
-        { name: 'Visu Difficulte', key: '7' }
+        { name: 'Visu Difficulte', key: '9' }
       ],
       categoriesCheckbox: [
         { name: 'Position des équipes', key: '7', function: this.displayPosEquipe },

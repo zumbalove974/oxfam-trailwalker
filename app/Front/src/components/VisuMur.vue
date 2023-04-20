@@ -54,7 +54,7 @@ export default {
                 '4': this.displayVisuMur,
                 '5': this.displayVisuNuit,
                 '6': this.displayVisuMoustache,
-                '7': this.displayDifficultyInfo
+                '9': this.displayDifficultyInfo
             },
             isLegend: false // définit si la légende doit être affichée pour la visualisation en cours
         }
@@ -1441,6 +1441,20 @@ export default {
             }
             //this.visu_meshes.push(this.controller.threeViewer.traj_parts)
         },
+
+        displayDifficultyInfo() {
+            this.toast.removeAllGroups();
+            this.visuFunction = this.displayDifficultyInfo;
+
+            if (this.devices.length === 0)
+                this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
+            else
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours et leurs difficultes.", life: 10000 });
+
+            this.addDifficultyInfo(this.devices);
+
+            this.isLegend = true;
+        },
     }
-};
+}
 </script>
