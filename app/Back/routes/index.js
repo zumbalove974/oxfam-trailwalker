@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const { Pool } = require("pg");
 
-/* Router pour tous les devices */
+/* Router pour tous les devices interpolés */
 
 // Configuration de la connexion à la base de données PostgreSQL
 router.pool = new Pool({
