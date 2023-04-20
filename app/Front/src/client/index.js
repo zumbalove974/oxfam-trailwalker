@@ -1,6 +1,5 @@
 import "regenerator-runtime/runtime";
 import * as THREE from "three";
-//import Feature from "ol/Feature";
 import { VTController } from "./VTController";
 import { mergedRender } from "./VTThreeViewer";// singleRender
 import { planStyle } from "./OLViewer"; //  planStyle, grisStyle, 

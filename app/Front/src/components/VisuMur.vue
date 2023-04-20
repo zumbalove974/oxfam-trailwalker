@@ -65,6 +65,7 @@ export default {
     methods: {
         // fonction appelée lorsque l'utilisateur clique sur une checkbox
         display() {
+            console.log("rrr__display")
             toRaw(this.functions[toRaw(this.category).key])();
             this.visu_function = this.functions[toRaw(this.category).key];
             // on envoit à la vue parente la focntion concernée et la nouvelle liste des vicualisations présentes dans la scène
@@ -715,29 +716,29 @@ export default {
                 );
 
                 // Face 1
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
                 // Face 1
                 colors2.push(0.5);
@@ -790,29 +791,29 @@ export default {
                 colors3.push(0.2);
 
                 // Face 1
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
 
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
             }
 
             // itemSize = 3 because there are 3 values (components) per vertex
@@ -1092,7 +1093,7 @@ export default {
             this.visu_function = this.addNightCoverage;
 
             const date_nuit = "2021-03-07T21:57:00.000Z";
-            const date_matin = "2021-04-07T05:53:00.000Z"
+            const date_matin = "2021-04-07T05:53:00.000Z";
 
             const devices_data = await Promise.all(deviceNumbers.map(d => getLiveDataDevice(d)));
 
