@@ -261,6 +261,8 @@ export default {
     }
   },
   async mounted() {
+    this.toast = useToast();
+
     init().then(res => {
       this.controller = res;
       this.controller = toRaw(this.controller);
@@ -278,8 +280,6 @@ export default {
 
     this.cameraZ = window.innerHeight / this.depht_s;
 
-    this.toast = useToast();
-
     if (this.deviceNumber) {
       await this.loadTimestamps();
     }
@@ -295,14 +295,16 @@ export default {
   },
   methods: {
     actualiser: function (data) {
+      console.log("____actualiser");
       this.visu_meshes = toRaw(data[0]);
-      this.visu_function = data[1];
+
 
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.visu_function) {
+if (this.visu_function && data[1] != this.visu_function) {
+        this.visu_function = data[1];
         this.visu_function(this.devices);
       }
       else {

@@ -238,14 +238,13 @@ export default {
         },
         displayVisuMontagne() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMontagne;
 
             if (this.devices.length > 1)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
             else
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
 
-            this.addItineraireSpeed3D(this.devices, this.dimension).then(res => {
+            this.addItineraireSpeed3D(this.devices).then(res => {
                 this.minLegend = tronquer(res[0], 2);
                 this.maxLegend = tronquer(res[1], 2);
             });
@@ -478,6 +477,8 @@ export default {
             let line3 = [];
             let line4 = [];
 
+            const coefficient = 10;
+
             for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
                 let listeplus1 = [];
@@ -487,22 +488,25 @@ export default {
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                const q3 = calculerTroisiemeQuartile(liste);
-                const max = Math.max(...liste);
+                const min = Math.min(...liste) * coefficient;
+                const minplus1 = Math.min(...listeplus1) * coefficient;
 
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-                const maxplus1 = Math.max(...listeplus1);
+                const q1 = calculerPremierQuartile(liste) * coefficient;
+                const q1plus1 = calculerPremierQuartile(listeplus1) * coefficient;
 
-                let wallZtop = max + q3 + q2 + q1 + min;
-                let wallZbottom = q3 + q2 + q1 + min;
-                let wallZtoplus1 = maxplus1 + q3plus1 + q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
+                const q2 = calculerMedian(liste) * coefficient;
+                const q2plus1 = calculerMedian(listeplus1) * coefficient;
+
+                const q3 = calculerTroisiemeQuartile(liste) * coefficient;
+                const max = Math.max(...liste) * coefficient;
+
+                const q3plus1 = calculerTroisiemeQuartile(listeplus1) * coefficient;
+                const maxplus1 = Math.max(...listeplus1) * coefficient;
+
+                let wallZtop = max;
+                let wallZbottom = q3;
+                let wallZtoplus1 = maxplus1;
+                let wallZbottomplus1 = q3plus1;
 
                 let data = devicesData[0];
                 //Face 1
@@ -536,32 +540,21 @@ export default {
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
                     wallZbottom)
                 );
-            }
-            for (let i = 0; i < (longueursData - 1); i++) {
-                let liste = [];
-                let listeplus1 = [];
+
+                liste = [];
+                listeplus1 = [];
 
                 devicesData.forEach(data => {
                     liste.push(data[i].speed);
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                const q3 = calculerTroisiemeQuartile(liste);
+                wallZtop = q3;
+                wallZbottom = q2;
+                wallZtoplus1 = q3plus1;
+                wallZbottomplus1 = q2plus1;
 
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-
-                let wallZtop = q3 + q2 + q1 + min;
-                let wallZbottom = q2 + q1 + min;
-                let wallZtoplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q2plus1 + q1plus1 + minplus1;
-
-                let data = devicesData[0];
+                data = devicesData[0];
 
                 // Face 1
                 vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -605,32 +598,19 @@ export default {
                         wallZbottomplus1));
 
                 geometriesQ2.push(new THREE.TubeGeometry(tube, 100, 0.2, 20, false));
-            }
-            for (let i = 0; i < (longueursData - 1); i++) {
-                let liste = [];
-                let listeplus1 = [];
+
+                liste = [];
+                listeplus1 = [];
 
                 devicesData.forEach(data => {
                     liste.push(data[i].speed);
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                //const q3 = calculerTroisiemeQuartile(liste);
-
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                //const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-
-                let wallZtop = q2 + q1 + min;
-                let wallZbottom = q1 + min;
-                let wallZtoplus1 = q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q1plus1 + minplus1;
-
-                let data = devicesData[0];
+                wallZtop = q2;
+                wallZbottom = q1;
+                wallZtoplus1 = q2plus1;
+                wallZbottomplus1 = q1plus1;
 
                 //Face 1
                 vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -663,32 +643,19 @@ export default {
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
                     wallZbottom)
                 );
-            }
-            for (let i = 0; i < (longueursData - 1); i++) {
-                let liste = [];
-                let listeplus1 = [];
+
+                liste = [];
+                listeplus1 = [];
 
                 devicesData.forEach(data => {
                     liste.push(data[i].speed);
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                //const q2 = calculerMedian(liste);
-                //const q3 = calculerTroisiemeQuartile(liste);
-
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                //const q2plus1 = calculerMedian(listeplus1);
-                //const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-
-                let wallZtop = q1 + min;
-                let wallZbottom = min;
-                let wallZtoplus1 = q1plus1 + minplus1;
-                let wallZbottomplus1 = minplus1;
-
-                let data = devicesData[0];
+                wallZtop = q1;
+                wallZbottom = min;
+                wallZtoplus1 = q1plus1;
+                wallZbottomplus1 = minplus1;
 
                 //Face 1
                 vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -746,9 +713,7 @@ export default {
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
                     wallZbottom)
                 );
-            }
 
-            for (let i = 0; i < (longueursData - 1); i++) {
                 // Face 1
                 colors1.push(0.5);
                 colors1.push(0.5);
@@ -915,18 +880,19 @@ export default {
         },
         async addItineraireSpeedWall(deviceNumbers) {
 
+            this.devices = deviceNumbers;
+
             // supprime les objets de la visualisation s'il y en a (parfois des objets sont en cache)
             this.controller.threeViewer.shperes.forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
                 this.disposeThreeMesh(sphere.wall);
                 this.disposeThreeMesh(sphere.line);
-            })
+            });
 
             let indexVisu = 0;
 
             this.visu_function = this.addItineraireSpeedWall;
 
-            this.devices = deviceNumbers;
             let moyennes
             let moyennesDict;
 
@@ -935,7 +901,13 @@ export default {
             moyennes = res[0];
             moyennesDict = res[1];
 
-            const medianMoyennes = asc(moyennes)[Math.round(moyennes.length / 2)];
+            let medianMoyennes;
+
+            if (this.devices.length == 1) {
+                medianMoyennes = asc(moyennes)[0];
+            } else {
+                medianMoyennes = asc(moyennes)[Math.round(moyennes.length / 2)];
+            }
             const deviceMedian = moyennesDict[medianMoyennes];
 
             const dataMedian = await getLiveDataDevice(deviceMedian);
@@ -1275,13 +1247,11 @@ export default {
         },
         displayVisuSimple() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuSimple;
             this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
             this.addItineraire(this.devices);
         },
         displayVisuEpaisseur() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuEpaisseur;
 
             if (this.devices.length > 1)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
@@ -1294,28 +1264,26 @@ export default {
         },
         displayVisuMur() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMur;
+
+            console.log("___devices___ ", this.devices);
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
-            this.addItineraireSpeedWall(this.devices);
 
             this.addItineraireSpeedWall(this.devices).then(res => {
                 this.minLegend = tronquer(res[0], 2);
                 this.maxLegend = tronquer(res[1], 2);
+
+                this.dimension = 3;
+                this.createDimensionEnvironment(3);
+
+                if (this.dimension == 3)
+                    this.isLegend = true;
             });
-
-            this.dimension = 3;
-            this.createDimensionEnvironment(3);
-
-            if (this.dimension == 3)
-                this.isLegend = true;
         },
         displayVisuMoustache() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMoustache;
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 de boîtes à moustache", life: 10000 });
-            this.addItineraireMoustache(this.devices);
 
             this.addItineraireMoustache(this.devices);
 
@@ -1327,7 +1295,6 @@ export default {
         },
         displayVisuNuit() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuNuit;
 
             if (this.devices.length === 0)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
