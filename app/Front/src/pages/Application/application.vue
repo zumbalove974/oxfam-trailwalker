@@ -1,6 +1,7 @@
 <template>
   <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
   <div id="map" class="map"></div>
+
   <Toast position="bottom-center" />
 
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
@@ -269,15 +270,15 @@ export default {
 
     const noms = await this.getNoms();
     noms.forEach(element => {
-      console.log(this.getDeviceName(element['table_name']));
       this.devicesName.push(this.getDeviceName(element['table_name']));
     });
 
     this.addItineraireReference();
 
-    this.cameraZ = window.innerHeight / this.depht_s,
+    this.cameraZ = window.innerHeight / this.depht_s;
 
-      this.toast = useToast();
+    this.toast = useToast();
+
     if (this.deviceNumber) {
       await this.loadTimestamps();
     }
@@ -344,7 +345,7 @@ export default {
         if (this.deviceNumber) {
           const ids = this.getValuesFromDevicesTab();
           console.log("__noms", this.devicesName);
-          if (!ids.includes(this.deviceNumber) && this.devicesName.includes(this.deviceNumber)) {
+          if (!ids.includes(this.deviceNumber) && toRaw(this.devicesName).includes(this.deviceNumber.toString())) {
             const moyenne = await this.getVitesseMoyenne(this.deviceNumber);
             this.devicesTab.push({ id: this.deviceNumber, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
             this.tabOpen = 0;

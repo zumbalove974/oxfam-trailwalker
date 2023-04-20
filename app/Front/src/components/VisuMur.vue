@@ -100,6 +100,7 @@ export default {
             // create material
             const material = new THREE.MeshBasicMaterial({
                 vertexColors: true,
+                side: THREE.DoubleSide
             });
 
             return new THREE.Line(geometry, material);
@@ -174,20 +175,12 @@ export default {
                     z1 = data[i + 1].speed / max * maxZ;
 
                     //Face 1
-                    vertices = this.addOneVertice(x0, y0, z0);
-                    vertices = this.addOneVertice(x0, y0, 0);
-                    vertices = this.addOneVertice(x1, y1, 0);
-                    vertices = this.addOneVertice(x1, y1, 0);
-                    vertices = this.addOneVertice(x1, y1, z1);
-                    vertices = this.addOneVertice(x0, y0, z0);
-
-                    // Face 2
-                    vertices = this.addOneVertice(x0, y0, z0);
-                    vertices = this.addOneVertice(x1, y1, 0);
-                    vertices = this.addOneVertice(x0, y0, 0);
-                    vertices = this.addOneVertice(x1, y1, 0);
-                    vertices = this.addOneVertice(x0, y0, z0);
-                    vertices = this.addOneVertice(x1, y1, z1);
+                    vertices = this.addOneVertice(vertices, x0, y0, z0);
+                    vertices = this.addOneVertice(vertices, x0, y0, 0);
+                    vertices = this.addOneVertice(vertices, x1, y1, 0);
+                    vertices = this.addOneVertice(vertices, x1, y1, 0);
+                    vertices = this.addOneVertice(vertices, x1, y1, z1);
+                    vertices = this.addOneVertice(vertices, x0, y0, z0);
                 }
 
                 // on définit les couleurs de chaque vertice
@@ -217,31 +210,6 @@ export default {
                     colors.push(1 - speeds[i]);
                     colors.push(speeds[i]);
                     colors.push(0.2);
-
-                    //Face 2
-                    colors.push(1 - speeds[i]);
-                    colors.push(speeds[i]);
-                    colors.push(0.2);
-
-                    colors.push(1.0);
-                    colors.push(0.2);
-                    colors.push(0.2);
-
-                    colors.push(1.0);
-                    colors.push(0.2);
-                    colors.push(0.2);
-
-                    colors.push(1.0);
-                    colors.push(0.2);
-                    colors.push(0.2);
-
-                    colors.push(1 - speeds[i]);
-                    colors.push(speeds[i]);
-                    colors.push(0.2);
-
-                    colors.push(1 - speeds[i + 1]);
-                    colors.push(speeds[i + 1]);
-                    colors.push(0.2);
                 }
 
                 // itemSize = 3 because there are 3 values (components) per vertex
@@ -253,7 +221,8 @@ export default {
                     vertexColors: true,
                     // on applique la transparence afin de pouvoir voir la carte au travers de la visualisation
                     transparent: true,
-                    opacity: 0.8
+                    opacity: 0.8,
+                    side: THREE.DoubleSide
                 });
 
                 let mesh = new THREE.Mesh(geometry, material);
@@ -412,6 +381,7 @@ export default {
             }
             const material = new THREE.MeshBasicMaterial({
                 vertexColors: true,
+                side: THREE.DoubleSide
             });
             const geometry = new THREE.BufferGeometry();
             geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
@@ -559,31 +529,6 @@ export default {
                 vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                 vertices1.push(wallZtop);
 
-                // Face 2
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices1.push(wallZtop);
-
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices1.push(wallZbottomplus1);
-
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices1.push(wallZbottom);
-
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices1.push(wallZbottomplus1);
-
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices1.push(wallZtop);
-
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices1.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices1.push(wallZtoplus1);
-
                 // Ligne du troisième quartile
                 line1.push(new THREE.Vector3(
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
@@ -641,31 +586,6 @@ export default {
                 vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
                 vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                 vertices2.push(wallZtop);
-
-                // Face 2
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices2.push(wallZtop);
-
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices2.push(wallZbottomplus1);
-
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices2.push(wallZbottom);
-
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices2.push(wallZbottomplus1);
-
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices2.push(wallZtop);
-
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices2.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices2.push(wallZtoplus1);
 
                 // Ligne de la médiane
                 line2.push(new THREE.Vector3(
@@ -736,31 +656,6 @@ export default {
                 vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                 vertices3.push(wallZtop);
 
-                // Face 2
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices3.push(wallZtop);
-
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices3.push(wallZbottomplus1);
-
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices3.push(wallZbottom);
-
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices3.push(wallZbottomplus1);
-
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices3.push(wallZtop);
-
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices3.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices3.push(wallZtoplus1);
-
                 // Ligne du premier quartile
                 line3.push(new THREE.Vector3(
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0],
@@ -819,31 +714,6 @@ export default {
                 vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                 vertices4.push(wallZtop);
 
-                // Face 2
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices4.push(wallZtop);
-
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices4.push(wallZbottomplus1);
-
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices4.push(wallZbottom);
-
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices4.push(wallZbottomplus1);
-
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices4.push(wallZtop);
-
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices4.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices4.push(wallZtoplus1);
-
                 //Face 1
                 vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
                 vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
@@ -868,31 +738,6 @@ export default {
                 vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
                 vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                 vertices5.push(wallZbottom);
-
-                // Face 2
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices5.push(wallZbottom);
-
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices5.push(0);
-
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices5.push(0);
-
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices5.push(0);
-
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                vertices5.push(wallZbottom);
-
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                vertices5.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                vertices5.push(wallZbottomplus1);
 
                 // Ligne du min
                 line4.push(new THREE.Vector3(
@@ -928,57 +773,7 @@ export default {
                 colors1.push(0.5);
                 colors1.push(0.5);
 
-                //Face 2
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
-
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
-
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
-
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
-
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
-
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
-
                 // Face 1
-                colors2.push(0.5);
-                colors2.push(0.2);
-                colors2.push(0.2);
-
-                colors2.push(0.8);
-                colors2.push(0.2);
-                colors2.push(0.2);
-
-                colors2.push(0.8);
-                colors2.push(0.2);
-                colors2.push(0.2);
-
-                colors2.push(0.8);
-                colors2.push(0.2);
-                colors2.push(0.2);
-
-                colors2.push(0.5);
-                colors2.push(0.2);
-                colors2.push(0.2);
-
-                colors2.push(0.5);
-                colors2.push(0.2);
-                colors2.push(0.2);
-
-                //Face 2
                 colors2.push(0.5);
                 colors2.push(0.2);
                 colors2.push(0.2);
@@ -1028,57 +823,7 @@ export default {
                 colors3.push(0.2);
                 colors3.push(0.2);
 
-                //Face 2
-                colors3.push(0.8);
-                colors3.push(0.2);
-                colors3.push(0.2);
-
-                colors3.push(0.5);
-                colors3.push(0.2);
-                colors3.push(0.2);
-
-                colors3.push(0.5);
-                colors3.push(0.2);
-                colors3.push(0.2);
-
-                colors3.push(0.5);
-                colors3.push(0.2);
-                colors3.push(0.2);
-
-                colors3.push(0.8);
-                colors3.push(0.2);
-                colors3.push(0.2);
-
-                colors3.push(0.8);
-                colors3.push(0.2);
-                colors3.push(0.2);
-
                 // Face 1
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
-
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
-
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
-
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
-
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
-
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
-
-                //Face 2
                 colors4.push(0.5);
                 colors4.push(0.5);
                 colors4.push(0.5);
@@ -1130,7 +875,7 @@ export default {
                 vertexColors: true,
                 transparent: true,
                 opacity: 0.8,
-                color: '0xFF5500'
+                side: THREE.DoubleSide
             });
 
             let moustache1 = new THREE.Mesh(geometry1, material);
@@ -1300,31 +1045,6 @@ export default {
                         vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
                         vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
                         vertices.push(wallZtop);
-
-                        // Face 2
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                        vertices.push(wallZtop);
-
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                        vertices.push(wallZbottom);
-
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                        vertices.push(wallZbottom);
-
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                        vertices.push(wallZbottom);
-
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1]);
-                        vertices.push(wallZtop);
-
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[0]);
-                        vertices.push(this.controller.threeViewer.getWorldCoords([data[i + 1].x, data[i + 1].y])[1]);
-                        vertices.push(wallZtop);
                     }
 
                     for (let i = 0; i < (data.length - 1); i++) {
@@ -1352,31 +1072,6 @@ export default {
                         colors.push(1.0 - speeds[i]);
                         colors.push(speeds[i]);
                         colors.push(0.0);
-
-                        //Face 2
-                        colors.push(1.0 - speeds[i]);
-                        colors.push(speeds[i]);
-                        colors.push(0.0);
-
-                        colors.push(1.0 - speeds[i + 1]);
-                        colors.push(speeds[i + 1]);
-                        colors.push(0.0);
-
-                        colors.push(1.0 - speeds[i + 1]);
-                        colors.push(speeds[i + 1]);
-                        colors.push(0.0);
-
-                        colors.push(1.0 - speeds[i + 1]);
-                        colors.push(speeds[i + 1]);
-                        colors.push(0.0);
-
-                        colors.push(1.0 - speeds[i]);
-                        colors.push(speeds[i]);
-                        colors.push(0.0);
-
-                        colors.push(1.0 - speeds[i + 1]);
-                        colors.push(speeds[i + 1]);
-                        colors.push(0.0);
                     }
 
                     // itemSize = 3 because there are 3 values (components) per vertex
@@ -1387,7 +1082,8 @@ export default {
                     const material = new THREE.MeshBasicMaterial({
                         vertexColors: true,
                         transparent: true,
-                        opacity: 0.8
+                        opacity: 0.8,
+                        side: THREE.DoubleSide
                     });
 
                     let wall = new THREE.Mesh(geometry, material);
@@ -1566,6 +1262,7 @@ export default {
 
             const material = new THREE.MeshBasicMaterial({
                 vertexColors: true,
+                side: THREE.DoubleSide
             });
             const geometry = new THREE.BufferGeometry();
             geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
