@@ -294,18 +294,21 @@ export default {
   },
   methods: {
     actualiser: function (data) {
+      console.log("____actualiser");
       this.visu_meshes = toRaw(data[0]);
-      this.visu_function = data[1];
+
 
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.devices.length && this.visu_function) {
+      if (this.devices.length && this.visu_function && data[1] != this.visu_function) {
+        this.visu_function = data[1];
         this.visu_function(this.devices);
       }
-      else
+      else {
         this.addItineraireReference();
+      }
     },
     changerDeDimension() {
       this.dimension = this.dimension.value;
