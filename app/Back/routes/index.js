@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 const { Pool } = require("pg");
 
+/* Router pour tous les devices interpolés */
+
+// Configuration de la connexion à la base de données PostgreSQL
 router.pool = new Pool({
   user: 'postgres_user',
   host: 'database',
@@ -10,6 +13,8 @@ router.pool = new Pool({
   port: 5432,
 });
 
+// Fonction pour se connecter à la base de données et récupérer les données d'interpolation
+// Et renvoie les données sous forme de JSON
 router.connectDB = async (req, that) => {
   try {
 
@@ -24,7 +29,7 @@ router.connectDB = async (req, that) => {
         )
       );
     })
-
+    // On attend que toutes les promesses soient résolues pour renvoyer les résultats
     let return_array = [];
     return Promise.all(promise_array)
       .then((response_array) => {
@@ -40,7 +45,6 @@ router.connectDB = async (req, that) => {
 }
 
 router.get('/', function (req, res, next) {
-
   router.connectDB(req, router).then(r => {
     res.json(r);
   })

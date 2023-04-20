@@ -1,3 +1,8 @@
+/**
+ * Cette fonction permet de convertir le time stamp en secondes 
+ * @param {*} timestamp 
+ * @returns un entier représentant ce temps en secondes
+ */
 export const calculerTempsTimestamp = function calculerTempsTimestamp(timestamp) {
     const jour = parseInt(timestamp.split('T')[0].split('-')[1]);
     const spliter = timestamp.split('T')[1].split(':');

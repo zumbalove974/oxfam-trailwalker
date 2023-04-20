@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 const { Pool } = require("pg");
 
+/* Router par device interpolée*/
+
+// Configuration de la connexion à la base de données PostgreSQL
 router.pool = new Pool({
     user: 'postgres_user',
     host: 'database',
@@ -10,6 +13,8 @@ router.pool = new Pool({
     port: 5432,
 });
 
+// Fonction pour se connecter à la base de données et récupérer les données d'interpolation par device spécifié
+// Et renvoie les données sous forme de JSON
 router.connectDB = async (req, that) => {
     try {
         const response = await that.pool.query(
@@ -22,7 +27,6 @@ router.connectDB = async (req, that) => {
 }
 
 router.get('/:deviceNumber', function (req, res, next) {
-
     router.connectDB(req, router).then(r => {
         res.json(r);
     })
