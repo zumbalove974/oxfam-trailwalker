@@ -1,9 +1,26 @@
 <template>
   <div id="app"> </div>
   <MenuBar pageName='Accueil' pageURL="home"></MenuBar>
-  <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" size="100rem" shape="circle" />
-  <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/asiyajavayant.png" size="xlarge" shape="circle" />
-  <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/onyamalimba.png" size="xlarge" shape="circle" />
+  <div class="teamWrapper" id="who-we-are">
+    <div class="wrapper">
+      <div class="flexColumn center">
+        <img class="image" src="./../../assets/DD.png" alt="Avatar">
+        <h4> Damien D'arras </h4>
+      </div>
+      <div class="flexColumn center">
+        <img class="image" src="./../../assets/HA.png" alt="Avatar">
+        <h4> Hiba Ait Oumajoud </h4>
+      </div>
+      <div class="flexColumn center">
+        <img class="image" src="./../../assets/OE.jpeg" alt="Avatar">
+        <h4> Omran Edoo </h4>
+      </div>
+      <div class="flexColumn center">
+        <img class="image" src="./../../assets/LSa.png" alt="Avatar">
+        <h4> Lina Saba </h4>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -13,14 +30,12 @@ import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 
 import MenuBar from '../../components/MenuBar.vue'
-import Avatar from 'primevue/avatar';
 //import AvatarGroup from 'primevue/avatargroup';   //Optional for grouping
 
 export default {
   name: 'App',
   components: {
     MenuBar,
-    Avatar
   }
 }
 </script>
@@ -33,5 +48,31 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin: 0;
+}
+
+.aboutText {
+  text-align: justify;
+  width: 50%;
+  color: aliceblue;
+}
+
+.centerItself {
+  justify-self: center;
+  align-self: center;
+  width: fit-content;
+  padding-bottom: 10px;
+}
+
+.image {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 10px;
+}
+
+.flexColumn {
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
 }
 </style>
