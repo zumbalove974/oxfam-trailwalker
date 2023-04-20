@@ -260,6 +260,8 @@ export default {
     }
   },
   async mounted() {
+    this.toast = useToast();
+
     init().then(res => {
       this.controller = res;
       this.controller = toRaw(this.controller);
@@ -276,8 +278,6 @@ export default {
     this.addItineraireReference();
 
     this.cameraZ = window.innerHeight / this.depht_s;
-
-    this.toast = useToast();
 
     if (this.deviceNumber) {
       await this.loadTimestamps();
