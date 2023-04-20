@@ -53,7 +53,8 @@ export default {
                 '3': this.displayVisuMontagne,
                 '4': this.displayVisuMur,
                 '5': this.displayVisuNuit,
-                '6': this.displayVisuMoustache
+                '6': this.displayVisuMoustache,
+                '9': this.displayDifficultyInfo
             },
             isLegend: false // définit si la légende doit être affichée pour la visualisation en cours
         }
@@ -1304,6 +1305,115 @@ export default {
 
             this.isLegend = true;
         },
+
+        async addDifficultyInfo(deviceNumbers) {
+
+            this.devices = deviceNumbers;
+            this.visu_function = this.addDifficultyInfo;
+
+            this.controller.threeViewer.traj_parts.clear();
+
+            const traj_data = await fetch(`http://localhost:5500/traj`, {
+                method: 'GET'
+            }).then(response => response.json())
+            const cp_data = await fetch(`http://localhost:5500/cp`, {
+                method: 'GET'
+            }).then(response => response.json())
+            const diff_data = await fetch(`http://localhost:5500/diff`, {
+                method: 'GET'
+            }).then(response => response.json())
+
+            // Detection CP
+            const cp_points = [];
+            for (let c = 0; c < cp_data.length - 1; c++) {
+                let cp = [];
+                for (let t = 0; t < traj_data.length; t++) {
+                    if (t > cp_data[c][5] && t < cp_data[c + 1][4]) {
+                        cp.push(t);
+                    }
+                }
+                cp_points.push(cp)
+            }
+            for (let c = 0; c < cp_points.length; c++) {
+
+                let shape = [];
+
+                for (let j = 0; j < cp_points[c].length - 2; j++) {
+                    let i = cp_points[c][j];
+
+                    let xA = this.controller.threeViewer.getWorldCoords([traj_data[i].x, traj_data[i].y])[0];
+                    let yA = this.controller.threeViewer.getWorldCoords([traj_data[i].x, traj_data[i].y])[1];
+                    let xB = this.controller.threeViewer.getWorldCoords([traj_data[i + 1].x, traj_data[i + 1].y])[0];
+                    let yB = this.controller.threeViewer.getWorldCoords([traj_data[i + 1].x, traj_data[i + 1].y])[1];
+                    let xC = this.controller.threeViewer.getWorldCoords([traj_data[i + 2].x, traj_data[i + 2].y])[0];
+                    let yC = this.controller.threeViewer.getWorldCoords([traj_data[i + 2].x, traj_data[i + 2].y])[1];
+                    let d = 5;
+                    let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+                    let normBC = Math.sqrt(Math.pow(xB - xC, 2) + Math.pow(yB - yC, 2));
+
+                    if (normAB === 0) { continue }
+
+                    shape.push(
+                        xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+                    shape.push(
+                        xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xA - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+                    if (normAB != 0 && normBC != 0 && d != 0) {
+                        shape.push(xB, yB, 0);
+                        shape.push(
+                            xB - d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+                            yB + d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+                        shape.push(
+                            xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                            yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+                        shape.push(xB, yB, 0);
+                        shape.push(
+                            xB + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                            yB - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                        shape.push(
+                            xB + d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+                            yB - d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+                    }
+                }
+
+                let material = new THREE.MeshBasicMaterial();
+                material.color.setRGB(
+                    1,
+                    1 - (diff_data[c].niveau_diff + 1) / 6,
+                    1 - (diff_data[c].niveau_diff + 1) / 6
+                )
+                let geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
+
+                let visu_mesh = new THREE.Mesh(geometry, material);
+                visu_mesh.cp = c;
+                this.controller.threeViewer.traj_parts.add(visu_mesh);
+            }
+        },
+
+        displayDifficultyInfo() {
+            this.toast.removeAllGroups();
+            this.visuFunction = this.displayDifficultyInfo;
+            this.addDifficultyInfo(this.devices);
+
+            this.isLegend = true;
+        },
     }
-};
+}
 </script>
