@@ -777,18 +777,28 @@ export default {
       }
     },
     async changeDiffPart(obj) {
-      obj.material.color.setHex(0x0000ff)
-      console.log("objui", obj.material)
       const diff_data = await fetch(`http://localhost:5500/diff`, {
         method: 'GET'
       }).then(response => response.json())
-      console.log("three.cp", obj.cp)
-      console.log("diff", diff_data[obj.cp])
+      this.controller.threeViewer.traj_parts.children.forEach(child => {
+        child.material.color.RGB(
+          1,
+          1 - (diff_data[child.cp].niveau_diff + 1) / 6,
+          1 - (diff_data[child.cp].niveau_diff + 1) / 6
+        )
+      })
+      obj.material.color.setHex(0x0000ff)
       this.toast.add(
         {
           severity: 'success',
           summary: 'Description',
-          detail: " ID de la zone = " + diff_data[obj.cp].id + " Dénivelé + = " + diff_data[obj.cp].denivele_positif + " m, Dénivelé - = " + diff_data[obj.cp].denivele_negatif + " m, Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance + " km, Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee + " km, niveau de difficulté = " + diff_data[obj.cp].niveau_diff,
+          detail:
+            " ID de la zone = " + diff_data[obj.cp].id +
+            " Dénivelé + = " + diff_data[obj.cp].denivele_positif +
+            " m, Dénivelé - = " + diff_data[obj.cp].denivele_negatif +
+            " m, Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance +
+            " km, Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee +
+            " km, niveau de difficulté = " + diff_data[obj.cp].niveau_diff,
           life: 5000
         }
       );

@@ -904,6 +904,9 @@ export default {
             const cp_data = await fetch(`http://localhost:5500/cp`, {
                 method: 'GET'
             }).then(response => response.json())
+            const diff_data = await fetch(`http://localhost:5500/diff`, {
+                method: 'GET'
+            }).then(response => response.json())
 
             // Detection CP
             const cp_points = [];
@@ -975,7 +978,11 @@ export default {
                 }
 
                 let material = new THREE.MeshBasicMaterial();
-                material.color.setRGB(1, 1 - (cp_data[c][6] + 1) / 6, 1 - (cp_data[c][6] + 1) / 6)
+                material.color.setRGB(
+                    1,
+                    1 - (diff_data[c].niveau_diff + 1) / 6,
+                    1 - (diff_data[c].niveau_diff + 1) / 6
+                )
                 let geometry = new THREE.BufferGeometry();
                 geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
 
@@ -984,21 +991,6 @@ export default {
                 this.controller.threeViewer.traj_parts.add(visu_mesh);
             }
             //this.visu_meshes.push(this.controller.threeViewer.traj_parts)
-        },
-        displayDifficultyInfo() {
-            this.toast.removeAllGroups();
-            this.visuFunction = this.displayDifficultyInfo;
-
-            if (this.devices.length === 0)
-                this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
-            else
-                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit.", life: 10000 });
-
-            this.addDifficultyInfo(this.devices);
-            this.isLegend = true;
-
-            this.$emit("EventChangeDiffPart", [this.changeDiffPart]);
-
         },
     }
 };

@@ -71,7 +71,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 87,
             distance: 6.9,
             distance_cummulee: 81.7,
-            niveau_diff: 6,
+            niveau_diff: 4,
             ouverture_pc: "2021-03-07T18:30:00.000Z",
             fermeture_pc: "2021-04-07T10:30:00.000Z",
 
@@ -81,7 +81,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 107,
             distance: 6.1,
             distance_cummulee: 87.8,
-            niveau_diff: 7,
+            niveau_diff: 3,
             ouverture_pc: "2021-03-07T19:00:00.000Z",
             fermeture_pc: "2021-04-07T12:15:00.000Z",
 
@@ -91,7 +91,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 300,
             distance: 12.5,
             distance_cummulee: 100,
-            niveau_diff: 8,
+            niveau_diff: 2,
             ouverture_pc: "2021-03-07T21:00:00.000Z",
             fermeture_pc: "2021-04-07T15:15:00.000Z",
 
