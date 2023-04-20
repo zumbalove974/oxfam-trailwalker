@@ -15,7 +15,7 @@
           </span>
 
           <div class="card flex justify-content-center">
-            <Button id="addTeamBtn" label="Ajouter" @click="addDevice" />
+            <Button id="addTeamBtn" label="Ajouter" @click="addDevice"></Button>
           </div>
         </div>
 
@@ -42,7 +42,7 @@
         <div class="flexRow evenly upSize spaceDown">
           <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
           <div class="card flex justify-content-center">
-            <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps" />
+            <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps"></Button>
           </div>
         </div>
         <div class="flexRow evenly upSize">
@@ -833,13 +833,20 @@ export default {
 </script>
 
 <style>
+html {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  top: 200px;
+  width: 100%;
+  height: 100%;
 }
 
 #map {
