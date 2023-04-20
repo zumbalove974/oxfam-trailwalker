@@ -1443,12 +1443,6 @@ export default {
         displayDifficultyInfo() {
             this.toast.removeAllGroups();
             this.visuFunction = this.displayDifficultyInfo;
-
-            if (this.devices.length === 0)
-                this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
-            else
-                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours et leurs difficultes.", life: 10000 });
-
             this.addDifficultyInfo(this.devices);
 
             this.isLegend = true;

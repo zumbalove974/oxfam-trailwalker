@@ -196,7 +196,7 @@ export default {
       upLeft: [77759.67642890716, 6453645.108348264],
       bottomRight: [162041.48828865882, 6394327.021226578],
       zoomPas: 1,
-      toast: null,
+      toast: useToast(),
       tabOpen: 1,
       selectedTimestamp: '',
       timestamps: [],
