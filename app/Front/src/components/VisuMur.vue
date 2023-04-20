@@ -714,29 +714,29 @@ export default {
                 );
 
                 // Face 1
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
                 // Face 1
                 colors2.push(0.5);
@@ -789,29 +789,29 @@ export default {
                 colors3.push(0.2);
 
                 // Face 1
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
 
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
             }
 
             // itemSize = 3 because there are 3 values (components) per vertex
