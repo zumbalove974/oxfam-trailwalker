@@ -11,7 +11,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 171,
             distance: 16.1,
             distance_cummulee: 16.1,
-            niveau_diff: 0,
+            niveau_diff: 2,
             ouverture_pc: "2021-03-07T09:00:00.000Z",
             fermeture_pc: "2021-03-07T14:15:00.000Z",
 
@@ -31,7 +31,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 99,
             distance: 14.1,
             distance_cummulee: 43.1,
-            niveau_diff: 2,
+            niveau_diff: 3,
             ouverture_pc: "2021-03-07T13:00:00.000Z",
             fermeture_pc: "2021-03-07T22:30:00.000Z",
 
@@ -41,7 +41,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 181,
             distance: 11.5,
             distance_cummulee: 54.6,
-            niveau_diff: 3,
+            niveau_diff: 2,
             ouverture_pc: "2021-03-07T14:30:00.000Z",
             fermeture_pc: "2021-04-07T02:00:00.000Z",
 
@@ -51,7 +51,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 217,
             distance: 11.7,
             distance_cummulee: 66.3,
-            niveau_diff: 4,
+            niveau_diff: 2,
             ouverture_pc: "2021-03-07T16:15:00.000Z",
             fermeture_pc: "2021-04-07T05:45:00.000Z",
 
@@ -61,7 +61,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 121,
             distance: 8.5,
             distance_cummulee: 74.8,
-            niveau_diff: 5,
+            niveau_diff: 1,
             ouverture_pc: "2021-03-07T17:30:00.000Z",
             fermeture_pc: "2021-04-07T08:30:00.000Z",
 
@@ -71,7 +71,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 87,
             distance: 6.9,
             distance_cummulee: 81.7,
-            niveau_diff: 4,
+            niveau_diff: 2,
             ouverture_pc: "2021-03-07T18:30:00.000Z",
             fermeture_pc: "2021-04-07T10:30:00.000Z",
 
@@ -91,7 +91,7 @@ router.get('/', function (req, res, next) {
             denivele_negatif: 300,
             distance: 12.5,
             distance_cummulee: 100,
-            niveau_diff: 2,
+            niveau_diff: 4,
             ouverture_pc: "2021-03-07T21:00:00.000Z",
             fermeture_pc: "2021-04-07T15:15:00.000Z",
 
