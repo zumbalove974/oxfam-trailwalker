@@ -1,13 +1,18 @@
 const request = require("supertest");
 const app = require("../app");
-
-//MOCK
+// Import du mock pour simuler la base de données
 const PgMock2 = require('pgmock2').default;
+// Sauvegarde de la pool de connexion originale pour pouvoir la restaurer plus tard
 const router = require("../routes/index");
 const truePool = router.pool;
 
+
+/* Définition des tests pour le router index*/
+
+// Remplacement de la pool de connexion par le mock
 router.pool = new PgMock2();
 
+// Ajout des réponses du mock pour les requêtes à la base de données
 router.pool.add("SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Interpolation%'", [], {
     rowCount: 2,
     rows: [
@@ -68,9 +73,13 @@ router.pool.add('SELECT * FROM public."Interpolation_3843" ORDER BY "index"', []
         }
     ]
 })
-
+// Connexion au mock pool de connexion à la bd
 router.pool.connect()
 
+/* Tester index : code de statut de la réponse, 
+pas de NaN, réponse a une propriété de longueur de 2, 
+Vérifiez que la première valeur de la deuxième liste dans le corps de la réponse est égale au mock spécifié
+*/
 describe("Test the index path", () => {
     test("It should response the mock object", async () => {
         const response = await request(app).get("/")
