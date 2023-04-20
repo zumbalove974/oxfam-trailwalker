@@ -1,6 +1,7 @@
 <template>
   <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
   <div id="map" class="map"></div>
+
   <Toast position="bottom-center" />
 
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
@@ -129,7 +130,7 @@ import { toRaw } from 'vue';
 
 import { init, vavinCenter } from '../../client/index.js'
 import VisuMur from './../../components/VisuMur.vue';
-import { getLiveDataDevice, getControlPoints } from "../../client/bddConnexion";
+import { getLiveDataDevice, getControlPoints, getNoms } from "../../client/bddConnexion";
 //import { tronquer } from "../../client/mathUtils";
 
 // Primevue components
@@ -157,7 +158,7 @@ import "primeicons/primeicons.css";
 
 import * as THREE from "three";
 
-import { ZOOM_RES_L93 } from "../../client/Utils";
+import { ZOOM_RES_L93, bounds } from "../../client/Utils";
 
 
 export default {
@@ -182,6 +183,7 @@ export default {
     return {
       active: false,
       getLiveDataDevice: getLiveDataDevice,
+      getNoms: getNoms,
       dimension: 2,
       depht_s: Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0,
       cameraZ: null,
@@ -203,6 +205,7 @@ export default {
       limitsMesh: null,
       teamMarkers: [],
       devicesTab: [],
+      devicesName: [],
       raycaster: new THREE.Raycaster(),
       pointer: new THREE.Vector2(),
       deviceNumber: null,
@@ -226,11 +229,12 @@ export default {
         { name: 'Visu colline', key: '3' },
         { name: 'Visu Mur', key: '4' },
         { name: 'Visu Nuit', key: '5' },
-        { name: 'Visu Difficulte', key: '6' }
+        { name: 'Visu Moustache', key: '6' },
+        { name: 'Visu Difficulte', key: '7' }
       ],
       categoriesCheckbox: [
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
-        { name: 'Points de contrôle', key: '6', function: this.displayPDC }
+        { name: 'Position des équipes', key: '7', function: this.displayPosEquipe },
+        { name: 'Points de contrôle', key: '8', function: this.displayPDC }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
@@ -261,15 +265,21 @@ export default {
       this.controller = res;
       this.controller = toRaw(this.controller);
 
-      this.createBoundingLimit();
       this.createDimensionEnvironment(this.dimension);
+      this.createBoundingLimit();
+    });
+
+    const noms = await this.getNoms();
+    noms.forEach(element => {
+      this.devicesName.push(this.getDeviceName(element['table_name']));
     });
 
     this.addItineraireReference();
 
-    this.cameraZ = window.innerHeight / this.depht_s,
+    this.cameraZ = window.innerHeight / this.depht_s;
 
-      this.toast = useToast();
+    this.toast = useToast();
+
     if (this.deviceNumber) {
       await this.loadTimestamps();
     }
@@ -336,7 +346,8 @@ export default {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
         if (this.deviceNumber) {
           const ids = this.getValuesFromDevicesTab();
-          if (!ids.includes(this.deviceNumber)) {
+          console.log("__noms", this.devicesName);
+          if (!ids.includes(this.deviceNumber) && toRaw(this.devicesName).includes(this.deviceNumber.toString())) {
             const moyenne = await this.getVitesseMoyenne(this.deviceNumber);
             this.devicesTab.push({ id: this.deviceNumber, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
             this.tabOpen = 0;
@@ -347,7 +358,7 @@ export default {
           if (this.deviceNumberFrom < this.deviceNumberTo) {
             for (let i = this.deviceNumberFrom; i <= this.deviceNumberTo; i++) {
               const ids = this.getValuesFromDevicesTab();
-              if (!ids.includes(i)) {
+              if (!ids.includes(i) && toRaw(this.devicesName).includes(i.toString())) {
                 const moyenne = await this.getVitesseMoyenne(i);
                 this.devicesTab.push({ id: i, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
                 this.tabOpen = 0;
@@ -387,6 +398,9 @@ export default {
       if (this.visuFunction)
         this.visuFunction();
     },
+    getDeviceName(tableName) {
+      return tableName.split('_')[1];
+    },
     displayPDC(input) {
       this.toast.removeAllGroups();
       this.removeCPS();
@@ -408,6 +422,10 @@ export default {
     createBoundingLimit() {
 
       let points = [];
+
+      console.log("lll", this.controller.threeViewer.zoomFactor);
+      this.upLeft = bounds[this.controller.threeViewer.zoomFactor][0];
+      this.bottomRight = bounds[this.controller.threeViewer.zoomFactor][1];
 
       points.push(new THREE.Vector3(
         this.controller.threeViewer.getWorldCoords(this.upLeft)[0],
@@ -453,7 +471,6 @@ export default {
       this.visu_meshes.push(this.limitsMesh);
     },
     verifyView(center) {
-      console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
 
       let x = center[0];
       let y = center[1];
@@ -724,12 +741,13 @@ export default {
       // Coordinates of the 10 points
       cps.forEach(point => {
         let worldCoords = toRaw(this.controller).threeViewer.getWorldCoords([point.x, point.y]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-        let geometry = new THREE.CircleGeometry(10, 32);
-        let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+        let geometry = new THREE.CylinderGeometry(10, 10, 70, 70);
+        let material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
         let circle = new THREE.Mesh(geometry, material);
         circle.position.x = worldCoords[0];
         circle.position.y = worldCoords[1];
-        circle.position.z = 0;
+        circle.position.z = 35;
+        circle.rotation.x = Math.PI / 2;
         this.controller.threeViewer.scene.add(circle);
 
 
