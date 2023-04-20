@@ -237,14 +237,13 @@ export default {
         },
         displayVisuMontagne() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMontagne;
 
             if (this.devices.length > 1)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
             else
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
 
-            this.addItineraireSpeed3D(this.devices, this.dimension).then(res => {
+            this.addItineraireSpeed3D(this.devices).then(res => {
                 this.minLegend = tronquer(res[0], 2);
                 this.maxLegend = tronquer(res[1], 2);
             });
@@ -914,36 +913,59 @@ export default {
         },
         async addItineraireSpeedWall(deviceNumbers) {
 
+            console.log("___devices2___ ", this.devices);
+
+            this.devices = deviceNumbers;
+
             // supprime les objets de la visualisation s'il y en a (parfois des objets sont en cache)
             this.controller.threeViewer.shperes.forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
                 this.disposeThreeMesh(sphere.wall);
                 this.disposeThreeMesh(sphere.line);
-            })
+            });
+
+            console.log("___devices2.1___ ", this.devices);
 
             let indexVisu = 0;
 
             this.visu_function = this.addItineraireSpeedWall;
 
-            this.devices = deviceNumbers;
             let moyennes
             let moyennesDict;
 
+            console.log("___devices2.2___ ", this.devices);
+
             let res = await this.getMoyenneDevice(this.devices);
+
+            console.log("___devices2.3___ ", this.devices);
 
             moyennes = res[0];
             moyennesDict = res[1];
 
-            const medianMoyennes = asc(moyennes)[Math.round(moyennes.length / 2)];
+            let medianMoyennes;
+
+            if (this.devices.length == 1) {
+                medianMoyennes = asc(moyennes)[0];
+            } else {
+                medianMoyennes = asc(moyennes)[Math.round(moyennes.length / 2)];
+            }
             const deviceMedian = moyennesDict[medianMoyennes];
 
+            console.log("___devices2.4___ ", asc(moyennes));
+            console.log("___devices2.4___ ", Math.round(moyennes.length / 2));
+            console.log("___devices2.4___ ", medianMoyennes);
+
             const dataMedian = await getLiveDataDevice(deviceMedian);
+
+            console.log("___devices2.5___ ", this.devices);
 
             let speedsDataSorted = [];
 
             for (let i = 0; i < dataMedian.length; i++) {
                 speedsDataSorted.push(dataMedian[i].speed);
             }
+
+            console.log("___devices2.5___ ", this.devices);
 
             // calcul des différents quartiles de la trajectoire qui a la vitesse moyenne médiane parmis les différentes trajectoires
             // on fait cela afin de réduire les disparités entre le rouge et le vert
@@ -953,7 +975,14 @@ export default {
             const q3 = calculerTroisiemeQuartile(speedsDataSorted);
             const max = Math.max(...speedsDataSorted);
 
+            console.log("___devices2.6___ ", this.devices.length);
+
+            if (toRaw(this.devices).length) {
+                console.log("___devices3___ ", this.devices.length);
+            }
+
             this.devices.forEach(async device => {
+                console.log("___devices4___ ", device);
 
                 const data = await getLiveDataDevice(device);
 
@@ -1274,13 +1303,11 @@ export default {
         },
         displayVisuSimple() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuSimple;
             this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
             this.addItineraire(this.devices);
         },
         displayVisuEpaisseur() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuEpaisseur;
 
             if (this.devices.length > 1)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
@@ -1293,28 +1320,26 @@ export default {
         },
         displayVisuMur() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMur;
+
+            console.log("___devices___ ", this.devices);
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
-            this.addItineraireSpeedWall(this.devices);
 
             this.addItineraireSpeedWall(this.devices).then(res => {
                 this.minLegend = tronquer(res[0], 2);
                 this.maxLegend = tronquer(res[1], 2);
+
+                this.dimension = 3;
+                this.createDimensionEnvironment(3);
+
+                if (this.dimension == 3)
+                    this.isLegend = true;
             });
-
-            this.dimension = 3;
-            this.createDimensionEnvironment(3);
-
-            if (this.dimension == 3)
-                this.isLegend = true;
         },
         displayVisuMoustache() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMoustache;
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 de boîtes à moustache", life: 10000 });
-            this.addItineraireMoustache(this.devices);
 
             this.addItineraireMoustache(this.devices);
 
@@ -1326,7 +1351,6 @@ export default {
         },
         displayVisuNuit() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuNuit;
 
             if (this.devices.length === 0)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
