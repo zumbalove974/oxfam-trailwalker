@@ -53,7 +53,8 @@ export default {
                 '3': this.displayVisuMontagne,
                 '4': this.displayVisuMur,
                 '5': this.displayVisuNuit,
-                '6': this.displayVisuMoustache
+                '6': this.displayVisuMoustache,
+                '9': this.displayDifficultyInfo
             },
             isLegend: false // définit si la légende doit être affichée pour la visualisation en cours
         }
@@ -64,6 +65,7 @@ export default {
     methods: {
         // fonction appelée lorsque l'utilisateur clique sur une checkbox
         display() {
+            console.log("rrr__display")
             toRaw(this.functions[toRaw(this.category).key])();
             this.visu_function = this.functions[toRaw(this.category).key];
             // on envoit à la vue parente la focntion concernée et la nouvelle liste des vicualisations présentes dans la scène
@@ -237,14 +239,13 @@ export default {
         },
         displayVisuMontagne() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMontagne;
 
             if (this.devices.length > 1)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
             else
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
 
-            this.addItineraireSpeed3D(this.devices, this.dimension).then(res => {
+            this.addItineraireSpeed3D(this.devices).then(res => {
                 this.minLegend = tronquer(res[0], 2);
                 this.maxLegend = tronquer(res[1], 2);
             });
@@ -477,6 +478,8 @@ export default {
             let line3 = [];
             let line4 = [];
 
+            const coefficient = 10;
+
             for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
                 let listeplus1 = [];
@@ -486,22 +489,25 @@ export default {
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                const q3 = calculerTroisiemeQuartile(liste);
-                const max = Math.max(...liste);
+                const min = Math.min(...liste) * coefficient;
+                const minplus1 = Math.min(...listeplus1) * coefficient;
 
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-                const maxplus1 = Math.max(...listeplus1);
+                const q1 = calculerPremierQuartile(liste) * coefficient;
+                const q1plus1 = calculerPremierQuartile(listeplus1) * coefficient;
 
-                let wallZtop = max + q3 + q2 + q1 + min;
-                let wallZbottom = q3 + q2 + q1 + min;
-                let wallZtoplus1 = maxplus1 + q3plus1 + q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
+                const q2 = calculerMedian(liste) * coefficient;
+                const q2plus1 = calculerMedian(listeplus1) * coefficient;
+
+                const q3 = calculerTroisiemeQuartile(liste) * coefficient;
+                const max = Math.max(...liste) * coefficient;
+
+                const q3plus1 = calculerTroisiemeQuartile(listeplus1) * coefficient;
+                const maxplus1 = Math.max(...listeplus1) * coefficient;
+
+                let wallZtop = max;
+                let wallZbottom = q3;
+                let wallZtoplus1 = maxplus1;
+                let wallZbottomplus1 = q3plus1;
 
                 let data = devicesData[0];
                 //Face 1
@@ -535,32 +541,21 @@ export default {
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
                     wallZbottom)
                 );
-            }
-            for (let i = 0; i < (longueursData - 1); i++) {
-                let liste = [];
-                let listeplus1 = [];
+
+                liste = [];
+                listeplus1 = [];
 
                 devicesData.forEach(data => {
                     liste.push(data[i].speed);
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                const q3 = calculerTroisiemeQuartile(liste);
+                wallZtop = q3;
+                wallZbottom = q2;
+                wallZtoplus1 = q3plus1;
+                wallZbottomplus1 = q2plus1;
 
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-
-                let wallZtop = q3 + q2 + q1 + min;
-                let wallZbottom = q2 + q1 + min;
-                let wallZtoplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q2plus1 + q1plus1 + minplus1;
-
-                let data = devicesData[0];
+                data = devicesData[0];
 
                 // Face 1
                 vertices2.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -604,32 +599,19 @@ export default {
                         wallZbottomplus1));
 
                 geometriesQ2.push(new THREE.TubeGeometry(tube, 100, 0.2, 20, false));
-            }
-            for (let i = 0; i < (longueursData - 1); i++) {
-                let liste = [];
-                let listeplus1 = [];
+
+                liste = [];
+                listeplus1 = [];
 
                 devicesData.forEach(data => {
                     liste.push(data[i].speed);
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                //const q3 = calculerTroisiemeQuartile(liste);
-
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                //const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-
-                let wallZtop = q2 + q1 + min;
-                let wallZbottom = q1 + min;
-                let wallZtoplus1 = q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q1plus1 + minplus1;
-
-                let data = devicesData[0];
+                wallZtop = q2;
+                wallZbottom = q1;
+                wallZtoplus1 = q2plus1;
+                wallZbottomplus1 = q1plus1;
 
                 //Face 1
                 vertices3.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -662,32 +644,19 @@ export default {
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
                     wallZbottom)
                 );
-            }
-            for (let i = 0; i < (longueursData - 1); i++) {
-                let liste = [];
-                let listeplus1 = [];
+
+                liste = [];
+                listeplus1 = [];
 
                 devicesData.forEach(data => {
                     liste.push(data[i].speed);
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                //const q2 = calculerMedian(liste);
-                //const q3 = calculerTroisiemeQuartile(liste);
-
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                //const q2plus1 = calculerMedian(listeplus1);
-                //const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-
-                let wallZtop = q1 + min;
-                let wallZbottom = min;
-                let wallZtoplus1 = q1plus1 + minplus1;
-                let wallZbottomplus1 = minplus1;
-
-                let data = devicesData[0];
+                wallZtop = q1;
+                wallZbottom = min;
+                wallZtoplus1 = q1plus1;
+                wallZbottomplus1 = minplus1;
 
                 //Face 1
                 vertices4.push(this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[0]);
@@ -745,33 +714,31 @@ export default {
                     this.controller.threeViewer.getWorldCoords([data[i].x, data[i].y])[1],
                     wallZbottom)
                 );
-            }
 
-            for (let i = 0; i < (longueursData - 1); i++) {
                 // Face 1
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
+                colors1.push(0.8);
                 colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.0);
 
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
-                colors1.push(0.5);
-                colors1.push(0.5);
-                colors1.push(0.5);
+                colors1.push(0.9);
+                colors1.push(0.9);
+                colors1.push(0.0);
 
                 // Face 1
                 colors2.push(0.5);
@@ -824,29 +791,29 @@ export default {
                 colors3.push(0.2);
 
                 // Face 1
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
-                colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.9);
+                colors4.push(0.9);
+                colors4.push(0.0);
 
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
 
+                colors4.push(0.8);
                 colors4.push(0.5);
-                colors4.push(0.5);
-                colors4.push(0.5);
+                colors4.push(0.0);
             }
 
             // itemSize = 3 because there are 3 values (components) per vertex
@@ -914,18 +881,19 @@ export default {
         },
         async addItineraireSpeedWall(deviceNumbers) {
 
+            this.devices = deviceNumbers;
+
             // supprime les objets de la visualisation s'il y en a (parfois des objets sont en cache)
             this.controller.threeViewer.shperes.forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
                 this.disposeThreeMesh(sphere.wall);
                 this.disposeThreeMesh(sphere.line);
-            })
+            });
 
             let indexVisu = 0;
 
             this.visu_function = this.addItineraireSpeedWall;
 
-            this.devices = deviceNumbers;
             let moyennes
             let moyennesDict;
 
@@ -934,7 +902,13 @@ export default {
             moyennes = res[0];
             moyennesDict = res[1];
 
-            const medianMoyennes = asc(moyennes)[Math.round(moyennes.length / 2)];
+            let medianMoyennes;
+
+            if (this.devices.length == 1) {
+                medianMoyennes = asc(moyennes)[0];
+            } else {
+                medianMoyennes = asc(moyennes)[Math.round(moyennes.length / 2)];
+            }
             const deviceMedian = moyennesDict[medianMoyennes];
 
             const dataMedian = await getLiveDataDevice(deviceMedian);
@@ -1274,13 +1248,11 @@ export default {
         },
         displayVisuSimple() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuSimple;
             this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
             this.addItineraire(this.devices);
         },
         displayVisuEpaisseur() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuEpaisseur;
 
             if (this.devices.length > 1)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
@@ -1293,28 +1265,26 @@ export default {
         },
         displayVisuMur() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMur;
+
+            console.log("___devices___ ", this.devices);
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
-            this.addItineraireSpeedWall(this.devices);
 
             this.addItineraireSpeedWall(this.devices).then(res => {
                 this.minLegend = tronquer(res[0], 2);
                 this.maxLegend = tronquer(res[1], 2);
+
+                this.dimension = 3;
+                this.createDimensionEnvironment(3);
+
+                if (this.dimension == 3)
+                    this.isLegend = true;
             });
-
-            this.dimension = 3;
-            this.createDimensionEnvironment(3);
-
-            if (this.dimension == 3)
-                this.isLegend = true;
         },
         displayVisuMoustache() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuMoustache;
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 de boîtes à moustache", life: 10000 });
-            this.addItineraireMoustache(this.devices);
 
             this.addItineraireMoustache(this.devices);
 
@@ -1326,7 +1296,6 @@ export default {
         },
         displayVisuNuit() {
             this.toast.removeAllGroups();
-            this.visuFunction = this.displayVisuNuit;
 
             if (this.devices.length === 0)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
@@ -1337,6 +1306,115 @@ export default {
 
             this.isLegend = true;
         },
+
+        async addDifficultyInfo(deviceNumbers) {
+
+            this.devices = deviceNumbers;
+            this.visu_function = this.addDifficultyInfo;
+
+            this.controller.threeViewer.traj_parts.clear();
+
+            const traj_data = await fetch(`http://localhost:5500/traj`, {
+                method: 'GET'
+            }).then(response => response.json())
+            const cp_data = await fetch(`http://localhost:5500/cp`, {
+                method: 'GET'
+            }).then(response => response.json())
+            const diff_data = await fetch(`http://localhost:5500/diff`, {
+                method: 'GET'
+            }).then(response => response.json())
+
+            // Detection CP
+            const cp_points = [];
+            for (let c = 0; c < cp_data.length - 1; c++) {
+                let cp = [];
+                for (let t = 0; t < traj_data.length; t++) {
+                    if (t > cp_data[c][5] && t < cp_data[c + 1][4]) {
+                        cp.push(t);
+                    }
+                }
+                cp_points.push(cp)
+            }
+            for (let c = 0; c < cp_points.length; c++) {
+
+                let shape = [];
+
+                for (let j = 0; j < cp_points[c].length - 2; j++) {
+                    let i = cp_points[c][j];
+
+                    let xA = this.controller.threeViewer.getWorldCoords([traj_data[i].x, traj_data[i].y])[0];
+                    let yA = this.controller.threeViewer.getWorldCoords([traj_data[i].x, traj_data[i].y])[1];
+                    let xB = this.controller.threeViewer.getWorldCoords([traj_data[i + 1].x, traj_data[i + 1].y])[0];
+                    let yB = this.controller.threeViewer.getWorldCoords([traj_data[i + 1].x, traj_data[i + 1].y])[1];
+                    let xC = this.controller.threeViewer.getWorldCoords([traj_data[i + 2].x, traj_data[i + 2].y])[0];
+                    let yC = this.controller.threeViewer.getWorldCoords([traj_data[i + 2].x, traj_data[i + 2].y])[1];
+                    let d = 5;
+                    let normAB = Math.sqrt(Math.pow(xB - xA, 2) + Math.pow(yB - yA, 2))
+                    let normBC = Math.sqrt(Math.pow(xB - xC, 2) + Math.pow(yB - yC, 2));
+
+                    if (normAB === 0) { continue }
+
+                    shape.push(
+                        xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+                    shape.push(
+                        xA + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                    shape.push(
+                        xA - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                        yA + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+                    if (normAB != 0 && normBC != 0 && d != 0) {
+                        shape.push(xB, yB, 0);
+                        shape.push(
+                            xB - d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+                            yB + d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+                        shape.push(
+                            xB - d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                            yB + d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+
+                        shape.push(xB, yB, 0);
+                        shape.push(
+                            xB + d * Math.cos((xB - xA) / normAB) * Math.sin((yB - yA) / normAB),
+                            yB - d * Math.sin((xB - xA) / normAB) * Math.cos((yB - yA) / normAB), 0)
+                        shape.push(
+                            xB + d * Math.cos((xC - xB) / normBC) * Math.sin((yC - yB) / normBC),
+                            yB - d * Math.sin((xC - xB) / normBC) * Math.cos((yC - yB) / normBC), 0)
+                    }
+                }
+
+                let material = new THREE.MeshBasicMaterial();
+                material.color.setRGB(
+                    1,
+                    1 - (diff_data[c].niveau_diff + 1) / 6,
+                    1 - (diff_data[c].niveau_diff + 1) / 6
+                )
+                let geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shape), 3));
+
+                let visu_mesh = new THREE.Mesh(geometry, material);
+                visu_mesh.cp = c;
+                this.controller.threeViewer.traj_parts.add(visu_mesh);
+            }
+        },
+
+        displayDifficultyInfo() {
+            this.toast.removeAllGroups();
+            this.visuFunction = this.displayDifficultyInfo;
+            this.addDifficultyInfo(this.devices);
+
+            this.isLegend = true;
+        },
     }
-};
+}
 </script>

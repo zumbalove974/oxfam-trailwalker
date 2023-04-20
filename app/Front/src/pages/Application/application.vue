@@ -193,7 +193,7 @@ export default {
       upLeft: [77759.67642890716, 6453645.108348264],
       bottomRight: [162041.48828865882, 6394327.021226578],
       zoomPas: 1,
-      toast: null,
+      toast: useToast(),
       tabOpen: 1,
       selectedTimestamp: '',
       timestamps: [],
@@ -226,7 +226,8 @@ export default {
         { name: 'Visu colline', key: '3' },
         { name: 'Visu Mur', key: '4' },
         { name: 'Visu Nuit', key: '5' },
-        { name: 'Visu Moustache', key: '6' }
+        { name: 'Visu Moustache', key: '6' },
+        { name: 'Visu Difficulte', key: '9' }
       ],
       categoriesCheckbox: [
         { name: 'Position des équipes', key: '7', function: this.displayPosEquipe },
@@ -257,6 +258,8 @@ export default {
     }
   },
   async mounted() {
+    this.toast = useToast();
+
     init().then(res => {
       this.controller = res;
       this.controller = toRaw(this.controller);
@@ -273,8 +276,6 @@ export default {
     this.addItineraireReference();
 
     this.cameraZ = window.innerHeight / this.depht_s;
-
-    this.toast = useToast();
 
     if (this.deviceNumber) {
       await this.loadTimestamps();
@@ -298,18 +299,22 @@ export default {
      **** data[1] : une fonction qui prend en paramètre une liste de devices et qui est supposée afficher les maillages.
      */
     actualiser: function (data) {
+      console.log("rrr____actualiser");
       this.visu_meshes = toRaw(data[0]);
-      this.visu_function = data[1];
+
 
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.devices.length && this.visu_function) {
+      if (data[1] && (data[1] != this.visu_function)) {
+        console.log("rrr__0")
+        this.visu_function = data[1];
         this.visu_function(this.devices);
       }
-      else
+      else {
         this.addItineraireReference();
+      }
     },
     /**
      * Cette méthode est appelée lorsque l'utilisateur souhaite changer de dimension. 
@@ -574,6 +579,14 @@ export default {
       this.controller.threeViewer.controls.enabled = true;
       this.pointerIsDown = false;
 
+      let mouse = {
+        x: (this.lastPointerX / window.innerWidth) * 2 - 1,
+        y: -(this.lastPointerY / window.innerHeight) * 2 + 1
+      }
+
+      this.raycaster.setFromCamera(mouse, this.controller.threeViewer.perspectiveCamera);
+      let intersected_traj_part = this.raycaster.intersectObjects(this.controller.threeViewer.traj_parts.children);
+
       this.pointer.x = 0;
       this.pointer.y = 0;
 
@@ -597,15 +610,22 @@ export default {
 
       this.controller.threeViewer.controls.enabled = true;
 
+      intersected_traj_part.forEach(intersection => {
+        this.changeDiffPart(intersection.object)
+      })
+
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.devices.length && this.visu_function) {
-        this.visu_function(this.devices);
+      if (!intersected_traj_part.length) {
+        console.log("rrr__", this.visu_function)
+        if (this.visu_function) {
+          this.visu_function(this.devices);
+        }
+        else
+          this.addItineraireReference();
       }
-      else
-        this.addItineraireReference();
 
       if (toRaw(this.teamMarkers).length > 0) {
         this.removeTeamMarkers();
@@ -675,7 +695,7 @@ export default {
           this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
         }
 
-        if (this.devices.length && this.visu_function)
+        if (this.visu_function)
           this.visu_function(this.devices);
         else
           this.addItineraireReference();
@@ -777,7 +797,12 @@ export default {
 
         this.addEventListeners();
 
-        if (this.device && this.visu_function)
+
+        //this.controller.threeViewer.scene.remove(wall);
+        //this.controller.threeViewer.scene.remove(mesh);
+
+        if (this.visu_function)
+
           this.visu_function(this.devices);
       } else {
         console.log("___dimension 3___");
@@ -842,7 +867,6 @@ export default {
         circle.position.z = 35;
         circle.rotation.x = Math.PI / 2;
         this.controller.threeViewer.scene.add(circle);
-        console.log("eee2", point)
 
 
         this.pdcs.push(circle);
@@ -902,7 +926,35 @@ export default {
           this.teamMarkers.push(sphere);
         }
       }
-    }
+    },
+    async changeDiffPart(obj) {
+      const diff_data = await fetch(`http://localhost:5500/diff`, {
+        method: 'GET'
+      }).then(response => response.json())
+      this.controller.threeViewer.traj_parts.children.forEach(child => {
+        child.material.color.setRGB(
+          1,
+          1 - (diff_data[child.cp].niveau_diff + 1) / 6,
+          1 - (diff_data[child.cp].niveau_diff + 1) / 6,
+        )
+      })
+      obj.material.color.setRGB(0.3, 0.3, 1)
+      this.toast.add(
+        {
+          severity: 'success',
+          summary: 'Description',
+          detail:
+            " ID de la zone = " + diff_data[obj.cp].id +
+            " Dénivelé + = " + diff_data[obj.cp].denivele_positif +
+            " m, Dénivelé - = " + diff_data[obj.cp].denivele_negatif +
+            " m, Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance +
+            " km, Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee +
+            " km, niveau de difficulté = " + diff_data[obj.cp].niveau_diff,
+          life: 5000
+        }
+      );
+
+    },
   }
 }
 </script>
