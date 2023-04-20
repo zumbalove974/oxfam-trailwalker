@@ -295,7 +295,7 @@ export default {
   },
   methods: {
     actualiser: function (data) {
-      console.log("____actualiser");
+      console.log("rrr____actualiser");
       this.visu_meshes = toRaw(data[0]);
 
 
@@ -303,7 +303,8 @@ export default {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-if (this.visu_function && data[1] != this.visu_function) {
+      if (data[1] && (data[1] != this.visu_function)) {
+        console.log("rrr__0")
         this.visu_function = data[1];
         this.visu_function(this.devices);
       }
@@ -535,6 +536,7 @@ if (this.visu_function && data[1] != this.visu_function) {
       }
 
       if (!intersected_traj_part.length) {
+        console.log("rrr__", this.visu_function)
         if (this.visu_function) {
           this.visu_function(this.devices);
         }
