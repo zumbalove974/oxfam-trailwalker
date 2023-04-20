@@ -1093,7 +1093,7 @@ export default {
             this.visu_function = this.addNightCoverage;
 
             const date_nuit = "2021-03-07T21:57:00.000Z";
-            const date_matin = "2021-04-07T05:53:00.000Z"
+            const date_matin = "2021-04-07T05:53:00.000Z";
 
             const devices_data = await Promise.all(deviceNumbers.map(d => getLiveDataDevice(d)));
 
