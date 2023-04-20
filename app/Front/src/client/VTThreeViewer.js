@@ -24,6 +24,7 @@ export class VTThreeViewer {
     this.mapCenter = mapCenter;
     this.zoomFactor = zoomFactor;
     this.planes = new THREE.Group();
+    this.traj_parts = new THREE.Group();
     this.rayCaster = new THREE.Raycaster();
     this.featuresGroup = new Map();
     this.animate = this.animate.bind(this);
@@ -110,6 +111,8 @@ export class VTThreeViewer {
 
     this.planes.add(plane);
     this.scene.add(this.planes);
+
+    this.scene.add(this.traj_parts);
 
     this.currentCamera = this.perspectiveCamera;
 

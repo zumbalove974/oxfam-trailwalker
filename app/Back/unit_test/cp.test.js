@@ -10,8 +10,9 @@ describe("Test the cp path", () => {
         expect(body).not.toBeNaN();
         expect(body).toHaveProperty('length', 10)
         expect(body[1]).toEqual([
-            132238.2362,
-            6435533.093,
+            133325.23988534685, 6435602.446513227,
+            133486.22446421266, 6435282.187671882,
+            485, 613, 2,
             "PC1"
         ]);
     })
