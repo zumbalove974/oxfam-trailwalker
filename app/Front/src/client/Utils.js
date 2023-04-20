@@ -3,6 +3,7 @@ import proj4 from "proj4";
 export const proj4326 = proj4.defs("EPSG:4326");
 export const proj3857 = proj4.defs("EPSG:3857");
 
+// Niveaux de zoom des tuiles
 export const ZOOM_RES_L93 = [
   156543.033928041,
   78271.5169640205,
@@ -28,6 +29,11 @@ export const ZOOM_RES_L93 = [
   0.0746455354
 ];
 
+/**
+ * L'objet bounds contient une entrée pour chaque niveau de zoom dans ZOOM_RES_L93
+ * où la clé est la résolution pour ce niveau de zoom 
+ * et la valeur est un tableau bidimensionnel représentant les limites de la tuile correspondante. 
+ */
 export const bounds = {
   19.1092570713: [[103950.31133371031, 6430303.649541902], [122178.02655277702, 6409178.693479394]],
   9.5546285356: [[103898.96137217121, 6430323.767097442], [122477.25393651777, 6409059.102844761]],
