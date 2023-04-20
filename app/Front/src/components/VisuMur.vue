@@ -476,6 +476,8 @@ export default {
             let line3 = [];
             let line4 = [];
 
+            const coefficient = 10;
+
             for (let i = 0; i < (longueursData - 1); i++) {
                 let liste = [];
                 let listeplus1 = [];
@@ -485,22 +487,22 @@ export default {
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                const q3 = calculerTroisiemeQuartile(liste);
-                const max = Math.max(...liste);
+                //const min = Math.min(...liste);
+                //const q1 = calculerPremierQuartile(liste);
+                //const q2 = calculerMedian(liste);
+                const q3 = calculerTroisiemeQuartile(liste) * coefficient;
+                const max = Math.max(...liste) * coefficient;
 
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                const q3plus1 = calculerTroisiemeQuartile(listeplus1);
-                const maxplus1 = Math.max(...listeplus1);
+                //const minplus1 = Math.min(...listeplus1);
+                //const q1plus1 = calculerPremierQuartile(listeplus1);
+                //const q2plus1 = calculerMedian(listeplus1);
+                const q3plus1 = calculerTroisiemeQuartile(listeplus1) * coefficient;
+                const maxplus1 = Math.max(...listeplus1) * coefficient;
 
-                let wallZtop = max + q3 + q2 + q1 + min;
-                let wallZbottom = q3 + q2 + q1 + min;
-                let wallZtoplus1 = maxplus1 + q3plus1 + q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
+                let wallZtop = max;
+                let wallZbottom = q3;
+                let wallZtoplus1 = maxplus1;
+                let wallZbottomplus1 = q3plus1;
 
                 let data = devicesData[0];
                 //Face 1
@@ -544,20 +546,20 @@ export default {
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
-                const q3 = calculerTroisiemeQuartile(liste);
+                //const min = Math.min(...liste);
+                //const q1 = calculerPremierQuartile(liste);
+                const q2 = calculerMedian(liste) * coefficient;
+                const q3 = calculerTroisiemeQuartile(liste) * coefficient;
 
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
-                const q3plus1 = calculerTroisiemeQuartile(listeplus1);
+                //const minplus1 = Math.min(...listeplus1);
+                //const q1plus1 = calculerPremierQuartile(listeplus1);
+                const q2plus1 = calculerMedian(listeplus1) * coefficient;
+                const q3plus1 = calculerTroisiemeQuartile(listeplus1) * coefficient;
 
-                let wallZtop = q3 + q2 + q1 + min;
-                let wallZbottom = q2 + q1 + min;
-                let wallZtoplus1 = q3plus1 + q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q2plus1 + q1plus1 + minplus1;
+                let wallZtop = q3;
+                let wallZbottom = q2;
+                let wallZtoplus1 = q3plus1;
+                let wallZbottomplus1 = q2plus1;
 
                 let data = devicesData[0];
 
@@ -613,20 +615,20 @@ export default {
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
-                const q2 = calculerMedian(liste);
+                //const min = Math.min(...liste);
+                const q1 = calculerPremierQuartile(liste) * coefficient;
+                const q2 = calculerMedian(liste) * coefficient;
                 //const q3 = calculerTroisiemeQuartile(liste);
 
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
-                const q2plus1 = calculerMedian(listeplus1);
+                //const minplus1 = Math.min(...listeplus1);
+                const q1plus1 = calculerPremierQuartile(listeplus1) * coefficient;
+                const q2plus1 = calculerMedian(listeplus1) * coefficient;
                 //const q3plus1 = calculerTroisiemeQuartile(listeplus1);
 
-                let wallZtop = q2 + q1 + min;
-                let wallZbottom = q1 + min;
-                let wallZtoplus1 = q2plus1 + q1plus1 + minplus1;
-                let wallZbottomplus1 = q1plus1 + minplus1;
+                let wallZtop = q2;
+                let wallZbottom = q1;
+                let wallZtoplus1 = q2plus1;
+                let wallZbottomplus1 = q1plus1;
 
                 let data = devicesData[0];
 
@@ -671,19 +673,19 @@ export default {
                     listeplus1.push(data[i + 1].speed);
                 });
 
-                const min = Math.min(...liste);
-                const q1 = calculerPremierQuartile(liste);
+                const min = Math.min(...liste) * coefficient;
+                const q1 = calculerPremierQuartile(liste) * coefficient;
                 //const q2 = calculerMedian(liste);
                 //const q3 = calculerTroisiemeQuartile(liste);
 
-                const minplus1 = Math.min(...listeplus1);
-                const q1plus1 = calculerPremierQuartile(listeplus1);
+                const minplus1 = Math.min(...listeplus1) * coefficient;
+                const q1plus1 = calculerPremierQuartile(listeplus1) * coefficient;
                 //const q2plus1 = calculerMedian(listeplus1);
                 //const q3plus1 = calculerTroisiemeQuartile(listeplus1);
 
-                let wallZtop = q1 + min;
+                let wallZtop = q1;
                 let wallZbottom = min;
-                let wallZtoplus1 = q1plus1 + minplus1;
+                let wallZtoplus1 = q1plus1;
                 let wallZbottomplus1 = minplus1;
 
                 let data = devicesData[0];
@@ -913,8 +915,6 @@ export default {
         },
         async addItineraireSpeedWall(deviceNumbers) {
 
-            console.log("___devices2___ ", this.devices);
-
             this.devices = deviceNumbers;
 
             // supprime les objets de la visualisation s'il y en a (parfois des objets sont en cache)
@@ -924,8 +924,6 @@ export default {
                 this.disposeThreeMesh(sphere.line);
             });
 
-            console.log("___devices2.1___ ", this.devices);
-
             let indexVisu = 0;
 
             this.visu_function = this.addItineraireSpeedWall;
@@ -933,11 +931,7 @@ export default {
             let moyennes
             let moyennesDict;
 
-            console.log("___devices2.2___ ", this.devices);
-
             let res = await this.getMoyenneDevice(this.devices);
-
-            console.log("___devices2.3___ ", this.devices);
 
             moyennes = res[0];
             moyennesDict = res[1];
@@ -951,21 +945,13 @@ export default {
             }
             const deviceMedian = moyennesDict[medianMoyennes];
 
-            console.log("___devices2.4___ ", asc(moyennes));
-            console.log("___devices2.4___ ", Math.round(moyennes.length / 2));
-            console.log("___devices2.4___ ", medianMoyennes);
-
             const dataMedian = await getLiveDataDevice(deviceMedian);
-
-            console.log("___devices2.5___ ", this.devices);
 
             let speedsDataSorted = [];
 
             for (let i = 0; i < dataMedian.length; i++) {
                 speedsDataSorted.push(dataMedian[i].speed);
             }
-
-            console.log("___devices2.5___ ", this.devices);
 
             // calcul des différents quartiles de la trajectoire qui a la vitesse moyenne médiane parmis les différentes trajectoires
             // on fait cela afin de réduire les disparités entre le rouge et le vert
@@ -975,14 +961,7 @@ export default {
             const q3 = calculerTroisiemeQuartile(speedsDataSorted);
             const max = Math.max(...speedsDataSorted);
 
-            console.log("___devices2.6___ ", this.devices.length);
-
-            if (toRaw(this.devices).length) {
-                console.log("___devices3___ ", this.devices.length);
-            }
-
             this.devices.forEach(async device => {
-                console.log("___devices4___ ", device);
 
                 const data = await getLiveDataDevice(device);
 
