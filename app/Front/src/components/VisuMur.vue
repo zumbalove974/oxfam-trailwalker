@@ -1344,8 +1344,7 @@ export default {
             this.devices = deviceNumbers;
             this.visu_function = this.addDifficultyInfo;
 
-            //this.controller.threeViewer.traj_parts.clear();
-            //this.controller.threeViewer.scene.add(this.controller.threeViewer.traj_parts)
+            this.controller.threeViewer.traj_parts.clear();
 
             const traj_data = await fetch(`http://localhost:5500/traj`, {
                 method: 'GET'
@@ -1439,7 +1438,6 @@ export default {
                 visu_mesh.cp = c;
                 this.controller.threeViewer.traj_parts.add(visu_mesh);
             }
-            //this.visu_meshes.push(this.controller.threeViewer.traj_parts)
         },
 
         displayDifficultyInfo() {

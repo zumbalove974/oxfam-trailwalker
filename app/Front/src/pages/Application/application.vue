@@ -532,11 +532,13 @@ export default {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.devices.length && this.visu_function) {
-        this.visu_function(this.devices);
+      if (!intersected_traj_part.length) {
+        if (this.visu_function) {
+          this.visu_function(this.devices);
+        }
+        else
+          this.addItineraireReference();
       }
-      else
-        this.addItineraireReference();
 
       if (toRaw(this.teamMarkers).length > 0) {
         this.removeTeamMarkers();
@@ -799,13 +801,13 @@ export default {
         method: 'GET'
       }).then(response => response.json())
       this.controller.threeViewer.traj_parts.children.forEach(child => {
-        child.material.color.RGB(
+        child.material.color.setRGB(
           1,
           1 - (diff_data[child.cp].niveau_diff + 1) / 6,
-          1 - (diff_data[child.cp].niveau_diff + 1) / 6
+          1 - (diff_data[child.cp].niveau_diff + 1) / 6,
         )
       })
-      obj.material.color.setHex(0x0000ff)
+      obj.material.color.setRGB(0.3, 0.3, 1)
       this.toast.add(
         {
           severity: 'success',
