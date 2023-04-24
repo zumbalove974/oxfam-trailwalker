@@ -35,6 +35,7 @@ export default {
     },
     emits: {
         data: Array,
+        legend: Array
     },
     data() {
         return {
@@ -56,7 +57,6 @@ export default {
                 '6': this.displayVisuMoustache,
                 '9': this.displayDifficultyInfo
             },
-            isLegend: false // définit si la légende doit être affichée pour la visualisation en cours
         }
     },
     mounted() {
@@ -65,7 +65,6 @@ export default {
     methods: {
         // fonction appelée lorsque l'utilisateur clique sur une checkbox
         display() {
-            console.log("rrr__display")
             toRaw(this.functions[toRaw(this.category).key])();
             this.visu_function = this.functions[toRaw(this.category).key];
             // on envoit à la vue parente la focntion concernée et la nouvelle liste des vicualisations présentes dans la scène
@@ -235,7 +234,7 @@ export default {
             }
 
             // on retourne ces valeurs car on en a besoin pour la légende
-            return [min, max];
+            return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51)', 'rgb(0, 255, 51)']];
         },
         displayVisuMontagne() {
             this.toast.removeAllGroups();
@@ -246,15 +245,12 @@ export default {
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
 
             this.addItineraireSpeed3D(this.devices).then(res => {
-                this.minLegend = tronquer(res[0], 2);
-                this.maxLegend = tronquer(res[1], 2);
+
+                this.dimension = 3;
+                this.createDimensionEnvironment(3);
+
+                this.$emit("legend", [tronquer(res[0], 2), tronquer(res[1], 2)]);
             });
-
-
-            this.dimension = 3;
-            this.createDimensionEnvironment(3);
-
-            this.isLegend = true;
         },
         addItineraire(deviceNumbers) {
 
@@ -294,6 +290,7 @@ export default {
 
             const trace = await getLiveDataDevice(device);
 
+            const minSpeed = Math.min(...trace.map(t => t.speed));
             const maxSpeed = Math.max(...trace.map(t => t.speed));
 
             let shape = [];
@@ -393,6 +390,8 @@ export default {
             this.controller.threeViewer.scene.add(visu_mesh);
 
             this.visu_function = this.addItineraireEpaisseur;
+
+            return [[tronquer(minSpeed, 2), tronquer(maxSpeed, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
         // calcul les vitesse moyennesde tous les trajets sélectionnés
         async getMoyenneDevice(devices) {
@@ -1085,7 +1084,7 @@ export default {
                 indexVisu++;
             })
 
-            return [min, max];
+            return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
         async addNightCoverage(deviceNumbers) {
 
@@ -1127,6 +1126,7 @@ export default {
                 trace_night.push(cpt);
             }
 
+            const min_night = Math.min(...trace_night)
             const max_night = Math.max(...trace_night)
 
             let trace = devices_data[0];
@@ -1245,6 +1245,8 @@ export default {
             let visu_mesh = new THREE.Mesh(geometry, material);
             this.visu_meshes.push(visu_mesh)
             this.controller.threeViewer.scene.add(visu_mesh);
+
+            return [[tronquer(min_night, 2), tronquer(0.4 * max_night, 2), tronquer(0.6 * max_night, 2), tronquer(max_night, 2)], ['rgb(0, 170, 255)', 'rgb(255, 170, 0)', 'rgb(255, 0, 0)', 'rgb(0, 0, 0)']];
         },
         displayVisuSimple() {
             this.toast.removeAllGroups();
@@ -1259,26 +1261,21 @@ export default {
             else
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
 
-            this.addItineraireEpaisseur(this.devices);
-
-            this.isLegend = true;
+            this.addItineraireEpaisseur(this.devices).then(res => {
+                this.$emit("legend", res);
+            });
         },
         displayVisuMur() {
             this.toast.removeAllGroups();
 
-            console.log("___devices___ ", this.devices);
-
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
 
             this.addItineraireSpeedWall(this.devices).then(res => {
-                this.minLegend = tronquer(res[0], 2);
-                this.maxLegend = tronquer(res[1], 2);
 
                 this.dimension = 3;
                 this.createDimensionEnvironment(3);
 
-                if (this.dimension == 3)
-                    this.isLegend = true;
+                this.$emit("legend", res);
             });
         },
         displayVisuMoustache() {
@@ -1290,9 +1287,6 @@ export default {
 
             this.dimension = 3;
             this.createDimensionEnvironment(3);
-
-            if (this.dimension == 3)
-                this.isLegend = true;
         },
         displayVisuNuit() {
             this.toast.removeAllGroups();
@@ -1302,9 +1296,9 @@ export default {
             else
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit.", life: 10000 });
 
-            this.addNightCoverage(this.devices);
-
-            this.isLegend = true;
+            this.addNightCoverage(this.devices).then(res => {
+                this.$emit("legend", res);
+            });
         },
 
         async addDifficultyInfo(deviceNumbers) {
@@ -1436,8 +1430,6 @@ export default {
             this.toast.removeAllGroups();
             this.visuFunction = this.displayDifficultyInfo;
             this.addDifficultyInfo(this.devices);
-
-            this.isLegend = true;
         },
     }
 }
