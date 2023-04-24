@@ -89,9 +89,10 @@
         <div v-if="controller" class="flex flex-column gap-3">
           <div v-for="category in categories" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
-            <VisuMur @data="actualiser" :toastProps="toast" :createDimensionEnvironmentProps="createDimensionEnvironment"
-              :controllerProps="controller" :devicesProps="devices" :visu_functionProps="visu_function"
-              :dimensionProps="dimension" :visu_meshesProps="visu_meshes" :categoryProps="category">
+            <VisuMur @data="actualiser" @legend="actualiserLegend" :toastProps="toast"
+              :createDimensionEnvironmentProps="createDimensionEnvironment" :controllerProps="controller"
+              :devicesProps="devices" :visu_functionProps="visu_function" :dimensionProps="dimension"
+              :visu_meshesProps="visu_meshes" :categoryProps="category">
             </VisuMur>
           </div>
           <div v-for="category in categoriesCheckbox" :key="category.key" class="flex align-items-center"
@@ -126,11 +127,10 @@
     </Dialog>
   </div>
 
-
   <Fieldset v-if="isLegend" legend="Légende" class="onglet bottom-left" :toggleable="true">
-    <div id="legend">
-      <label id="minLegend" for="">{{ minLegend }}</label>
-      <label id="maxLegend" for="">{{ maxLegend }}</label>
+    <div id="legend" :style="{ background: rgbLegend }">
+      <label v-for="legend in legends" :key="legend.value" for=""
+        :style="{ position: 'absolute', transform: legend.decalage }">{{ legend.value }}</label>
     </div>
   </Fieldset>
 
@@ -251,8 +251,10 @@ export default {
         { name: '3D', value: 3 }
       ],
       isLegend: false,
-      minLegend: null,
-      maxLegend: null,
+      legends: [],
+      rgbMinLegend: '',
+      rgbMaxLegend: '',
+      rgbLegend: '',
       selectedCategory: 'Production',
       categories: [
         { name: 'Trajectoire enregistrée', key: '1' },
@@ -347,6 +349,22 @@ export default {
       else {
         this.addItineraireReference();
       }
+    },
+    actualiserLegend: function (legend) {
+      this.legends = [];
+      let index = 0;
+      legend[0].forEach(nombre => {
+        toRaw(this.legends).push({ value: nombre, decalage: 'translate(' + (200 / (legend[0].length - 1) * index - 5).toString() + 'px , -20px)' });
+        index++;
+      });
+
+      this.rgbLegend = 'linear-gradient(90deg, ';
+      legend[1].forEach(couleur => {
+        this.rgbLegend += couleur + ','
+      });
+      this.rgbLegend = this.rgbLegend.substring(0, this.rgbLegend.length - 1) + ')';
+      console.log("----", this.rgbLegend);
+      this.isLegend = true;
     },
     /**
      * Cette méthode est appelée lorsque l'utilisateur souhaite changer de dimension. 
@@ -1156,17 +1174,6 @@ body {
   width: 200px;
   height: 30px;
   border: 1px solid black;
-  background: linear-gradient(90deg, rgb(0, 255, 51), rgb(255, 0, 51));
   text-align: start;
-}
-
-#minLegend {
-  position: absolute;
-  transform: translate(-5px, -20px);
-}
-
-#maxLegend {
-  position: absolute;
-  transform: translate(185px, -20px);
 }
 </style>
