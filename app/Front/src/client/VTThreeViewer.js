@@ -112,8 +112,6 @@ export class VTThreeViewer {
     this.planes.add(plane);
     this.scene.add(this.planes);
 
-    this.scene.add(this.traj_parts);
-
     this.currentCamera = this.perspectiveCamera;
 
     this.renderer.domElement.addEventListener(

@@ -686,11 +686,10 @@ export default {
       })
 
       // Mise a jour des objects Three.js
-      while (this.visu_meshes.length > 0) {
-        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
-      }
-
       if (!intersected_traj_part.length) {
+        while (this.visu_meshes.length > 0) {
+          this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+        }
         if (this.visu_function) {
           this.visu_function(this.devices);
         }
