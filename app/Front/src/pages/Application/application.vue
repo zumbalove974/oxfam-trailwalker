@@ -542,7 +542,7 @@ export default {
 
       if (input[input.length - 1] == "Points de contrôle") {
         this.addCPs();
-        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 3000 });
       }
     },
     /**
@@ -554,7 +554,7 @@ export default {
       this.removeTeamMarkers();
 
       if (input[input.length - 1] == "Position des équipes") {
-        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 10000 });
+        this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute la position d'une équipe à un temp donné.", life: 3000 });
         this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
       }
     },
