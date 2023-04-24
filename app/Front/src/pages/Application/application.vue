@@ -4,8 +4,8 @@
 
   <Toast position="bottom-center" />
 
-  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
-    :activeIndex="0" class="onglet up">
+  <Accordion :style="[helpIndex === 0 ? { 'border': borderStyle } : { 'border': '' }]" @pointerover="removeEventListeners"
+    v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }" :activeIndex="accordionIndex" class="onglet up">
     <AccordionTab header="Ajouter une ou plusieurs équipes">
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown">
@@ -37,9 +37,11 @@
         </div>
       </div>
     </AccordionTab>
+
     <AccordionTab header="Ajouter un marquer d'équipe à un temps donné">
       <div class="flexColumn">
-        <div class="flexRow evenly upSize spaceDown">
+        <div class="flexRow evenly upSize spaceDown"
+          :style="[helpIndex === 1 ? { 'border': borderStyle } : { 'border': '' }]">
           <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
           <div class="card flex justify-content-center">
             <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps"></Button>
@@ -64,8 +66,9 @@
     </AccordionTab>
   </Accordion>
 
-  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
-    expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
+  <Accordion :style="[helpIndex === 2 ? { 'border': borderStyle } : { 'border': '' }]" @pointerover="removeEventListeners"
+    v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }" expandIcon="pi pi-ellipsis-h"
+    collapseIcon="pi pi-ellipsis-v" class="onglet left" :activeIndex="tabOpen">
     <AccordionTab>
       <DataTable v-model:selection="selectedProduct" @rowSelect="onRowSelect" @rowUnselect="onRowUnselect"
         @rowSelectAll="onRowSelectAll" @rowUnselectAll="onRowUnselectAll" scrollHeight="40vh" style="max-height: 80vh;"
@@ -77,8 +80,10 @@
       </DataTable>
     </AccordionTab>
   </Accordion>
-  <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
-    expandIcon="pi pi-ellipsis-h" collapseIcon="pi pi-ellipsis-v" class="onglet right" :activeIndex="tabOpen">
+
+  <Accordion :style="[helpIndex === 3 ? { 'border': borderStyle } : { 'border': '' }]" @pointerover="removeEventListeners"
+    v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }" expandIcon="pi pi-ellipsis-h"
+    collapseIcon="pi pi-ellipsis-v" class="onglet right" :activeIndex="tabOpen">
     <AccordionTab>
       <div class="card flex justify-content-center">
         <div v-if="controller" class="flex flex-column gap-3">
@@ -110,6 +115,18 @@
     </div>
   </div>
 
+  <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }">
+    <Dialog v-model:visible="helpVisible" :style="{ width: '50vw' }" :position="'bottom'">
+      <p>
+        {{ textHelp[helpIndex] }}
+      </p>
+      <template #footer>
+        <Button :label="btnTextHelp" icon="pi pi-angle-double-right" @click="nextHelp" autofocus />
+      </template>
+    </Dialog>
+  </div>
+
+
   <Fieldset v-if="isLegend" legend="Légende" class="onglet bottom-left" :toggleable="true">
     <div id="legend">
       <label id="minLegend" for="">{{ minLegend }}</label>
@@ -117,7 +134,8 @@
     </div>
   </Fieldset>
 
-  <div id="dimensionBtnContainer" class="card flex justify-content-center p-button-lg">
+  <div :style="[helpIndex === 4 ? { 'border': borderStyle } : { 'border': '' }]" id="dimensionBtnContainer"
+    class="card flex justify-content-center p-button-lg">
     <SelectButton id="dimensionBtn" @click="changerDeDimension" v-model="dimension" :options="options" optionLabel="name"
       aria-labelledby="basic" />
   </div>
@@ -143,6 +161,7 @@ import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toast from 'primevue/toast';
+import Dialog from 'primevue/dialog';
 import { useToast } from "primevue/usetoast";
 import Fieldset from 'primevue/fieldset';
 import Checkbox from 'primevue/checkbox';
@@ -174,11 +193,26 @@ export default {
     Toast,
     Fieldset,
     Checkbox,
-    VisuMur
+    VisuMur,
+    Dialog
   },
   data() {
     return {
       active: false,
+      accordionIndex: 0,
+      // help section
+      helpVisible: false,
+      helpIndex: -1,
+      textHelp: [
+        "Cet onglet permet d'ajouter de nouvelles équipes avec leur ID. Vous pouvez ajouter une équipe individuellement (zone de texte du haut) et/ou ajouter plusieurs équipes en même temps (zone de texte du bas).",
+        "Cet onglet permet d'afficher la position d'une équipe a un temps donné.",
+        "Cet onglet recense les équipes sélectionnés pour chaque visualisation. Lorsque vous ajoutez des équipes elles appraissent dans cet onglet et vous pouvez ensuite les sélectionner pour les intégrer dans les visualisations.",
+        "Cet onglet permet d'afficher les différentes visualisations. Certaines visualisations nécessite une équipe, d'autres plusieurs, vous aurez plus d'informations en cliquant dessus.",
+        "Ce bouton permet de passer de la 2D à la 3D et vice versa."
+      ],
+      btnTextHelp: "Suivant",
+      borderStyle: 'dashed 3px blueviolet',
+      accordionStyle: "",
       getLiveDataDevice: getLiveDataDevice,
       getNoms: getNoms,
       dimension: 2,
@@ -251,7 +285,8 @@ export default {
           label: 'Info',
           icon: 'pi pi-info-circle',
           command: () => {
-            this.toast.add({ severity: 'success', summary: 'Info', detail: "Le premier numéro d'équipe doit être plus petit que le deuxième.", life: 2000 });
+            this.helpVisible = true;
+            this.helpIndex = 0;
           }
         }
       ]
@@ -283,8 +318,8 @@ export default {
 
     // Modification du style des bouton du speed dial 
     // On y a pas accès autrement que par le DOM
-    document.getElementById("speedial_0").children[0].innerHTML = "";
-    document.getElementById("speedial_1").children[0].innerHTML = "";
+    //document.getElementById("speedial_0").children[0].innerHTML = "";
+    //document.getElementById("speedial_1").children[0].innerHTML = "";
 
     document.getElementById("speedial_0").children[0].style = "background-color: green";
     document.getElementById("speedial_1").children[0].style = "background-color: cyan";
@@ -299,16 +334,13 @@ export default {
      **** data[1] : une fonction qui prend en paramètre une liste de devices et qui est supposée afficher les maillages.
      */
     actualiser: function (data) {
-      console.log("rrr____actualiser");
       this.visu_meshes = toRaw(data[0]);
-
 
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
       if (data[1] && (data[1] != this.visu_function)) {
-        console.log("rrr__0")
         this.visu_function = data[1];
         this.visu_function(this.devices);
       }
@@ -324,6 +356,28 @@ export default {
     changerDeDimension() {
       this.dimension = this.dimension.value;
       this.createDimensionEnvironment(this.dimension);
+    },
+    nextHelp() {
+      this.helpIndex++;
+
+      switch (this.helpIndex) {
+        case 1:
+          this.accordionIndex = 1;
+          break;
+        case 2:
+          this.tabOpen = 0;
+          break;
+        case this.textHelp.length - 1:
+          this.btnTextHelp = "Fermer";
+          break;
+        case this.helpIndex == this.textHelp.length:
+          this.helpIndex = -1;
+          this.btnTextHelp = "Suivant";
+          this.accordionStyle = "";
+          this.helpVisible = false;
+          break;
+      }
+
     },
     /**
      * Obtient une liste des identifiants des périphériques 
@@ -380,7 +434,6 @@ export default {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
         if (this.deviceNumber) {
           const ids = this.getValuesFromDevicesTab();
-          console.log("__noms", this.devicesName);
           if (!ids.includes(this.deviceNumber) && toRaw(this.devicesName).includes(this.deviceNumber.toString())) {
             const moyenne = await this.getVitesseMoyenne(this.deviceNumber);
             this.devicesTab.push({ id: this.deviceNumber, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
@@ -497,7 +550,6 @@ export default {
 
       let points = [];
 
-      console.log("lll", this.controller.threeViewer.zoomFactor);
       this.upLeft = bounds[this.controller.threeViewer.zoomFactor][0];
       this.bottomRight = bounds[this.controller.threeViewer.zoomFactor][1];
 
@@ -541,7 +593,6 @@ export default {
 
       this.controller.threeViewer.scene.add(this.limitsMesh);
 
-      console.log("this.limitsMesh", this.limitsMesh)
       this.visu_meshes.push(this.limitsMesh);
     },
     /**
@@ -622,7 +673,6 @@ export default {
       }
 
       if (!intersected_traj_part.length) {
-        console.log("rrr__", this.visu_function)
         if (this.visu_function) {
           this.visu_function(this.devices);
         }
@@ -756,9 +806,20 @@ export default {
      */
     resetCamera(dimension) {
       this.controller.olViewer.map.getView().setCenter(vavinCenter);
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
+
+      if (this.visu_function) {
+        this.visu_function(this.devices);
+      }
+      else
+        this.addItineraireReference();
+
       this.createDimensionEnvironment(2)
       if (dimension == 3) {
-        this.createDimensionEnvironment(3)
+        this.createDimensionEnvironment(3);
       }
     },
     /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
@@ -853,7 +914,7 @@ export default {
       this.visu_meshes.push(GPSvisu_mesh);
       this.controller.threeViewer.scene.add(GPSvisu_mesh);
     },
-    /**
+    /*
      * Récupère les points de contrôle et dessine un cylindre jaune dans la scène à l'appelle de cette fonction.
      */
     async addCPs() {
