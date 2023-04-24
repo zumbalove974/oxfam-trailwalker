@@ -1250,7 +1250,7 @@ export default {
         },
         displayVisuSimple() {
             this.toast.removeAllGroups();
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 10000 });
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "La trajectoire mesurée par le GPS est affichée.", life: 5000 });
             this.addItineraire(this.devices);
         },
         displayVisuEpaisseur() {
@@ -1258,17 +1258,18 @@ export default {
 
             if (this.devices.length > 1)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-            else
-                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide.", life: 10000 });
+            else {
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide. Le couleur de la ligne change également en fonction de la vitesse.", life: 5000 });
 
-            this.addItineraireEpaisseur(this.devices).then(res => {
-                this.$emit("legend", res);
-            });
+                this.addItineraireEpaisseur(this.devices).then(res => {
+                    this.$emit("legend", res);
+                });
+            }
         },
         displayVisuMur() {
             this.toast.removeAllGroups();
 
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes.", life: 10000 });
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes. Plus la colline est haute et verte en un point plus l'équipe est rapide en ce point.", life: 5000 });
 
             this.addItineraireSpeedWall(this.devices).then(res => {
 
@@ -1281,7 +1282,7 @@ export default {
         displayVisuMoustache() {
             this.toast.removeAllGroups();
 
-            this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 de boîtes à moustache", life: 10000 });
+            this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 représentant des boîtes à moustache en continue. Le min, le max et les trois quartiles sont représentés.", life: 5000 });
 
             this.addItineraireMoustache(this.devices);
 
@@ -1294,7 +1295,7 @@ export default {
             if (this.devices.length === 0)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
             else
-                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit.", life: 10000 });
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit. Plus il y a d'équipe qui sont sur une même portion la nuit plus la couleur de la trajectoir est \"chaude\".", life: 5000 });
 
             this.addNightCoverage(this.devices).then(res => {
                 this.$emit("legend", res);
