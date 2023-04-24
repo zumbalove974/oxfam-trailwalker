@@ -1,18 +1,23 @@
 I – Glossaire
+
 II – Introduction
+
 III – Contexte et problématique
     1) Contexte 
     2) Problématique
     3) Besoins
     4) Cas d’usages
+
 VI – Réalisation et suivi du projet
     1) Méthodologie Agile
     2) Gestion de projet en Sprints
     3) Planning prévisionnel
     4) Gestion des risques
+
 V – Etude technique
     1) Architecture du projet 
     2) Diagramme de deploiement
+
 VI – Technologies 
     1) languages
     2) Frameworks
@@ -23,6 +28,7 @@ VI – Technologies
         3) Tests automatisés
         4) Docker
         5) Versions / Releases
+
 VII – Analyse fonctionnelle 
     1) Présentation de la solution proposée
     2) Guide de l'utilisateur 
