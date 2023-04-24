@@ -1,6 +1,7 @@
 <template>
   <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
   <div id="map" class="map"></div>
+
   <Toast position="bottom-center" />
 
   <Accordion @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
@@ -14,7 +15,7 @@
           </span>
 
           <div class="card flex justify-content-center">
-            <Button id="addTeamBtn" label="Ajouter" @click="addDevice" />
+            <Button id="addTeamBtn" label="Ajouter" @click="addDevice"></Button>
           </div>
         </div>
 
@@ -41,7 +42,7 @@
         <div class="flexRow evenly upSize spaceDown">
           <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
           <div class="card flex justify-content-center">
-            <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps" />
+            <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps"></Button>
           </div>
         </div>
         <div class="flexRow evenly upSize">
@@ -129,8 +130,7 @@ import { toRaw } from 'vue';
 
 import { init, vavinCenter } from '../../client/index.js'
 import VisuMur from './../../components/VisuMur.vue';
-import { getLiveDataDevice, getControlPoints } from "../../client/bddConnexion";
-//import { tronquer } from "../../client/mathUtils";
+import { getLiveDataDevice, getControlPoints, getNoms } from "../../client/bddConnexion";
 
 // Primevue components
 import Dropdown from 'primevue/dropdown';
@@ -143,7 +143,6 @@ import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toast from 'primevue/toast';
-//import RadioButton from 'primevue/radiobutton';
 import { useToast } from "primevue/usetoast";
 import Fieldset from 'primevue/fieldset';
 import Checkbox from 'primevue/checkbox';
@@ -153,11 +152,10 @@ import "primevue/resources/themes/lara-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 
-//import { preventDefault } from 'ol/events/Event';
 
 import * as THREE from "three";
 
-import { ZOOM_RES_L93 } from "../../client/Utils";
+import { ZOOM_RES_L93, bounds } from "../../client/Utils";
 
 
 export default {
@@ -182,6 +180,7 @@ export default {
     return {
       active: false,
       getLiveDataDevice: getLiveDataDevice,
+      getNoms: getNoms,
       dimension: 2,
       depht_s: Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0,
       cameraZ: null,
@@ -194,7 +193,7 @@ export default {
       upLeft: [77759.67642890716, 6453645.108348264],
       bottomRight: [162041.48828865882, 6394327.021226578],
       zoomPas: 1,
-      toast: null,
+      toast: useToast(),
       tabOpen: 1,
       selectedTimestamp: '',
       timestamps: [],
@@ -203,6 +202,7 @@ export default {
       limitsMesh: null,
       teamMarkers: [],
       devicesTab: [],
+      devicesName: [],
       raycaster: new THREE.Raycaster(),
       pointer: new THREE.Vector2(),
       deviceNumber: null,
@@ -225,11 +225,13 @@ export default {
         { name: 'Visu épaisseur', key: '2' },
         { name: 'Visu colline', key: '3' },
         { name: 'Visu Mur', key: '4' },
-        { name: 'Visu Nuit', key: '5' }
+        { name: 'Visu Nuit', key: '5' },
+        { name: 'Visu Moustache', key: '6' },
+        { name: 'Visu Difficulte', key: '9' }
       ],
       categoriesCheckbox: [
-        { name: 'Position des équipes', key: '5', function: this.displayPosEquipe },
-        { name: 'Points de contrôle', key: '6', function: this.displayPDC }
+        { name: 'Position des équipes', key: '7', function: this.displayPosEquipe },
+        { name: 'Points de contrôle', key: '8', function: this.displayPDC }
       ],
       columns: [
         { selectionMode: "multiple", headerStyle: "background-color: #A855F7; max-width: 3rem", isSortable: false },
@@ -256,19 +258,25 @@ export default {
     }
   },
   async mounted() {
+    this.toast = useToast();
+
     init().then(res => {
       this.controller = res;
       this.controller = toRaw(this.controller);
 
-      this.createBoundingLimit();
       this.createDimensionEnvironment(this.dimension);
+      this.createBoundingLimit();
+    });
+
+    const noms = await this.getNoms();
+    noms.forEach(element => {
+      this.devicesName.push(this.getDeviceName(element['table_name']));
     });
 
     this.addItineraireReference();
 
-    this.cameraZ = window.innerHeight / this.depht_s,
+    this.cameraZ = window.innerHeight / this.depht_s;
 
-      this.toast = useToast();
     if (this.deviceNumber) {
       await this.loadTimestamps();
     }
@@ -283,24 +291,45 @@ export default {
 
   },
   methods: {
+    /**
+     * Met à jour l'affichage de la vue en retirant les maillages existants 
+     * et en affichant les nouveaux maillages en utilisant la fonction de visualisation 
+     * @param {*} data tableau contenant deux éléments :
+     **** data[0] : une liste de maillages à visualiser
+     **** data[1] : une fonction qui prend en paramètre une liste de devices et qui est supposée afficher les maillages.
+     */
     actualiser: function (data) {
+      console.log("rrr____actualiser");
       this.visu_meshes = toRaw(data[0]);
-      this.visu_function = data[1];
+
 
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.devices.length && this.visu_function) {
+      if (data[1] && (data[1] != this.visu_function)) {
+        console.log("rrr__0")
+        this.visu_function = data[1];
         this.visu_function(this.devices);
       }
-      else
+      else {
         this.addItineraireReference();
+      }
     },
+    /**
+     * Cette méthode est appelée lorsque l'utilisateur souhaite changer de dimension. 
+     * Elle met à jour la variable de dimension
+     * puis crée l'environnement de la nouvelle dimension.
+     */
     changerDeDimension() {
       this.dimension = this.dimension.value;
       this.createDimensionEnvironment(this.dimension);
     },
+    /**
+     * Obtient une liste des identifiants des périphériques 
+     * à partir du tableau de périphériques sélectionnés
+     * @returns {Array} Liste des identifiants de périphériques sélectionnés
+     */
     getValuesFromDevicesTab() {
       let res = [];
       this.devicesTab.forEach(device => {
@@ -309,32 +338,50 @@ export default {
 
       return res;
     },
+    /**
+     * convertit une vitesse de m/s en km/h
+     * @param {*} vitesse en m/s 
+     * @returns vitesse en km/h
+     */
     convertToKmH(vitesse) {
       return vitesse * 3.6
     },
+    /**
+     * Tronque un nombre en précisant le nombre de décimales à conserver.
+     * @param {*} nombre Le nombre à tronquer.
+     * @param {*} decimal Le nombre de décimales à conserver.
+     * @returns Le nombre tronqué.
+     */
     tronquer(nombre, decimal) {
       return Math.round(nombre * (10 ** decimal)) / (10 ** decimal);
     },
+    /**
+     *  Permet de charger les timestamps des données en temps réel d'un périphérique spécifié par deviceNumber
+     */
     async loadTimestamps() {
       try {
-        console.log("Loading timestamps...");
         const liveData = await getLiveDataDevice(this.deviceNumber);
         const timestamps = liveData.map(row => row.timestamp);
-        console.log("Timestamps loaded:", timestamps);
         this.timestamps = timestamps;
-        console.log('console.log(this.timestamps):', this.timestamps)
       } catch (error) {
         console.error(error);
       }
     },
+    /**
+     * Cette fonction ajoute un marqueur à la carte représentant la position de l'appareil au moment sélectionnée. 
+     */
     addTeamMarkerPoint() {
       this.addTeamMarker(this.deviceNumber, this.selectedTimestamp)
     },
+    /**
+     * Cette fonction ajoute un appareil à la liste des appareils en fonction des données fournies par l'utilisateur.
+     */
     async addDevice() {
       if (this.deviceNumber || (this.deviceNumberFrom && this.deviceNumberTo)) {
         if (this.deviceNumber) {
           const ids = this.getValuesFromDevicesTab();
-          if (!ids.includes(this.deviceNumber)) {
+          console.log("__noms", this.devicesName);
+          if (!ids.includes(this.deviceNumber) && toRaw(this.devicesName).includes(this.deviceNumber.toString())) {
             const moyenne = await this.getVitesseMoyenne(this.deviceNumber);
             this.devicesTab.push({ id: this.deviceNumber, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
             this.tabOpen = 0;
@@ -345,7 +392,7 @@ export default {
           if (this.deviceNumberFrom < this.deviceNumberTo) {
             for (let i = this.deviceNumberFrom; i <= this.deviceNumberTo; i++) {
               const ids = this.getValuesFromDevicesTab();
-              if (!ids.includes(i)) {
+              if (!ids.includes(i) && toRaw(this.devicesName).includes(i.toString())) {
                 const moyenne = await this.getVitesseMoyenne(i);
                 this.devicesTab.push({ id: i, vitesse: this.tronquer(this.convertToKmH(moyenne), 2) });
                 this.tabOpen = 0;
@@ -359,11 +406,23 @@ export default {
         this.toast.add({ severity: 'warn', summary: 'Attention', detail: "Vous n'avez rien écris", life: 2000 });
       }
     },
+    /**
+     * Cette fonction est appelée lorsqu'une ligne de la table des appareils est sélectionnée.
+     * Elle ajoute l'ID de l'appareil sélectionné à la liste des appareils à afficher.
+     * Si une fonction de visualisation est définie, elle l'appelle.
+     * @param {*} event  L'événement de sélection de de ligne.
+     */
     onRowSelect(event) {
       this.devices.push(event.data.id);
       if (this.visuFunction)
         this.visuFunction();
     },
+    /**
+     * Gère l'événement de déselection d'une ligne dans un tableau.
+     * Supprime l'identifiant de l'équipe correspondant à la ligne déselectionnée de la liste des équipes sélectionnées.
+     * Si une fonction de visualisation est définie, elle est appelée.
+     * @param {*} event L'événement de déselection de ligne.
+     */
     onRowUnselect(event) {
       this.devices = this.devices.filter(function (item) {
         return item !== event.data.id;
@@ -371,6 +430,10 @@ export default {
       if (this.visuFunction)
         this.visuFunction();
     },
+    /**
+     * Ajoute toutes les équipes sélectionnées à la liste des équipes à afficher
+     * @param {*} event L'événement de sélection de toutes les lignes.
+     */
     onRowSelectAll(event) {
       event.data.forEach(device => {
         this.devices.push(device.id);
@@ -379,12 +442,29 @@ export default {
       if (this.visuFunction)
         this.visuFunction();
     },
+    /**
+     * Gère l'événement de déselection de toutes les lignes
+     */
     onRowUnselectAll() {
       this.devices = [];
 
       if (this.visuFunction)
         this.visuFunction();
     },
+    /**
+     * Obtient le nom du dispositif à partir du nom de la table.
+     * @param {*} tableName  Le nom de la table contenant les données du dispositif.
+     */
+    getDeviceName(tableName) {
+      return tableName.split('_')[1];
+    },
+    /**
+     * Affiche les points de contrôle du parcours si l'input se termine par "Points de contrôle".
+     * Supprime tous les messages de toast en groupe avant d'afficher le nouveau message.
+     * Supprime également les marqueurs de course de l'équipe.
+     * Le nom de l'input sélectionné.
+     * @param {*} input 
+     */
     displayPDC(input) {
       this.toast.removeAllGroups();
       this.removeCPS();
@@ -394,6 +474,10 @@ export default {
         this.toast.add({ severity: 'info', summary: 'Info', detail: "Ajoute les points de contrôle du parcours.", life: 10000 });
       }
     },
+    /**
+     * Affiche la position de l'équipe sélectionnée à un temps donné.
+     * @param {*} input L'input du composant d'entrée de commande.
+     */
     displayPosEquipe(input) {
       this.toast.removeAllGroups();
       this.removeTeamMarkers();
@@ -403,9 +487,19 @@ export default {
         this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
       }
     },
+    /**
+     * Cette fonction crée un contour de limite en se basant sur les limites de zoom de la vue 3D.
+     * Elle récupère les coordonnées des points supérieurs gauche et inférieurs droits, puis les convertit en coordonnées du monde 3D.
+     * En utilisant ces coordonnées, elle crée un mesh en forme de rectangle qui sera affiché sur la vue 3D.
+     * Ce mesh est ajouté à la scène de la vue 3D et stocké dans le tableau des meshes visuels pour pouvoir le supprimer ultérieurement.
+     */
     createBoundingLimit() {
 
       let points = [];
+
+      console.log("lll", this.controller.threeViewer.zoomFactor);
+      this.upLeft = bounds[this.controller.threeViewer.zoomFactor][0];
+      this.bottomRight = bounds[this.controller.threeViewer.zoomFactor][1];
 
       points.push(new THREE.Vector3(
         this.controller.threeViewer.getWorldCoords(this.upLeft)[0],
@@ -450,8 +544,12 @@ export default {
       console.log("this.limitsMesh", this.limitsMesh)
       this.visu_meshes.push(this.limitsMesh);
     },
+    /**
+     * Vérifie si la vue est valide pour les limites de la carte.
+     * @param {*} center Les coordonnées du centre de la vue.
+     * @returns un tableau contenant les coordonnées du centre de la vue ajustées si elles sont en dehors des limites de la carte.
+     */
     verifyView(center) {
-        console.log("fff", toRaw(this.controller.olViewer.map.getView()).getCenter());
 
       let x = center[0];
       let y = center[1];
@@ -470,9 +568,24 @@ export default {
 
       return [x, y];
     },
+    /**
+     * Méthode appelée lors du clic sur le bouton haut.
+     * Active le contrôle de la caméra, vérifie l'intersection avec le sol,
+     * met à jour la position de la caméra et des coordonnées,
+     * et lance la fonction de visualisation si des dispositifs sont présents.
+     * Ajoute également des marqueurs d'équipe et des checkpoints si présents.
+     */
     clickUp() {
       this.controller.threeViewer.controls.enabled = true;
       this.pointerIsDown = false;
+
+      let mouse = {
+        x: (this.lastPointerX / window.innerWidth) * 2 - 1,
+        y: -(this.lastPointerY / window.innerHeight) * 2 + 1
+      }
+
+      this.raycaster.setFromCamera(mouse, this.controller.threeViewer.perspectiveCamera);
+      let intersected_traj_part = this.raycaster.intersectObjects(this.controller.threeViewer.traj_parts.children);
 
       this.pointer.x = 0;
       this.pointer.y = 0;
@@ -497,15 +610,22 @@ export default {
 
       this.controller.threeViewer.controls.enabled = true;
 
+      intersected_traj_part.forEach(intersection => {
+        this.changeDiffPart(intersection.object)
+      })
+
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      if (this.devices.length && this.visu_function) {
-        this.visu_function(this.devices);
+      if (!intersected_traj_part.length) {
+        console.log("rrr__", this.visu_function)
+        if (this.visu_function) {
+          this.visu_function(this.devices);
+        }
+        else
+          this.addItineraireReference();
       }
-      else
-        this.addItineraireReference();
 
       if (toRaw(this.teamMarkers).length > 0) {
         this.removeTeamMarkers();
@@ -519,6 +639,10 @@ export default {
 
       this.createBoundingLimit();
     },
+    /**
+     * Gère l'événement de clic de souris enfoncée.
+     * @param {*} event L'événement de clic de souris.
+     */
     clickDown(event) {
       this.controller.threeViewer.controls.enabled = false;
       this.pointerIsDown = true;
@@ -529,6 +653,10 @@ export default {
       this.lastPointerX = event.clientX;
       this.lastPointerY = event.clientY;
     },
+    /**
+     * Déplace la vue de la caméra en fonction du déplacement de la souris lors d'un clic.
+     * @param {*} event L'événement de clic de la souris.
+     */
     clickMove(event) {
       if (this.pointerIsDown) {
         this.newPointerX = event.clientX;
@@ -541,6 +669,11 @@ export default {
         this.lastPointerY = this.newPointerY;
       }
     },
+    /**
+     * La fonction met à jour le niveau de zoom de la carte OpenLayers en fonction de la position de la caméra Three.js, et met à jour le facteur de zoom Three.js.
+     * La fonction supprime également les marqueurs d'équipe et les points de contrôle précédemment affichés sur la carte, puis ajoute les nouveaux marqueurs d'équipe et points de contrôle. 
+     * La fonction crée une limite de zone de visualisation pour la carte.
+     */
     scroll() {
 
       const changeZ = this.controller.threeViewer.perspectiveCamera.position.z;
@@ -562,7 +695,7 @@ export default {
           this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
         }
 
-        if (this.devices.length && this.visu_function)
+        if (this.visu_function)
           this.visu_function(this.devices);
         else
           this.addItineraireReference();
@@ -581,6 +714,11 @@ export default {
       this.createBoundingLimit();
     },
     /* Lorsqu'on est en 3D l'utilisateur peut déplacer la caméra avec les flèches directionnelles */
+    /**
+     * Cette fonction est appelée à chaque fois qu'une touche est enfoncée dans la zone de rendu 3D.
+     * Elle permet de déplacer la caméra de visualisation en fonction de la touche pressée.
+     * @param {*} event L'événement du clavier qui a déclenché cette fonction.
+     */
     onKeyDown(event) {
       switch (event.key) {
         case 'ArrowUp':
@@ -601,18 +739,21 @@ export default {
           break;
       }
     },
+    /**
+     * Cette fonction est appelée lorsque l'utilisateur lâche une touche du clavier.
+     * Elle réinitialise les translations horizontales et verticales de la caméra Three.js à zéro.
+     */
     onKeyUp() {
       this.controller.threeViewer.translateX = 0;
       this.controller.threeViewer.translateZ = 0;
     },
+    /**
+     * Réinitialise la caméra en recentrant la vue sur le centre de Vavin et en créant un environnement en 2 dimensions.
+     * @param {*} dimension  La dimension de l'environnement à créer (2 ou 3).
+     */
     resetCamera(dimension) {
-
-      //const worldCoords = controller.threeViewer.getWorldCoords(vavinCenter); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-      //controller.threeViewer.perspectiveCamera.position.set(worldCoords[0], worldCoords[1], cameraZ);
       this.controller.olViewer.map.getView().setCenter(vavinCenter);
-
       this.createDimensionEnvironment(2)
-
       if (dimension == 3) {
         this.createDimensionEnvironment(3)
       }
@@ -633,6 +774,10 @@ export default {
       document.removeEventListener("pointermove", this.clickMove, true);
       this.controller.threeViewer.controls.removeEventListener('change', this.scroll, true);
     },
+    /**
+     * Cette méthode permet de créer un environnement de dimension spécifiée.
+     * @param {*} dimensionNb le nombre de dimensions, peut être 2 ou 3.
+     */
     createDimensionEnvironment(dimensionNb) {
 
       this.dimension = dimensionNb;
@@ -652,10 +797,12 @@ export default {
 
         this.addEventListeners();
 
+
         //this.controller.threeViewer.scene.remove(wall);
         //this.controller.threeViewer.scene.remove(mesh);
 
-        if (this.device && this.visu_function)
+        if (this.visu_function)
+
           this.visu_function(this.devices);
       } else {
         console.log("___dimension 3___");
@@ -666,6 +813,11 @@ export default {
         this.removeEventListeners();
       }
     },
+    /**
+     * Récupère la vitesse moyenne d'un dispositif spécifié en calculant la moyenne des vitesses de tous les points de données de ce dispositif.
+     * @param {*} device Le numéro du dispositif dont la vitesse moyenne est calculée.
+     * @returns la vitesse moyenne du dispositif spécifié.
+     */
     async getVitesseMoyenne(device) {
       const data = await getLiveDataDevice(device);
 
@@ -677,16 +829,15 @@ export default {
 
       return somme / data.length;
     },
+    /**
+     * Cette fonction ajoute un itinéraire de référence à la scène.
+     */
     async addItineraireReference() {
-
       const coords = await getLiveDataDevice(3843);
-
       const GPSmaterial = new THREE.LineBasicMaterial({
         color: 0xff0000
       });
-
       const GPSpoints = [];
-
       for (let i = 0; i < coords.length; i++) {
 
         GPSpoints.push(new THREE.Vector3(
@@ -694,40 +845,45 @@ export default {
           this.controller.threeViewer.getWorldCoords([coords[i].x, coords[i].y])[1],
           0));
       }
-
-      //console.log("GPSpoints", GPSpoints)
-
       const GPSgeometry = new THREE.BufferGeometry().setFromPoints(GPSpoints);
-
       let GPSvisu_mesh = new THREE.Line(GPSgeometry, GPSmaterial);
       this.visu_meshes.push(GPSvisu_mesh);
-
       this.controller.threeViewer.scene.add(GPSvisu_mesh);
     },
+    /**
+     * Récupère les points de contrôle et dessine un cylindre jaune dans la scène à l'appelle de cette fonction.
+     */
     async addCPs() {
       let cps = await getControlPoints();
 
       // Coordinates of the 10 points
       cps.forEach(point => {
         let worldCoords = toRaw(this.controller).threeViewer.getWorldCoords([point.x, point.y]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-        let geometry = new THREE.CircleGeometry(10, 32);
-        let material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+        let geometry = new THREE.CylinderGeometry(10, 10, 70, 70);
+        let material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
         let circle = new THREE.Mesh(geometry, material);
         circle.position.x = worldCoords[0];
         circle.position.y = worldCoords[1];
-        circle.position.z = 0;
+        circle.position.z = 35;
+        circle.rotation.x = Math.PI / 2;
         this.controller.threeViewer.scene.add(circle);
-        console.log("eee2", point)
 
 
         this.pdcs.push(circle);
       })
     },
+    /**
+     * Supprime la géométrie, le matériau et le maillage three.js de l'objet mesh spécifié.
+     * @param {*} mesh L'objet mesh three.js à supprimer.
+     */
     disposeThreeMesh(mesh) {
       mesh.geometry.dispose();
       mesh.material.dispose();
       this.controller.threeViewer.scene.remove(mesh);
     },
+    /**
+     * Supprime les points de contrôle de la scène.
+     */
     removeCPS() {
       this.pdcs.forEach(pdc => {
         this.disposeThreeMesh(pdc);
@@ -735,6 +891,9 @@ export default {
 
       this.pdcs = [];
     },
+    /**
+     * Supprime tous les marqueurs d'équipe de la carte en supprimant les mesh ThreeJS associés.
+     */
     removeTeamMarkers() {
       this.teamMarkers.forEach(teamMarker => {
         this.disposeThreeMesh(teamMarker);
@@ -742,6 +901,11 @@ export default {
 
       this.teamMarkers = [];
     },
+    /**
+     *  Ajoute un marqueur pour l'équipe sélectionnée à l'instant donné.
+     * @param {*} deviceNumber Le numéro de l'appareil de l'équipe.
+     * @param {*} timeStamp Le temps de l'instant sélectionné.
+     */
     async addTeamMarker(deviceNumber, timeStamp) {
       this.device = deviceNumber;
       this.time_stamp = timeStamp;
@@ -762,19 +926,54 @@ export default {
           this.teamMarkers.push(sphere);
         }
       }
-    }
+    },
+    async changeDiffPart(obj) {
+      const diff_data = await fetch(`http://localhost:5500/diff`, {
+        method: 'GET'
+      }).then(response => response.json())
+      this.controller.threeViewer.traj_parts.children.forEach(child => {
+        child.material.color.setRGB(
+          1,
+          1 - (diff_data[child.cp].niveau_diff + 1) / 6,
+          1 - (diff_data[child.cp].niveau_diff + 1) / 6,
+        )
+      })
+      obj.material.color.setRGB(0.3, 0.3, 1)
+      this.toast.add(
+        {
+          severity: 'success',
+          summary: 'Description',
+          detail:
+            " ID de la zone = " + diff_data[obj.cp].id +
+            " Dénivelé + = " + diff_data[obj.cp].denivele_positif +
+            " m, Dénivelé - = " + diff_data[obj.cp].denivele_negatif +
+            " m, Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance +
+            " km, Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee +
+            " km, niveau de difficulté = " + diff_data[obj.cp].niveau_diff,
+          life: 5000
+        }
+      );
+
+    },
   }
 }
 </script>
 
 <style>
+html {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  top: 200px;
+  width: 100%;
+  height: 100%;
 }
 
 #map {

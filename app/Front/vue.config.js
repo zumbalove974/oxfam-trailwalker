@@ -31,6 +31,12 @@ module.exports = defineConfig({
       template: 'public/index.html',
       title: 'About Page',
       chunks: ['chunk-vendors', 'chunk-common', 'about']
+    },
+    team: {
+      entry: 'src/pages/Team/team.js',
+      template: 'public/index.html',
+      title: 'Team Page',
+      chunks: ['chunk-vendors', 'chunk-common', 'team']
     }
   }
 })

@@ -51,7 +51,8 @@ export default {
                 },
                 {
                     label: 'Team',
-                    icon: 'pi pi-fw pi-user'
+                    icon: 'pi pi-fw pi-user',
+                    url: 'team'
                 },
                 {
                     label: 'Github',
