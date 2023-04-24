@@ -342,6 +342,8 @@ export default {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
+      console.log("oooooooooooooo", data[1] != this.visu_function)
+
       if (data[1] && (data[1] != this.visu_function)) {
         this.visu_function = data[1];
         this.visu_function(this.devices);
