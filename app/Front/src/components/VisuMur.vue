@@ -1309,6 +1309,7 @@ export default {
 
         async addDifficultyInfo(deviceNumbers) {
 
+            // Initialisation
             this.devices = deviceNumbers;
             this.visu_function = this.addDifficultyInfo;
 
@@ -1323,8 +1324,14 @@ export default {
             const diff_data = await fetch(`http://localhost:5500/diff`, {
                 method: 'GET'
             }).then(response => response.json())
+            let device_data = null;
+            if (deviceNumbers.length) {
+                device_data = await fetch(`http://localhost:5500/inter/${deviceNumbers[0]}`, {
+                    method: 'GET'
+                }).then(response => response.json())
+            }
 
-            // Detection CP
+            // Detection des points entre chaque cp
             const cp_points = [];
             for (let c = 0; c < cp_data.length - 1; c++) {
                 let cp = [];
@@ -1334,9 +1341,23 @@ export default {
                     }
                 }
                 cp_points.push(cp)
-            }
-            for (let c = 0; c < cp_points.length; c++) {
 
+                // Calcul vitesses moyennes si besoin
+                let vitesse_moyenne = null;
+                if (deviceNumbers.length) {
+                    let debut = new Date(device_data[cp[0]].timestamp)
+                    let fin = new Date(device_data[cp[cp.length - 1]].timestamp)
+                    let dist = diff_data[c].distance
+
+                    // Contourner le probleme des timestamp mal realises
+                    if (debut.getMonth() != fin.getMonth()) {
+                        debut.setMonth(fin.getMonth());
+                        debut.setDate(fin.getDate())
+                    }
+                    vitesse_moyenne = (dist / ((fin.getTime() - debut.getTime()) / 3600000))
+                }
+
+                // construction de l'objet Three.js
                 let shape = [];
 
                 for (let j = 0; j < cp_points[c].length - 2; j++) {
@@ -1404,6 +1425,9 @@ export default {
 
                 let visu_mesh = new THREE.Mesh(geometry, material);
                 visu_mesh.cp = c;
+                if (deviceNumbers.length) {
+                    visu_mesh.vitesse_moy = vitesse_moyenne;
+                }
                 this.controller.threeViewer.traj_parts.add(visu_mesh);
             }
         },
