@@ -638,6 +638,7 @@ export default {
       this.raycaster.setFromCamera(mouse, this.controller.threeViewer.perspectiveCamera);
       let intersected_traj_part = this.raycaster.intersectObjects(this.controller.threeViewer.traj_parts.children);
 
+      // Decallage de la carte en 2D
       this.pointer.x = 0;
       this.pointer.y = 0;
 
@@ -661,10 +662,12 @@ export default {
 
       this.controller.threeViewer.controls.enabled = true;
 
+      // Mise a jour de la visu Difficulte
       intersected_traj_part.forEach(intersection => {
         this.changeDiffPart(intersection.object)
       })
 
+      // Mise a jour des objects Three.js
       while (this.visu_meshes.length > 0) {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
@@ -988,6 +991,11 @@ export default {
         }
       }
     },
+    /**
+     * Change la couleur de l'objet selectionne, reset celle des autres, 
+     * et affiche un toast contenant les informations sur l'objet.
+     * @param {*} obj L'objet concerne, qui est une partie de la trajectoire.
+     */
     async changeDiffPart(obj) {
       const diff_data = await fetch(`http://localhost:5500/diff`, {
         method: 'GET'
@@ -1000,17 +1008,23 @@ export default {
         )
       })
       obj.material.color.setRGB(0.3, 0.3, 1)
+
+      let detail = " ID de la zone = " + diff_data[obj.cp].id +
+        " Dénivelé + = " + diff_data[obj.cp].denivele_positif +
+        " m, Dénivelé - = " + diff_data[obj.cp].denivele_negatif +
+        " m, Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance +
+        " km, Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee +
+        " km, niveau de difficulté = " + diff_data[obj.cp].niveau_diff
+
+      if (this.devices.length) {
+        detail += ", \nVitesse moyenne = " + obj.vitesse_moy + " km/h"
+      }
+
       this.toast.add(
         {
           severity: 'success',
           summary: 'Description',
-          detail:
-            " ID de la zone = " + diff_data[obj.cp].id +
-            " Dénivelé + = " + diff_data[obj.cp].denivele_positif +
-            " m, Dénivelé - = " + diff_data[obj.cp].denivele_negatif +
-            " m, Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance +
-            " km, Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee +
-            " km, niveau de difficulté = " + diff_data[obj.cp].niveau_diff,
+          detail: detail,
           life: 5000
         }
       );
