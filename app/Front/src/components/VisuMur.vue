@@ -65,7 +65,8 @@ export default {
     methods: {
         // fonction appelée lorsque l'utilisateur clique sur une checkbox
         display() {
-            toRaw(this.functions[toRaw(this.category).key])();
+            console.log("oooooooooo display")
+            //toRaw(this.functions[toRaw(this.category).key])();
             this.visu_function = this.functions[toRaw(this.category).key];
             // on envoit à la vue parente la focntion concernée et la nouvelle liste des vicualisations présentes dans la scène
             this.$emit("data", [this.visu_meshes, this.visu_function]);
@@ -115,6 +116,12 @@ export default {
         },
         // Visualisation qui fait varier la couleur et la hauteur (en z) en fonction de la vitesse
         async addItineraireSpeed3D(deviceNumbers) {
+
+            console.log("oooooooooo additi")
+
+            toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
+                this.disposeThreeMesh(sphere.mesh);
+            })
 
             this.devices = deviceNumbers;
             const device = this.devices[0];
@@ -237,20 +244,23 @@ export default {
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51)', 'rgb(0, 255, 51)']];
         },
         displayVisuMontagne() {
+
+            console.log("ooooooooo colline")
+
             this.toast.removeAllGroups();
 
             if (this.devices.length > 1)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-            else
+            else {
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation en 2D+1 permet de visualiser les vitesses des coureurs sur l'axe verticale ainsi que grâce au code couleur. Si vous ajoutez plusieurs équipes, leur vitesse est définit uniquement par le code couleur et l'axe verticale permet de comparer vitesses des différentes équipe sur chaque portion du terrain.", life: 10000 });
-
-            this.addItineraireSpeed3D(this.devices).then(res => {
 
                 this.dimension = 3;
                 this.createDimensionEnvironment(3);
 
-                this.$emit("legend", [tronquer(res[0], 2), tronquer(res[1], 2)]);
-            });
+                this.addItineraireSpeed3D(this.devices).then(res => {
+                    this.$emit("legend", [tronquer(res[0], 2), tronquer(res[1], 2)]);
+                });
+            }
         },
         addItineraire(deviceNumbers) {
 
@@ -284,6 +294,10 @@ export default {
             });
         },
         async addItineraireEpaisseur(deviceNumbers) {
+
+            toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
+                this.disposeThreeMesh(sphere.mesh);
+            })
 
             this.devices = deviceNumbers;
             const device = this.devices[0];
@@ -426,6 +440,10 @@ export default {
             return somme / data.length;
         },
         async addItineraireMoustache(deviceNumbers) {
+
+            toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
+                this.disposeThreeMesh(sphere.mesh);
+            })
 
             this.visu_function = this.addItineraireMoustache;
 
@@ -883,10 +901,10 @@ export default {
             this.devices = deviceNumbers;
 
             // supprime les objets de la visualisation s'il y en a (parfois des objets sont en cache)
-            this.controller.threeViewer.shperes.forEach(sphere => {
+            toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
-                this.disposeThreeMesh(sphere.wall);
-                this.disposeThreeMesh(sphere.line);
+                //this.disposeThreeMesh(sphere.wall);
+                //this.disposeThreeMesh(sphere.line);
             });
 
             let indexVisu = 0;
@@ -1088,6 +1106,10 @@ export default {
         },
         async addNightCoverage(deviceNumbers) {
 
+            toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
+                this.disposeThreeMesh(sphere.mesh);
+            })
+
             this.devices = deviceNumbers;
             this.visu_function = this.addNightCoverage;
 
@@ -1256,9 +1278,14 @@ export default {
         displayVisuEpaisseur() {
             this.toast.removeAllGroups();
 
-            if (this.devices.length > 1)
+            console.log("ooooooooo epaisseur")
+
+            if (this.devices.length > 1) {
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
-            else {
+                toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
+                    this.disposeThreeMesh(sphere.mesh);
+                })
+            } else {
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide. Le couleur de la ligne change également en fonction de la vitesse.", life: 5000 });
 
                 this.addItineraireEpaisseur(this.devices).then(res => {
@@ -1267,15 +1294,18 @@ export default {
             }
         },
         displayVisuMur() {
+
+            console.log("ooooooooooooo")
+
             this.toast.removeAllGroups();
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes. Plus la colline est haute et verte en un point plus l'équipe est rapide en ce point.", life: 5000 });
 
+
+            this.dimension = 3;
+            this.createDimensionEnvironment(3);
+
             this.addItineraireSpeedWall(this.devices).then(res => {
-
-                this.dimension = 3;
-                this.createDimensionEnvironment(3);
-
                 this.$emit("legend", res);
             });
         },
@@ -1284,10 +1314,10 @@ export default {
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 représentant des boîtes à moustache en continue. Le min, le max et les trois quartiles sont représentés.", life: 5000 });
 
-            this.addItineraireMoustache(this.devices);
-
             this.dimension = 3;
             this.createDimensionEnvironment(3);
+
+            this.addItineraireMoustache(this.devices);
         },
         displayVisuNuit() {
             this.toast.removeAllGroups();
@@ -1301,7 +1331,6 @@ export default {
                 this.$emit("legend", res);
             });
         },
-
         async addDifficultyInfo(deviceNumbers) {
 
             // Initialisation
@@ -1428,7 +1457,6 @@ export default {
             }
             this.visu_meshes.push(this.controller.threeViewer.traj_parts)
         },
-
         displayDifficultyInfo() {
             this.toast.removeAllGroups();
             this.visuFunction = this.displayDifficultyInfo;
