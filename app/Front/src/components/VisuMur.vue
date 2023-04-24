@@ -1307,6 +1307,7 @@ export default {
             // Initialisation
             this.devices = deviceNumbers;
             this.visu_function = this.addDifficultyInfo;
+            this.controller.threeViewer.scene.add(this.controller.threeViewer.traj_parts)
 
             this.controller.threeViewer.traj_parts.clear();
 
@@ -1425,6 +1426,7 @@ export default {
                 }
                 this.controller.threeViewer.traj_parts.add(visu_mesh);
             }
+            this.visu_meshes.push(this.controller.threeViewer.traj_parts)
         },
 
         displayDifficultyInfo() {
