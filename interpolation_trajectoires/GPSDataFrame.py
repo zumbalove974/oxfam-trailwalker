@@ -28,6 +28,11 @@ def connect():
 
 def sql_to_df(conn, query, column_names):
     # Transforme une requete SQL en DataFrame
+    #
+    # conn: connection a la base de donnees
+    # query: requete SQL a effectuer
+    # column_names: nom des collones attendues
+    # return: pandas Dataframe
 
     cursor = conn.cursor()
 
@@ -48,6 +53,8 @@ def sql_to_df(conn, query, column_names):
 
 def deviceList():
     # Liste les tables de donnees initiales
+    #
+    # return: pandas DataFrame des noms des tables
 
     query = """
         SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%Device%';
@@ -60,7 +67,10 @@ def deviceList():
 
 
 def deviceDF(tableName):
-    # R
+    # Recupere la table sous forme de DataFrame
+    #
+    # tableName: nom de la table a obtenir
+    # return: pandas DataFrame
 
     query = """
         SELECT "timestamp","x", "y" 
@@ -80,6 +90,10 @@ def deviceDF(tableName):
 
 
 def df_to_sql(df, table_name):
+    # Envoi un DataFrame vers la base de donnees
+    #
+    # df: DataFrame a envoyer
+    # table_name: nom de la table a creer dans la base de donnees
 
     engine = create_engine(
         'postgresql://postgres_user:postgres_password@localhost:6500/postgres_user'
