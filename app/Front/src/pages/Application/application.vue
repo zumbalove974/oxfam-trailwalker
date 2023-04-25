@@ -942,17 +942,34 @@ export default {
       // Coordinates of the 10 points
       cps.forEach(point => {
         let worldCoords = toRaw(this.controller).threeViewer.getWorldCoords([point.x, point.y]); // the getWorldCoords function transform webmercator coordinates into three js world coordinates
-        let geometry = new THREE.CylinderGeometry(10, 10, 70, 70);
-        let material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-        let circle = new THREE.Mesh(geometry, material);
-        circle.position.x = worldCoords[0];
-        circle.position.y = worldCoords[1];
-        circle.position.z = 35;
-        circle.rotation.x = Math.PI / 2;
-        this.controller.threeViewer.scene.add(circle);
 
+        if (this.dimension == 2) {
 
-        this.pdcs.push(circle);
+          const geometry = new THREE.CircleGeometry(5, 32);
+          const material = new THREE.MeshStandardMaterial({ color: 0xff9000 });
+          const cercle = new THREE.Mesh(geometry, material);
+
+          cercle.position.x = worldCoords[0];
+          cercle.position.y = worldCoords[1];
+          cercle.position.z = 0;
+
+          this.controller.threeViewer.scene.add(cercle);
+          this.pdcs.push(cercle);
+        } else {
+          const hauteurCylindre = 40;
+
+          const geometry = new THREE.CylinderGeometry(5, 5, hauteurCylindre, 64);
+          const material = new THREE.MeshBasicMaterial({ color: 0xff9000 });
+          const cylindre = new THREE.Mesh(geometry, material);
+
+          cylindre.position.x = worldCoords[0];
+          cylindre.position.y = worldCoords[1];
+          cylindre.position.z = hauteurCylindre / 2;
+          cylindre.rotation.x = Math.PI / 2;
+
+          this.controller.threeViewer.scene.add(cylindre);
+          this.pdcs.push(cylindre);
+        }
       })
     },
     /**
@@ -1002,26 +1019,31 @@ export default {
 
           if (this.dimension == 2) {
 
-            const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
+            const geometry = new THREE.CircleGeometry(5, 32);
             const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
             const sphere = new THREE.Mesh(geometry, material);
+
             sphere.position.x = worldCoords[0];
             sphere.position.y = worldCoords[1];
             sphere.position.z = 0;
-            this.controller.threeViewer.scene.add(sphere);
 
+            this.controller.threeViewer.scene.add(sphere);
             this.teamMarkers.push(sphere);
+
           } else {
+
             const hauteurCylindre = 40;
+
             const geometry = new THREE.CylinderGeometry(5, 5, hauteurCylindre, 64);
             const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
             const cylindre = new THREE.Mesh(geometry, material);
+
             cylindre.position.x = worldCoords[0];
             cylindre.position.y = worldCoords[1];
             cylindre.position.z = hauteurCylindre / 2;
             cylindre.rotateX(Math.PI / 2);
-            this.controller.threeViewer.scene.add(cylindre);
 
+            this.controller.threeViewer.scene.add(cylindre);
             this.teamMarkers.push(cylindre);
           }
         }
