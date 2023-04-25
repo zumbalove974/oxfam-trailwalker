@@ -310,6 +310,9 @@ export default {
 
       this.createDimensionEnvironment(this.dimension);
       this.createBoundingLimit();
+
+      document.addEventListener("pointerup", this.rightClickUp, true);
+      document.addEventListener("contextmenu", (e) => { e.preventDefault(); return false; })
     });
 
     const noms = await this.getNoms();
@@ -647,55 +650,43 @@ export default {
       return [x, y];
     },
     /**
-     * Méthode appelée lors du clic sur le bouton haut.
+     * Méthode appelée lors du clic sur le bouton de la souris en 2D.
      * Active le contrôle de la caméra, vérifie l'intersection avec le sol,
      * met à jour la position de la caméra et des coordonnées,
      * et lance la fonction de visualisation si des dispositifs sont présents.
      * Ajoute également des marqueurs d'équipe et des checkpoints si présents.
      */
-    clickUp() {
-      this.controller.threeViewer.controls.enabled = true;
-      this.pointerIsDown = false;
+    clickUp2D(event) {
+      if (event.button === 0) {
+        this.controller.threeViewer.controls.enabled = true;
+        this.pointerIsDown = false;
 
-      let mouse = {
-        x: (this.lastPointerX / window.innerWidth) * 2 - 1,
-        y: -(this.lastPointerY / window.innerHeight) * 2 + 1
-      }
+        // Decallage de la carte en 2D
+        this.pointer.x = 0;
+        this.pointer.y = 0;
 
-      this.raycaster.setFromCamera(mouse, this.controller.threeViewer.perspectiveCamera);
-      let intersected_traj_part = this.raycaster.intersectObjects(this.controller.threeViewer.traj_parts.children);
+        this.raycaster.setFromCamera(this.pointer, this.controller.threeViewer.perspectiveCamera);
+        let intersects = this.raycaster.intersectObjects(this.controller.threeViewer.planes.children);
 
-      // Decallage de la carte en 2D
-      this.pointer.x = 0;
-      this.pointer.y = 0;
+        if (intersects.length) {
+          let x = intersects[0].point.x * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[0];
+          let y = intersects[0].point.y * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[1];
 
-      this.raycaster.setFromCamera(this.pointer, this.controller.threeViewer.perspectiveCamera);
-      let intersects = this.raycaster.intersectObjects(this.controller.threeViewer.planes.children);
+          let verifiedCoords = this.verifyView([x, y]);
+          this.controller.olViewer.map.getView().setCenter(verifiedCoords);
+          this.controller.threeViewer.mapCenter = verifiedCoords;
+        }
 
-      if (intersects.length) {
-        let x = intersects[0].point.x * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[0];
-        let y = intersects[0].point.y * this.controller.threeViewer.zoomFactor + this.controller.threeViewer.mapCenter[1];
+        this.controller.threeViewer.controls.enabled = false;
 
-        let verifiedCoords = this.verifyView([x, y]);
-        this.controller.olViewer.map.getView().setCenter(verifiedCoords);
-        this.controller.threeViewer.mapCenter = verifiedCoords;
-      }
+        this.controller.threeViewer.perspectiveCamera.position.set(0, 0, this.cameraZ);
+        this.controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
+        this.controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
 
-      this.controller.threeViewer.controls.enabled = false;
+        this.controller.threeViewer.controls.enabled = true;
 
-      this.controller.threeViewer.perspectiveCamera.position.set(0, 0, this.cameraZ);
-      this.controller.threeViewer.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
-      this.controller.threeViewer.perspectiveCamera.rotation.z -= Math.PI / 2;
+        // Mise a jour des objects Three.js
 
-      this.controller.threeViewer.controls.enabled = true;
-
-      // Mise a jour de la visu Difficulte
-      intersected_traj_part.forEach(intersection => {
-        this.changeDiffPart(intersection.object)
-      })
-
-      // Mise a jour des objects Three.js
-      if (!intersected_traj_part.length) {
         while (this.visu_meshes.length > 0) {
           this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
         }
@@ -704,19 +695,41 @@ export default {
         }
         else
           this.addItineraireReference();
-      }
 
-      if (toRaw(this.teamMarkers).length > 0) {
-        this.removeTeamMarkers();
-        this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
-      }
 
-      if (toRaw(this.pdcs).length > 0) {
-        this.removeCPS();
-        this.addCPs();
-      }
+        if (toRaw(this.teamMarkers).length > 0) {
+          this.removeTeamMarkers();
+          this.addTeamMarker(this.deviceNumber, this.selectedTimestamp);
+        }
 
-      this.createBoundingLimit();
+        if (toRaw(this.pdcs).length > 0) {
+          this.removeCPS();
+          this.addCPs();
+        }
+
+        this.createBoundingLimit();
+      }
+    },
+    /**
+     * Méthode appelée lors du clic sur le bouton droit de la souris.
+     * N'agit que sur la visualisation Difficulte
+     * @param {*} event L'evenement de clic de souris
+     */
+    rightClickUp(event) {
+      if (event.button === 2) {
+        let mouse = {
+          x: (event.clientX / window.innerWidth) * 2 - 1,
+          y: -(event.clientY / window.innerHeight) * 2 + 1
+        }
+
+        this.raycaster.setFromCamera(mouse, this.controller.threeViewer.perspectiveCamera);
+        let intersected_traj_part = this.raycaster.intersectObjects(this.controller.threeViewer.traj_parts.children);
+
+        // Mise a jour de la visu Difficulte
+        intersected_traj_part.forEach(intersection => {
+          this.changeDiffPart(intersection.object)
+        })
+      }
     },
     /**
      * Gère l'événement de clic de souris enfoncée.
@@ -851,7 +864,7 @@ export default {
     /* Ajoute les évènements du scroll et du drag lorsqu'on est en 2D */
     addEventListeners() {
       /* On désactive l'orbit control lors du click (drag) */
-      document.addEventListener("pointerup", this.clickUp, true);
+      document.addEventListener("pointerup", this.clickUp2D, true);
       document.addEventListener("pointerdown", this.clickDown, true);
       document.addEventListener("pointermove", this.clickMove, true);
       /* On modifie le zoom de la map lors du zoom et on ne change pas la position de la camera contrairement au fonctionement par défault de l'orbit control */
@@ -859,7 +872,7 @@ export default {
     },
     /* Supprime les évènements du scroll et du drag lorsqu'on passe en 3D */
     removeEventListeners() {
-      document.removeEventListener("pointerup", this.clickUp, true);
+      document.removeEventListener("pointerup", this.clickUp2D, true);
       document.removeEventListener("pointerdown", this.clickDown, true);
       document.removeEventListener("pointermove", this.clickMove, true);
       this.controller.threeViewer.controls.removeEventListener('change', this.scroll, true);
