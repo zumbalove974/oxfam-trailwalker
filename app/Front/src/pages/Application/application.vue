@@ -116,16 +116,20 @@
     </div>
   </div>
 
-  <div @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }">
-    <Dialog v-model:visible="helpVisible" :style="{ width: '50vw' }" :position="'bottom'">
-      <p>
-        {{ textHelp[helpIndex] }}
-      </p>
-      <template #footer>
-        <Button :label="btnTextHelp" icon="pi pi-angle-double-right" @click="nextHelp" autofocus />
-      </template>
-    </Dialog>
-  </div>
+  <Dialog v-model:visible="helpVisible" :style="{ width: '50vw' }" :position="'bottom'">
+    <p>
+      {{ textHelp[helpIndex] }}
+    </p>
+    <template #footer>
+      <Button :label="btnTextHelp" icon="pi pi-angle-double-right" @click="nextHelp" autofocus />
+    </template>
+  </Dialog>
+
+  <Dialog v-model:visible="isVisuDiffDesc" :style="{ width: '30vw' }" :position="'bottomleft'" @hide="resetVisuDiffDesc">
+    <p v-for="detail in details" :key="detail">
+      {{ detail }}
+    </p>
+  </Dialog>
 
   <Fieldset v-if="isLegend" legend="Légende" class="onglet bottom-left" :toggleable="true">
     <div id="legend" :style="{ background: rgbLegend }">
@@ -213,6 +217,9 @@ export default {
       btnTextHelp: "Suivant",
       borderStyle: 'dashed 3px blueviolet',
       accordionStyle: "",
+      // Onglet de description pour la visu difficulté
+      isVisuDiffDesc: false,
+      details: [],
       getLiveDataDevice: getLiveDataDevice,
       getNoms: getNoms,
       dimension: 2,
@@ -1067,27 +1074,25 @@ export default {
       })
       obj.material.color.setRGB(0.3, 0.3, 1)
 
-      let detail = " ID de la zone = " + diff_data[obj.cp].id +
-        " Dénivelé + = " + diff_data[obj.cp].denivele_positif +
-        " m, Dénivelé - = " + diff_data[obj.cp].denivele_negatif +
-        " m, Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance +
-        " km, Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee +
-        " km, niveau de difficulté = " + diff_data[obj.cp].niveau_diff
+      this.details = [];
+
+      this.details.push("ID de la zone = " + diff_data[obj.cp].id);
+      this.details.push("Dénivelé + = " + diff_data[obj.cp].denivele_positif + "m,");
+      this.details.push("Dénivelé - = " + diff_data[obj.cp].denivele_negatif + "m,");
+      this.details.push("Distance depuis le dernier point de contrôle = " + diff_data[obj.cp].distance + "km,");
+      this.details.push("Distance depuis le début de la course = " + diff_data[obj.cp].distance_cummulee + "km,");
+      this.details.push("Niveau de difficulté = " + diff_data[obj.cp].niveau_diff);
 
       if (this.devices.length) {
-        detail += ", \nVitesse moyenne = " + obj.vitesse_moy + " km/h"
+        this.details += "Vitesse moyenne = " + obj.vitesse_moy + " km/h."
       }
 
-      this.toast.add(
-        {
-          severity: 'success',
-          summary: 'Description',
-          detail: detail,
-          life: 5000
-        }
-      );
-
+      this.isVisuDiffDesc = true;
     },
+    resetVisuDiffDesc() {
+      this.isVisuDiffDesc = false;
+      this.details = [];
+    }
   }
 }
 </script>
