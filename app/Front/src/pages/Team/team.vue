@@ -10,8 +10,9 @@
       <div class="flexColumn center">
         <img class="image" src="./../../assets/DD.png" alt="Avatar">
         <h4> Damien D'arras </h4>
-        <h5> The light of my devotion will set the world aflame.</h5>
-        <h5>- death metal and kpop enthusiast - </h5>
+        <h5> The light of my devotion will set the world aflame.
+          <br>- Death metal and kpop enthusiast -
+        </h5>
         <a label="Go to linkedin" href='https://fr.linkedin.com/in/damien-d-arras-9b38a4239'>
           <i class="pi pi-linkedin"></i>
         </a>
@@ -22,8 +23,9 @@
       <div class="flexColumn center">
         <img class="image" src="./../../assets/LS.png" alt="Avatar">
         <h4> Lina Saba </h4>
-        <h5> By grace, through faith. </h5>
-        <h5> - Ambitious soul - </h5>
+        <h5> By grace, through faith.
+          <br> - Ambitious soul -
+        </h5>
 
         <a label="Go to linkedin" href='https://fr.linkedin.com/in/lina-s-59678a157'>
           <i class="pi pi-linkedin"></i>
@@ -36,7 +38,10 @@
       <div class="flexColumn center">
         <img class="image" src="./../../assets/HA.png" alt="Avatar">
         <h4> Hiba Ait Oumajoud </h4>
-        <h5> phrase </h5>
+        <h5> Choose a lazy person to do a hard job.
+          <br>Because a lazy person will find an easy way to do it
+          <br>- A lazy person -
+        </h5>
         <a label="Go to linkedin" href='https://ma.linkedin.com/in/hiba-ait-oumajoud-775055182'>
           <i class="pi pi-linkedin"></i>
         </a>
@@ -47,7 +52,9 @@
       <div class="flexColumn center">
         <img class="image" src="./../../assets/EO.png" alt="Avatar">
         <h4> Omran Edoo </h4>
-        <h5> Les actes ne valent que par leurs intentions. </h5>
+        <h5> Les actes ne valent que par leurs intentions.
+          <br>- A butter chicken lover -
+        </h5>
         <a label="Go to linkedin" href='https://fr.linkedin.com/in/omran-edoo-6a170022a'>
           <i class="pi pi-linkedin"></i>
         </a>
@@ -103,7 +110,6 @@ export default {
   border-radius: 50%;
   width: 200px;
   height: 200px;
-  margin-bottom: 10px;
   object-fit: contain;
 }
 
@@ -119,7 +125,7 @@ export default {
 
 .teamWrapper {
   color: whitesmoke;
-  padding: 2px;
+  padding: 1px;
   font-family: Verdana, Geneva, Tahoma, sans-serif
 }
 </style>
