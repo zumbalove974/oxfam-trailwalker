@@ -8,7 +8,7 @@
 
     <div class="wrapper">
       <div class="flexColumn center">
-        <img class="image" :src="srcDD" @mouseover="hover = true" @mouseleave="hover = false" alt="Avatar">
+        <img class="image" src="./../../assets/DD.png" alt="Avatar">
         <h4> Damien D'arras </h4>
         <h5> The light of my devotion will set the world aflame.</h5>
         <h5>- death metal and kpop enthusiast - </h5>
@@ -73,24 +73,7 @@ export default {
   name: 'App',
   components: {
     MenuBar,
-  },
-  data() {
-    return {
-      srcDD: require("./../../assets/DD.png"),
-      srcDDhov: require("./../../assets/DDhov.jpg"),
-      hover: false
-    }
-  },
-  computed: {
-    pictureHover() {
-      if (this.hover == true) {
-        return this.srcDD
-      } else {
-        return this.srcDDhov
-      }
-    }
   }
-
 }
 </script>
 
