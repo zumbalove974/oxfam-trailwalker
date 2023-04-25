@@ -996,17 +996,34 @@ export default {
 
       for (let i = 0; i < teamPositions.length; i++) {
         if (teamPositions[i].timestamp === this.time_stamp) {
+
           // Convert the team's position from Web Mercator to world coordinates
           const worldCoords = this.controller.threeViewer.getWorldCoords([teamPositions[i].x, teamPositions[i].y]);
-          const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
-          const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
-          const sphere = new THREE.Mesh(geometry, material);
-          sphere.position.x = worldCoords[0];
-          sphere.position.y = worldCoords[1];
-          sphere.position.z = 0;
-          this.controller.threeViewer.scene.add(sphere);
 
-          this.teamMarkers.push(sphere);
+          if (this.dimension == 2) {
+
+            const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
+            const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.x = worldCoords[0];
+            sphere.position.y = worldCoords[1];
+            sphere.position.z = 0;
+            this.controller.threeViewer.scene.add(sphere);
+
+            this.teamMarkers.push(sphere);
+          } else {
+            const hauteurCylindre = 40;
+            const geometry = new THREE.CylinderGeometry(5, 5, hauteurCylindre, 64);
+            const material = new THREE.MeshStandardMaterial({ color: 0x297540 });
+            const cylindre = new THREE.Mesh(geometry, material);
+            cylindre.position.x = worldCoords[0];
+            cylindre.position.y = worldCoords[1];
+            cylindre.position.z = hauteurCylindre / 2;
+            cylindre.rotateX(Math.PI / 2);
+            this.controller.threeViewer.scene.add(cylindre);
+
+            this.teamMarkers.push(cylindre);
+          }
         }
       }
     },
