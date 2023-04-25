@@ -59,6 +59,17 @@ export default {
             },
         }
     },
+    watch: {
+        devicesProps: {
+            handler(oldDevices) {
+                if (this.visu_function)
+                    this.visu_function(oldDevices);
+
+                this.devices = oldDevices;
+            },
+            deep: true
+        }
+    },
     mounted() {
         this.toast = useToast();
     },
@@ -115,15 +126,12 @@ export default {
             return vertices;
         },
         // Visualisation qui fait varier la couleur et la hauteur (en z) en fonction de la vitesse
-        async addItineraireSpeed3D(deviceNumbers) {
-
-            console.log("oooooooooo additi")
+        async addItineraireSpeed3D() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.devices = deviceNumbers;
             const device = this.devices[0];
             this.visu_function = this.addItineraireSpeed3D;
 
@@ -262,9 +270,8 @@ export default {
                 });
             }
         },
-        addItineraire(deviceNumbers) {
+        addItineraire() {
 
-            this.devices = deviceNumbers;
             //device = devices[0]; //////temporaire
             this.devices.forEach(async device => {
                 this.visu_function = this.addItineraire;
@@ -293,13 +300,12 @@ export default {
                 this.controller.threeViewer.scene.add(visu_mesh);
             });
         },
-        async addItineraireEpaisseur(deviceNumbers) {
+        async addItineraireEpaisseur() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.devices = deviceNumbers;
             const device = this.devices[0];
 
             const trace = await getLiveDataDevice(device);
@@ -400,7 +406,7 @@ export default {
             geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
 
             let visu_mesh = new THREE.Mesh(geometry, material);
-            this.visu_meshes.push(visu_mesh)
+            this.visu_meshes.push(visu_mesh);
             this.controller.threeViewer.scene.add(visu_mesh);
 
             this.visu_function = this.addItineraireEpaisseur;
@@ -439,15 +445,13 @@ export default {
 
             return somme / data.length;
         },
-        async addItineraireMoustache(deviceNumbers) {
+        async addItineraireMoustache() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
             this.visu_function = this.addItineraireMoustache;
-
-            this.devices = deviceNumbers;
 
             let devicesData = [];
 
@@ -896,15 +900,11 @@ export default {
             this.controller.threeViewer.scene.add(lineQ1);
             this.controller.threeViewer.scene.add(lineQ0);
         },
-        async addItineraireSpeedWall(deviceNumbers) {
-
-            this.devices = deviceNumbers;
+        async addItineraireSpeedWall() {
 
             // supprime les objets de la visualisation s'il y en a (parfois des objets sont en cache)
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
-                //this.disposeThreeMesh(sphere.wall);
-                //this.disposeThreeMesh(sphere.line);
             });
 
             let indexVisu = 0;
@@ -1104,19 +1104,18 @@ export default {
 
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
-        async addNightCoverage(deviceNumbers) {
+        async addNightCoverage() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.devices = deviceNumbers;
             this.visu_function = this.addNightCoverage;
 
             const date_nuit = "2021-03-07T21:57:00.000Z";
             const date_matin = "2021-04-07T05:53:00.000Z";
 
-            const devices_data = await Promise.all(deviceNumbers.map(d => getLiveDataDevice(d)));
+            const devices_data = await Promise.all(this.devices.map(d => getLiveDataDevice(d)));
 
             const device_night = devices_data.map(t => {
                 let i_debut = 0;
@@ -1282,7 +1281,7 @@ export default {
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
                 toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                     this.disposeThreeMesh(sphere.mesh);
-                })
+                });
             } else {
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide. Le couleur de la ligne change également en fonction de la vitesse.", life: 5000 });
 
@@ -1296,7 +1295,6 @@ export default {
             this.toast.removeAllGroups();
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes. Plus la colline est haute et verte en un point plus l'équipe est rapide en ce point.", life: 5000 });
-
 
             this.dimension = 3;
             this.createDimensionEnvironment(3);
@@ -1328,6 +1326,10 @@ export default {
             });
         },
         async addDifficultyInfo(deviceNumbers) {
+
+            toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
+                this.disposeThreeMesh(sphere.mesh);
+            })
 
             // Initialisation
             this.devices = deviceNumbers;
