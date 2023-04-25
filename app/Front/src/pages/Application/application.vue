@@ -42,7 +42,10 @@
       <div class="flexColumn">
         <div class="flexRow evenly upSize spaceDown"
           :style="[helpIndex === 1 ? { 'border': borderStyle } : { 'border': '' }]">
-          <InputNumber placeholder="Device ID" v-model="deviceNumber" inputId="integeronly" />
+
+          <Dropdown v-model="deviceNumber" :options="devices" placeholder="Selectionnez une équipe"
+            class="w-full md:w-14rem" />
+
           <div class="card flex justify-content-center">
             <Button id="addTeamBtn" label="Ajouter les time stamps" @click="loadTimestamps"></Button>
           </div>
@@ -443,6 +446,7 @@ export default {
      *  Permet de charger les timestamps des données en temps réel d'un périphérique spécifié par deviceNumber
      */
     async loadTimestamps() {
+      console.log("hhhhhhh ", this.deviceNumber)
       try {
         const liveData = await getLiveDataDevice(this.deviceNumber);
         const timestamps = liveData.map(row => row.timestamp);
