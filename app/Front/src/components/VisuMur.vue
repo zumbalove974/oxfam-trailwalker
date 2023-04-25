@@ -1278,8 +1278,6 @@ export default {
         displayVisuEpaisseur() {
             this.toast.removeAllGroups();
 
-            console.log("ooooooooo epaisseur")
-
             if (this.devices.length > 1) {
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
                 toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
@@ -1294,8 +1292,6 @@ export default {
             }
         },
         displayVisuMur() {
-
-            console.log("ooooooooooooo")
 
             this.toast.removeAllGroups();
 
