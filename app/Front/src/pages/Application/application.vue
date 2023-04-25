@@ -252,7 +252,6 @@ export default {
       deviceNumber: null,
       deviceNumberFrom: null,
       deviceNumberTo: null,
-      visuFunction: null,
       controller: null,
       visu_function: null,
       pdcs: [],
@@ -355,11 +354,9 @@ export default {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      console.log("oooooooooooooo", data[1] != this.visu_function)
-
       if (data[1] && (data[1] != this.visu_function)) {
         this.visu_function = data[1];
-        this.visu_function(this.devices);
+        this.visu_function();
       }
       else {
         this.addItineraireReference();
@@ -378,7 +375,6 @@ export default {
         this.rgbLegend += couleur + ','
       });
       this.rgbLegend = this.rgbLegend.substring(0, this.rgbLegend.length - 1) + ')';
-      console.log("----", this.rgbLegend);
       this.isLegend = true;
     },
     /**
@@ -446,7 +442,6 @@ export default {
      *  Permet de charger les timestamps des données en temps réel d'un périphérique spécifié par deviceNumber
      */
     async loadTimestamps() {
-      console.log("hhhhhhh ", this.deviceNumber)
       try {
         const liveData = await getLiveDataDevice(this.deviceNumber);
         const timestamps = liveData.map(row => row.timestamp);
@@ -501,8 +496,10 @@ export default {
      */
     onRowSelect(event) {
       this.devices.push(event.data.id);
-      if (this.visuFunction)
-        this.visuFunction();
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
     },
     /**
      * Gère l'événement de déselection d'une ligne dans un tableau.
@@ -511,11 +508,12 @@ export default {
      * @param {*} event L'événement de déselection de ligne.
      */
     onRowUnselect(event) {
-      this.devices = this.devices.filter(function (item) {
-        return item !== event.data.id;
-      })
-      if (this.visuFunction)
-        this.visuFunction();
+
+      this.devices = this.devices.filter(item => item != event.data.id);
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
     },
     /**
      * Ajoute toutes les équipes sélectionnées à la liste des équipes à afficher
@@ -526,8 +524,9 @@ export default {
         this.devices.push(device.id);
       })
 
-      if (this.visuFunction)
-        this.visuFunction();
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
     },
     /**
      * Gère l'événement de déselection de toutes les lignes
@@ -535,8 +534,9 @@ export default {
     onRowUnselectAll() {
       this.devices = [];
 
-      if (this.visuFunction)
-        this.visuFunction();
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
     },
     /**
      * Obtient le nom du dispositif à partir du nom de la table.
@@ -695,11 +695,10 @@ export default {
           this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
         }
         if (this.visu_function) {
-          this.visu_function(this.devices);
+          this.visu_function();
         }
         else
           this.addItineraireReference();
-
 
         if (toRaw(this.teamMarkers).length > 0) {
           this.removeTeamMarkers();
@@ -792,7 +791,7 @@ export default {
         }
 
         if (this.visu_function)
-          this.visu_function(this.devices);
+          this.visu_function();
         else
           this.addItineraireReference();
       }
@@ -855,7 +854,7 @@ export default {
       }
 
       if (this.visu_function) {
-        this.visu_function(this.devices);
+        this.visu_function();
       }
       else
         this.addItineraireReference();
@@ -904,13 +903,9 @@ export default {
 
         this.addEventListeners();
 
-
-        //this.controller.threeViewer.scene.remove(wall);
-        //this.controller.threeViewer.scene.remove(mesh);
-
         if (this.visu_function)
+          this.visu_function();
 
-          this.visu_function(this.devices);
       } else {
         console.log("___dimension 3___");
 
