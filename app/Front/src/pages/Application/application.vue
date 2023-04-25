@@ -2,7 +2,8 @@
   <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
   <div id="map" class="map"></div>
 
-  <Toast position="bottom-center" />
+  <Toast @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    position="bottom-center" />
 
   <Accordion :style="[helpIndex === 0 ? { 'border': borderStyle } : { 'border': '' }]" @pointerover="removeEventListeners"
     v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }" :activeIndex="accordionIndex" class="onglet up">

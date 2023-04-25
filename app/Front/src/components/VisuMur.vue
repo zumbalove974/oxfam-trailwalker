@@ -66,6 +66,8 @@ export default {
                     this.visu_function(oldDevices);
 
                 this.devices = oldDevices;
+
+                console.log("rrr", this.visu_function);
             },
             deep: true
         }
@@ -252,8 +254,6 @@ export default {
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51)', 'rgb(0, 255, 51)']];
         },
         displayVisuMontagne() {
-
-            console.log("ooooooooo colline")
 
             this.toast.removeAllGroups();
 
@@ -1319,7 +1319,7 @@ export default {
             if (this.devices.length === 0)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
             else
-                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit. Plus il y a d'équipe qui sont sur une même portion la nuit plus la couleur de la trajectoir est \"chaude\".", life: 5000 });
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit. Plus il y a d'équipe qui sont sur une même portion la nuit plus la couleur de la trajectoire est \"chaude\".", life: 5000 });
 
             this.addNightCoverage(this.devices).then(res => {
                 this.$emit("legend", res);
