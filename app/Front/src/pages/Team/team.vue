@@ -2,10 +2,16 @@
   <div id="app"> </div>
   <MenuBar pageName='Accueil' pageURL="home"></MenuBar>
   <div class="teamWrapper" id="who-we-are">
+    <h1>Notre équipe</h1>
+    <h4> Nous sommes un groupe de quatre étudiants en dernière année du cycle ingénieur à l'École Nationale des Sciences
+      Géographiques. Passionés par l'Informatique, nous étudions les Technologies des Systèmes d'Information. </h4>
+
     <div class="wrapper">
       <div class="flexColumn center">
-        <img class="image" src="./../../assets/DD.png" alt="Avatar">
+        <img class="image" :src="srcDD" @mouseover="hover = true" @mouseleave="hover = false" alt="Avatar">
         <h4> Damien D'arras </h4>
+        <h5> The light of my devotion will set the world aflame.</h5>
+        <h5>- death metal and kpop enthusiast - </h5>
         <a label="Go to linkedin" href='https://fr.linkedin.com/in/damien-d-arras-9b38a4239'>
           <i class="pi pi-linkedin"></i>
         </a>
@@ -16,8 +22,10 @@
       <div class="flexColumn center">
         <img class="image" src="./../../assets/LS.png" alt="Avatar">
         <h4> Lina Saba </h4>
-        <a label="Go to linkedin"
-          href='https://fr.linkedin.com/in/lina-s-59678a157/fr?trk=people-guest_people_search-card'>
+        <h5> By grace, through faith. </h5>
+        <h5> - Ambitious soul - </h5>
+
+        <a label="Go to linkedin" href='https://fr.linkedin.com/in/lina-s-59678a157'>
           <i class="pi pi-linkedin"></i>
         </a>
         <a label="Go to Github" href='https://github.com/LinaSaba'>
@@ -28,7 +36,8 @@
       <div class="flexColumn center">
         <img class="image" src="./../../assets/HA.png" alt="Avatar">
         <h4> Hiba Ait Oumajoud </h4>
-        <a label="Go to linkedin" href='https://ma.linkedin.com/in/hiba-ait-oumajoud-775055182/en'>
+        <h5> phrase </h5>
+        <a label="Go to linkedin" href='https://ma.linkedin.com/in/hiba-ait-oumajoud-775055182'>
           <i class="pi pi-linkedin"></i>
         </a>
         <a label="Go to Github" href='https://github.com/hibaa-ai'>
@@ -38,6 +47,7 @@
       <div class="flexColumn center">
         <img class="image" src="./../../assets/EO.png" alt="Avatar">
         <h4> Omran Edoo </h4>
+        <h5> Les actes ne valent que par leurs intentions. </h5>
         <a label="Go to linkedin" href='https://fr.linkedin.com/in/omran-edoo-6a170022a'>
           <i class="pi pi-linkedin"></i>
         </a>
@@ -58,11 +68,29 @@ import "primeicons/primeicons.css";
 import MenuBar from '../../components/MenuBar.vue'
 //import AvatarGroup from 'primevue/avatargroup';   //Optional for grouping
 
+
 export default {
   name: 'App',
   components: {
     MenuBar,
+  },
+  data() {
+    return {
+      srcDD: require("./../../assets/DD.png"),
+      srcDDhov: require("./../../assets/DDhov.jpg"),
+      hover: false
+    }
+  },
+  computed: {
+    pictureHover() {
+      if (this.hover == true) {
+        return this.srcDD
+      } else {
+        return this.srcDDhov
+      }
+    }
   }
+
 }
 </script>
 
@@ -86,7 +114,6 @@ export default {
   justify-self: center;
   align-self: center;
   width: fit-content;
-  padding-bottom: 10px;
 }
 
 .image {
@@ -99,14 +126,17 @@ export default {
 
 .flexColumn {
   justify-self: center;
-  display: flex;
-  flex-direction: column;
+  padding: 5px;
 }
 
 .wrapper {
   display: grid;
   grid-template: "a a" auto;
-  color: blueviolet;
+}
 
+.teamWrapper {
+  color: whitesmoke;
+  padding: 2px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif
 }
 </style>
