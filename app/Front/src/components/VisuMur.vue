@@ -41,6 +41,7 @@ export default {
         return {
             devices: this.devicesProps,
             visu_function: this.visu_functionProps,
+            visu_function_app: null,
             dimension: this.dimensionProps,
             controller: this.controllerProps,
             visu_meshes: this.visu_meshesProps,
@@ -62,7 +63,7 @@ export default {
     watch: {
         devicesProps: {
             handler(oldDevices) {
-                if (this.visu_function)
+                if (this.visu_function && this.visu_function == this.visu_functionProps)
                     this.visu_function(oldDevices);
 
                 this.devices = oldDevices;
@@ -70,6 +71,11 @@ export default {
                 console.log("rrr", this.visu_function);
             },
             deep: true
+        },
+        visu_functionProps: {
+            handler(oldVisu) {
+                this.visu_function_app = oldVisu;
+            }
         }
     },
     mounted() {
