@@ -423,16 +423,16 @@ export default {
       this.helpIndex = -1;
     },
     mettreEnPause() {
-      console.log("___", this.pause)
+      console.log("___", toRaw(this.pause).value)
       if (this.pause) {
         switch (toRaw(this.pause).value) {
           case 0:
             this.controller.threeViewer.animeTrailer = false;
-            //this.controller.threeViewer.state.clock.stop();
+            console.log("___", this.controller.threeViewer.state.clock.elapsedTime);
             break;
           case 1:
             this.controller.threeViewer.animeTrailer = true;
-            //this.controller.threeViewer.state.clock.start();
+            console.log("___", this.controller.threeViewer.state.clock.elapsedTime);
             break;
           case 2:
             this.controller.threeViewer.shperes.forEach(sphere => {
@@ -1172,7 +1172,7 @@ export default {
       this.details.push("Niveau de difficulté = " + diff_data[obj.cp].niveau_diff);
 
       if (this.devices.length) {
-        this.details += "Vitesse moyenne = " + obj.vitesse_moy + " km/h."
+        this.details.push("Vitesse moyenne = " + obj.vitesse_moy + " km/h.");
       }
 
       this.isVisuDiffDesc = true;
