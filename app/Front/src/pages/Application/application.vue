@@ -361,7 +361,7 @@ export default {
       }
       else {
         this.addItineraireReference();
-      }////////
+      }
     },
     actualiserLegend: function (legend) {
       this.legends = [];

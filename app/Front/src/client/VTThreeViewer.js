@@ -434,6 +434,7 @@ export class VTThreeViewer {
     //let self = this;
     this.rayCaster.setFromCamera(new THREE.Vector2(x, y), this.currentCamera);
     var intersects = this.rayCaster.intersectObjects(this.planes.children);
+    console.log(this.zoomFactor);
     console.log(intersects);
     console.log(
       "point",
