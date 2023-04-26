@@ -129,6 +129,23 @@
     </template>
   </Dialog>
 
+  <Dialog v-model:visible="navHelpVisible" :style="{ width: '50vw' }" :position="'bottom'">
+    <p>
+      En 2D, le drag and drop permet de se déplacer sur la carte et la molette permet de zoomer.
+    </p>
+    <p>
+      En 3D, le drag and drop permet de faire des rotation,la molette permet de zoomer et les touches directionnelles
+      permettent de se déplacer.
+    </p>
+    <p>
+      Pour la visualisation difficulté, le clic droit sur une portion de la trajectoire permet d'afficher les informations
+      correspondantes.
+    </p>
+    <p>
+      Certaines visualisations mettent un peu temps à charger en fonction du nombre de devices sélectionné.
+    </p>
+  </Dialog>
+
   <Dialog v-model:visible="isVisuDiffDesc" :style="{ width: '30vw' }" :position="'bottomleft'" @hide="resetVisuDiffDesc">
     <p v-for="detail in details" :key="detail">
       {{ detail }}
@@ -219,6 +236,7 @@ export default {
         "Ce bouton permet de passer de la 2D à la 3D et vice versa."
       ],
       btnTextHelp: "Suivant",
+      navHelpVisible: false,
       borderStyle: 'dashed 3px blueviolet',
       accordionStyle: "",
       // Onglet de description pour la visu difficulté
@@ -300,6 +318,13 @@ export default {
             this.helpVisible = true;
             this.helpIndex = 0;
           }
+        },
+        {
+          label: 'Bouton navigation',
+          icon: 'pi pi-wrench',
+          command: () => {
+            this.navHelpVisible = true;
+          }
         }
       ]
     }
@@ -333,9 +358,6 @@ export default {
 
     // Modification du style des bouton du speed dial 
     // On y a pas accès autrement que par le DOM
-    //document.getElementById("speedial_0").children[0].innerHTML = "";
-    //document.getElementById("speedial_1").children[0].innerHTML = "";
-
     document.getElementById("speedial_0").children[0].style = "background-color: green";
     document.getElementById("speedial_1").children[0].style = "background-color: cyan";
 
