@@ -120,7 +120,7 @@
     </div>
   </div>
 
-  <Dialog v-model:visible="helpVisible" :style="{ width: '50vw' }" :position="'bottom'">
+  <Dialog v-model:visible="helpVisible" :style="{ width: '50vw' }" :position="'bottom'" @hide="resetHelp">
     <p>
       {{ textHelp[helpIndex] }}
     </p>
@@ -401,6 +401,11 @@ export default {
       this.rgbLegend = this.rgbLegend.substring(0, this.rgbLegend.length - 1) + ')';
       this.isLegend = true;
     },
+    resetHelp() {
+      this.helpVisible = false;
+      this.helpIndex = -1;
+      console.log("________tyytyt")
+    },
     /**
      * Cette méthode est appelée lorsque l'utilisateur souhaite changer de dimension. 
      * Elle met à jour la variable de dimension
@@ -423,11 +428,10 @@ export default {
         case this.textHelp.length - 1:
           this.btnTextHelp = "Fermer";
           break;
-        case this.helpIndex == this.textHelp.length:
-          this.helpIndex = -1;
+        case this.textHelp.length:
+          this.resetHelp();
           this.btnTextHelp = "Suivant";
           this.accordionStyle = "";
-          this.helpVisible = false;
           break;
       }
 
