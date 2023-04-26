@@ -1351,6 +1351,9 @@ export default {
                 this.$emit("legend", res);
             });
         },
+        /* 
+         * Cette visualisation fait varier l'épaisseur et la couleur de la trajectoire en fonction de la vitesse.
+         */
         async addDifficultyInfo(deviceNumbers) {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
