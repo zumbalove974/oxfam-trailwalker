@@ -1172,7 +1172,7 @@ export default {
       this.details.push("Niveau de difficulté = " + diff_data[obj.cp].niveau_diff);
 
       if (this.devices.length) {
-        this.details += "Vitesse moyenne = " + obj.vitesse_moy + " km/h."
+        this.details.push("Vitesse moyenne = " + obj.vitesse_moy + " km/h.");
       }
 
       this.isVisuDiffDesc = true;
