@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-04-25T11:17:12.225Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0" etag="UPnfLr_EbOukWB_Or4LX" version="21.2.1" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2023-04-26T11:39:01.005Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0" etag="715AHhuPfCEwHVruVAlF" version="21.2.1" type="github" pages="2">
   <diagram name="use_case_diag" id="VuEXv8mchvgsIPv52Sd7">
-    <mxGraphModel dx="1360" dy="1895" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="183" dy="1207" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -27,7 +27,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="Er8cf-PNEWmhMYi2h8hF-1" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+        <mxCell id="Er8cf-PNEWmhMYi2h8hF-1" value="Acteur" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
           <mxGeometry x="90" y="290" width="60" height="120" as="geometry" />
         </mxCell>
         <mxCell id="Er8cf-PNEWmhMYi2h8hF-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" parent="1" source="Er8cf-PNEWmhMYi2h8hF-4" target="Er8cf-PNEWmhMYi2h8hF-10" edge="1">
