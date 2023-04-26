@@ -3,7 +3,7 @@
         <Slide v-for="image in images" :key="image.id">
             {{ image.url }}
             <div class='carousel-img'>
-                <img :src="getImage(image.url)" />
+                <img :src=image.url />
             </div>
         </Slide>
 
@@ -29,9 +29,12 @@ export default defineComponent({
     data() {
         return {
             images: [
-                { id: 1, url: '../assets/mur.png', color: "brown" },
-                { id: 2, url: '../assets/nuit.png' },
-                { id: 3, url: '../assets/difficu.png' }
+                { id: 1, url: require('../assets/mur.png') },
+                { id: 2, url: require('../assets/nuit.png') },
+                { id: 3, url: require('../assets/difficu.png') },
+                { id: 4, url: require('../assets/epaisseur.png') },
+                { id: 5, url: require('../assets/mousta.png') },
+
             ]
         }
     },
