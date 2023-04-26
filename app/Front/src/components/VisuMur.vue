@@ -35,7 +35,8 @@ export default {
     },
     emits: {
         data: Array,
-        legend: Array
+        legend: Array,
+        isVisuMur: Boolean
     },
     data() {
         return {
@@ -255,6 +256,8 @@ export default {
                 this.controller.threeViewer.scene.add(mesh);
             }
 
+            this.$emit("isVisuMur", false);
+
             // on retourne ces valeurs car on en a besoin pour la légende
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51)', 'rgb(0, 255, 51)']];
         },
@@ -311,6 +314,8 @@ export default {
 
                 this.controller.threeViewer.scene.add(visu_mesh);
             });
+
+            this.$emit("isVisuMur", false);
         },
         /* 
          * Cette visualisation fait varier l'épaisseur et la couleur de la trajectoire en fonction de la vitesse.
@@ -425,6 +430,8 @@ export default {
             this.controller.threeViewer.scene.add(visu_mesh);
 
             this.visu_function = this.displayVisuEpaisseur;
+
+            this.$emit("isVisuMur", false);
 
             return [[tronquer(minSpeed, 2), tronquer(maxSpeed, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
@@ -917,6 +924,8 @@ export default {
             this.controller.threeViewer.scene.add(lineQ2);
             this.controller.threeViewer.scene.add(lineQ1);
             this.controller.threeViewer.scene.add(lineQ0);
+
+            this.$emit("isVisuMur", false);
         },
         /* 
          * Cette visualisation fait varier la couleur en fonction de la vitesse tandis que la hauteur des murs restent fixes.
@@ -1124,6 +1133,8 @@ export default {
 
                 indexVisu++;
             })
+
+            this.$emit("isVisuMur", true);
 
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
