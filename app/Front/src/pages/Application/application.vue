@@ -93,7 +93,7 @@
         <div v-if="controller" class="flex flex-column gap-3">
           <div v-for="category in categories" :key="category.key" class="flex align-items-center"
             style="width:fit-content; margin-bottom: 1rem;">
-            <VisuMur @data="actualiser" @legend="actualiserLegend" :toastProps="toast"
+            <VisuMur @data="actualiser" @legend="actualiserLegend" @isVisuMur="actualiserIsVisuMur" :toastProps="toast"
               :createDimensionEnvironmentProps="createDimensionEnvironment" :controllerProps="controller"
               :devicesProps="devices" :visu_functionProps="visu_function" :dimensionProps="dimension"
               :visu_meshesProps="visu_meshes" :categoryProps="category">
@@ -158,6 +158,13 @@
         :style="{ position: 'absolute', transform: legend.decalage }">{{ legend.value }}</label>
     </div>
   </Fieldset>
+
+  <SelectButton id="pauseBtn" v-if="isVisuMur" @click="mettreEnPause" v-model="pause" :options="pauseOuStart"
+    optionLabel="pause" aria-labelledby="custom">
+    <template #option="slotProps">
+      <i :class="slotProps.option.icon"></i>
+    </template>
+  </SelectButton>
 
   <div :style="[helpIndex === 4 ? { 'border': borderStyle } : { 'border': '' }]" id="dimensionBtnContainer"
     class="card flex justify-content-center p-button-lg">
@@ -278,6 +285,13 @@ export default {
         { name: '2D', value: 2 },
         { name: '3D', value: 3 }
       ],
+      pauseOuStart: [
+        { icon: 'pi pi-pause', value: 0 },
+        { icon: 'pi pi-play', value: 1 },
+        { icon: 'pi pi-undo', value: 2 }
+      ],
+      pause: 0,
+      isVisuMur: false,
       isLegend: false,
       legends: [],
       rgbMinLegend: '',
@@ -401,10 +415,44 @@ export default {
       this.rgbLegend = this.rgbLegend.substring(0, this.rgbLegend.length - 1) + ')';
       this.isLegend = true;
     },
+    actualiserIsVisuMur: function (isVisuMur) {
+      this.isVisuMur = isVisuMur;
+    },
     resetHelp() {
       this.helpVisible = false;
       this.helpIndex = -1;
-      console.log("________tyytyt")
+    },
+    mettreEnPause() {
+      console.log("___", this.pause)
+      if (this.pause) {
+        switch (toRaw(this.pause).value) {
+          case 0:
+            this.controller.threeViewer.animeTrailer = false;
+            //this.controller.threeViewer.state.clock.stop();
+            break;
+          case 1:
+            this.controller.threeViewer.animeTrailer = true;
+            //this.controller.threeViewer.state.clock.start();
+            break;
+          case 2:
+            this.controller.threeViewer.shperes.forEach(sphere => {
+              // On vérifie que les coureurs n'ont pas finis la course
+              sphere.indexTraj = 0;
+              sphere.temps = 0;
+              sphere.tempsBetweenPoints = 0;
+              this.controller.threeViewer.state = {
+                clock: new THREE.Clock(),
+                frame: 0,
+                maxFrame: 90,
+                fps: 30,
+                per: 0
+              };
+            });
+
+            this.controller.threeViewer.animeTrailer = true;
+            break;
+        }
+      }
     },
     /**
      * Cette méthode est appelée lorsque l'utilisateur souhaite changer de dimension. 
@@ -1211,6 +1259,13 @@ body {
   position: absolute;
   z-index: 2;
   bottom: 50px;
+  right: 50px;
+}
+
+#pauseBtn {
+  position: absolute;
+  z-index: 2;
+  bottom: 130px;
   right: 50px;
 }
 
