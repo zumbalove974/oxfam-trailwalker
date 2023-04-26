@@ -2,7 +2,8 @@
   <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
   <div id="map" class="map"></div>
 
-  <Toast position="bottom-center" />
+  <Toast @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    position="bottom-center" />
 
   <Accordion :style="[helpIndex === 0 ? { 'border': borderStyle } : { 'border': '' }]" @pointerover="removeEventListeners"
     v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }" :activeIndex="accordionIndex" class="onglet up">
@@ -119,13 +120,30 @@
     </div>
   </div>
 
-  <Dialog v-model:visible="helpVisible" :style="{ width: '50vw' }" :position="'bottom'">
+  <Dialog v-model:visible="helpVisible" :style="{ width: '50vw' }" :position="'bottom'" @hide="resetHelp">
     <p>
       {{ textHelp[helpIndex] }}
     </p>
     <template #footer>
       <Button :label="btnTextHelp" icon="pi pi-angle-double-right" @click="nextHelp" autofocus />
     </template>
+  </Dialog>
+
+  <Dialog v-model:visible="navHelpVisible" :style="{ width: '50vw' }" :position="'bottom'">
+    <p>
+      En 2D, le drag and drop permet de se déplacer sur la carte et la molette permet de zoomer.
+    </p>
+    <p>
+      En 3D, le drag and drop permet de faire des rotation,la molette permet de zoomer et les touches directionnelles
+      permettent de se déplacer.
+    </p>
+    <p>
+      Pour la visualisation difficulté, le clic droit sur une portion de la trajectoire permet d'afficher les informations
+      correspondantes.
+    </p>
+    <p>
+      Certaines visualisations mettent un peu temps à charger en fonction du nombre de devices sélectionné.
+    </p>
   </Dialog>
 
   <Dialog v-model:visible="isVisuDiffDesc" :style="{ width: '30vw' }" :position="'bottomleft'" @hide="resetVisuDiffDesc">
@@ -218,6 +236,7 @@ export default {
         "Ce bouton permet de passer de la 2D à la 3D et vice versa."
       ],
       btnTextHelp: "Suivant",
+      navHelpVisible: false,
       borderStyle: 'dashed 3px blueviolet',
       accordionStyle: "",
       // Onglet de description pour la visu difficulté
@@ -252,7 +271,6 @@ export default {
       deviceNumber: null,
       deviceNumberFrom: null,
       deviceNumberTo: null,
-      visuFunction: null,
       controller: null,
       visu_function: null,
       pdcs: [],
@@ -300,6 +318,13 @@ export default {
             this.helpVisible = true;
             this.helpIndex = 0;
           }
+        },
+        {
+          label: 'Bouton navigation',
+          icon: 'pi pi-wrench',
+          command: () => {
+            this.navHelpVisible = true;
+          }
         }
       ]
     }
@@ -333,9 +358,6 @@ export default {
 
     // Modification du style des bouton du speed dial 
     // On y a pas accès autrement que par le DOM
-    //document.getElementById("speedial_0").children[0].innerHTML = "";
-    //document.getElementById("speedial_1").children[0].innerHTML = "";
-
     document.getElementById("speedial_0").children[0].style = "background-color: green";
     document.getElementById("speedial_1").children[0].style = "background-color: cyan";
 
@@ -355,11 +377,9 @@ export default {
         this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
       }
 
-      console.log("oooooooooooooo", data[1] != this.visu_function)
-
       if (data[1] && (data[1] != this.visu_function)) {
         this.visu_function = data[1];
-        this.visu_function(this.devices);
+        this.visu_function();
       }
       else {
         this.addItineraireReference();
@@ -368,6 +388,7 @@ export default {
     actualiserLegend: function (legend) {
       this.legends = [];
       let index = 0;
+      console.log("rrr legend", legend)
       legend[0].forEach(nombre => {
         toRaw(this.legends).push({ value: nombre, decalage: 'translate(' + (200 / (legend[0].length - 1) * index - 5).toString() + 'px , -20px)' });
         index++;
@@ -378,8 +399,12 @@ export default {
         this.rgbLegend += couleur + ','
       });
       this.rgbLegend = this.rgbLegend.substring(0, this.rgbLegend.length - 1) + ')';
-      console.log("----", this.rgbLegend);
       this.isLegend = true;
+    },
+    resetHelp() {
+      this.helpVisible = false;
+      this.helpIndex = -1;
+      console.log("________tyytyt")
     },
     /**
      * Cette méthode est appelée lorsque l'utilisateur souhaite changer de dimension. 
@@ -403,11 +428,10 @@ export default {
         case this.textHelp.length - 1:
           this.btnTextHelp = "Fermer";
           break;
-        case this.helpIndex == this.textHelp.length:
-          this.helpIndex = -1;
+        case this.textHelp.length:
+          this.resetHelp();
           this.btnTextHelp = "Suivant";
           this.accordionStyle = "";
-          this.helpVisible = false;
           break;
       }
 
@@ -446,7 +470,6 @@ export default {
      *  Permet de charger les timestamps des données en temps réel d'un périphérique spécifié par deviceNumber
      */
     async loadTimestamps() {
-      console.log("hhhhhhh ", this.deviceNumber)
       try {
         const liveData = await getLiveDataDevice(this.deviceNumber);
         const timestamps = liveData.map(row => row.timestamp);
@@ -501,8 +524,10 @@ export default {
      */
     onRowSelect(event) {
       this.devices.push(event.data.id);
-      if (this.visuFunction)
-        this.visuFunction();
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
     },
     /**
      * Gère l'événement de déselection d'une ligne dans un tableau.
@@ -511,11 +536,12 @@ export default {
      * @param {*} event L'événement de déselection de ligne.
      */
     onRowUnselect(event) {
-      this.devices = this.devices.filter(function (item) {
-        return item !== event.data.id;
-      })
-      if (this.visuFunction)
-        this.visuFunction();
+
+      this.devices = this.devices.filter(item => item != event.data.id);
+
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
     },
     /**
      * Ajoute toutes les équipes sélectionnées à la liste des équipes à afficher
@@ -526,8 +552,9 @@ export default {
         this.devices.push(device.id);
       })
 
-      if (this.visuFunction)
-        this.visuFunction();
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
     },
     /**
      * Gère l'événement de déselection de toutes les lignes
@@ -535,8 +562,9 @@ export default {
     onRowUnselectAll() {
       this.devices = [];
 
-      if (this.visuFunction)
-        this.visuFunction();
+      while (this.visu_meshes.length > 0) {
+        this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
+      }
     },
     /**
      * Obtient le nom du dispositif à partir du nom de la table.
@@ -695,11 +723,10 @@ export default {
           this.controller.threeViewer.scene.remove(this.visu_meshes.pop());
         }
         if (this.visu_function) {
-          this.visu_function(this.devices);
+          this.visu_function();
         }
         else
           this.addItineraireReference();
-
 
         if (toRaw(this.teamMarkers).length > 0) {
           this.removeTeamMarkers();
@@ -792,7 +819,7 @@ export default {
         }
 
         if (this.visu_function)
-          this.visu_function(this.devices);
+          this.visu_function();
         else
           this.addItineraireReference();
       }
@@ -855,7 +882,7 @@ export default {
       }
 
       if (this.visu_function) {
-        this.visu_function(this.devices);
+        this.visu_function();
       }
       else
         this.addItineraireReference();
@@ -904,13 +931,9 @@ export default {
 
         this.addEventListeners();
 
-
-        //this.controller.threeViewer.scene.remove(wall);
-        //this.controller.threeViewer.scene.remove(mesh);
-
         if (this.visu_function)
+          this.visu_function();
 
-          this.visu_function(this.devices);
       } else {
         console.log("___dimension 3___");
 

@@ -41,6 +41,7 @@ export default {
         return {
             devices: this.devicesProps,
             visu_function: this.visu_functionProps,
+            visu_function_app: null,
             dimension: this.dimensionProps,
             controller: this.controllerProps,
             visu_meshes: this.visu_meshesProps,
@@ -59,13 +60,28 @@ export default {
             },
         }
     },
+    watch: {
+        devicesProps: {
+            handler(oldDevices) {
+                if (this.visu_function && this.visu_function == this.visu_functionProps)
+                    this.visu_function(oldDevices);
+
+                this.devices = oldDevices;
+            },
+            deep: true
+        },
+        visu_functionProps: {
+            handler(oldVisu) {
+                this.visu_function_app = oldVisu;
+            }
+        }
+    },
     mounted() {
         this.toast = useToast();
     },
     methods: {
         // fonction appelée lorsque l'utilisateur clique sur une checkbox
         display() {
-            console.log("oooooooooo display")
             //toRaw(this.functions[toRaw(this.category).key])();
             this.visu_function = this.functions[toRaw(this.category).key];
             // on envoit à la vue parente la focntion concernée et la nouvelle liste des vicualisations présentes dans la scène
@@ -114,18 +130,17 @@ export default {
 
             return vertices;
         },
-        // Visualisation qui fait varier la couleur et la hauteur (en z) en fonction de la vitesse
-        async addItineraireSpeed3D(deviceNumbers) {
-
-            console.log("oooooooooo additi")
+        /* 
+         * Visualisation qui fait varier la couleur et la hauteur (en z) en fonction de la vitesse.
+         */
+        async addItineraireSpeed3D() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.devices = deviceNumbers;
             const device = this.devices[0];
-            this.visu_function = this.addItineraireSpeed3D;
+            this.visu_function = this.displayVisuMontagne;
 
             const data = await getLiveDataDevice(device);
 
@@ -243,9 +258,11 @@ export default {
             // on retourne ces valeurs car on en a besoin pour la légende
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51)', 'rgb(0, 255, 51)']];
         },
+        /* 
+        * Affichage de la visualisation montagne si une seule device a été sélectionnée.
+        * + passage en 3D
+        */
         displayVisuMontagne() {
-
-            console.log("ooooooooo colline")
 
             this.toast.removeAllGroups();
 
@@ -258,14 +275,16 @@ export default {
                 this.createDimensionEnvironment(3);
 
                 this.addItineraireSpeed3D(this.devices).then(res => {
-                    this.$emit("legend", [tronquer(res[0], 2), tronquer(res[1], 2)]);
+                    this.$emit("legend", res);
                 });
             }
         },
-        addItineraire(deviceNumbers) {
+        /* 
+         * Création de la trajectoire enregistrée par le GPS.
+         * On peut afficher les trajectoires de plusieurs devices.
+         */
+        addItineraire() {
 
-            this.devices = deviceNumbers;
-            //device = devices[0]; //////temporaire
             this.devices.forEach(async device => {
                 this.visu_function = this.addItineraire;
 
@@ -293,13 +312,15 @@ export default {
                 this.controller.threeViewer.scene.add(visu_mesh);
             });
         },
-        async addItineraireEpaisseur(deviceNumbers) {
+        /* 
+         * Cette visualisation fait varier l'épaisseur et la couleur de la trajectoire en fonction de la vitesse.
+         */
+        async addItineraireEpaisseur() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.devices = deviceNumbers;
             const device = this.devices[0];
 
             const trace = await getLiveDataDevice(device);
@@ -400,14 +421,14 @@ export default {
             geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
 
             let visu_mesh = new THREE.Mesh(geometry, material);
-            this.visu_meshes.push(visu_mesh)
+            this.visu_meshes.push(visu_mesh);
             this.controller.threeViewer.scene.add(visu_mesh);
 
-            this.visu_function = this.addItineraireEpaisseur;
+            this.visu_function = this.displayVisuEpaisseur;
 
             return [[tronquer(minSpeed, 2), tronquer(maxSpeed, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
-        // calcul les vitesse moyennesde tous les trajets sélectionnés
+        /* calcul les vitesse moyennesde tous les trajets sélectionnés */
         async getMoyenneDevice(devices) {
             let moyennes = [];
             let moyennesDict = {};
@@ -421,13 +442,13 @@ export default {
 
             return [moyennes, moyennesDict];
         },
-        // supprime un mesh threesjs présents dans la scène
+        /* supprime un mesh threesjs présents dans la scène */
         disposeThreeMesh(mesh) {
             mesh.geometry.dispose();
             mesh.material.dispose();
             this.controller.threeViewer.scene.remove(mesh);
         },
-        // calcul la vitesse moyenne d'une trajectoire
+        /* calcul la vitesse moyenne d'une trajectoire */
         async getVitesseMoyenne(device) {
             const data = await getLiveDataDevice(device);
 
@@ -439,15 +460,16 @@ export default {
 
             return somme / data.length;
         },
-        async addItineraireMoustache(deviceNumbers) {
+        /* 
+         * Cette visualisation permet de visualiser les quartiles des vitesses d'un ensemble d'équipe en chaque point de la trajectoire.
+         */
+        async addItineraireMoustache() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.visu_function = this.addItineraireMoustache;
-
-            this.devices = deviceNumbers;
+            this.visu_function = this.displayVisuMoustache;
 
             let devicesData = [];
 
@@ -896,20 +918,21 @@ export default {
             this.controller.threeViewer.scene.add(lineQ1);
             this.controller.threeViewer.scene.add(lineQ0);
         },
-        async addItineraireSpeedWall(deviceNumbers) {
-
-            this.devices = deviceNumbers;
+        /* 
+         * Cette visualisation fait varier la couleur en fonction de la vitesse tandis que la hauteur des murs restent fixes.
+         * On peut afficher plusieurs équipes en même temps, les murs sont alors superposés.
+         * Une simulation avec des sphères bleus représentant les coureurs permet de visualiser la course en temps réelle.
+         */
+        async addItineraireSpeedWall() {
 
             // supprime les objets de la visualisation s'il y en a (parfois des objets sont en cache)
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
-                //this.disposeThreeMesh(sphere.wall);
-                //this.disposeThreeMesh(sphere.line);
             });
 
             let indexVisu = 0;
 
-            this.visu_function = this.addItineraireSpeedWall;
+            this.visu_function = this.displayVisuMur;
 
             let moyennes
             let moyennesDict;
@@ -1104,19 +1127,21 @@ export default {
 
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
-        async addNightCoverage(deviceNumbers) {
+        /* 
+         * Cette visualisation fait varier la couleur en fonction de la densité de coureur la nuit.
+         */
+        async addNightCoverage() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.devices = deviceNumbers;
-            this.visu_function = this.addNightCoverage;
+            this.visu_function = this.displayVisuNuit;
 
             const date_nuit = "2021-03-07T21:57:00.000Z";
             const date_matin = "2021-04-07T05:53:00.000Z";
 
-            const devices_data = await Promise.all(deviceNumbers.map(d => getLiveDataDevice(d)));
+            const devices_data = await Promise.all(this.devices.map(d => getLiveDataDevice(d)));
 
             const device_night = devices_data.map(t => {
                 let i_debut = 0;
@@ -1282,7 +1307,7 @@ export default {
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir une seule devices pour afficher cette visualisation.", life: 3000 });
                 toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
                     this.disposeThreeMesh(sphere.mesh);
-                })
+                });
             } else {
                 this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir la vitesse des coureurs sur le parcours, plus la ligne est épaisse plus le coureur est rapide. Le couleur de la ligne change également en fonction de la vitesse.", life: 5000 });
 
@@ -1296,7 +1321,6 @@ export default {
             this.toast.removeAllGroups();
 
             this.toast.add({ severity: 'info', summary: 'Info', detail: "Visualisation 2D+1 qui permet de comparer les vitesses des différentes équipes. Plus la colline est haute et verte en un point plus l'équipe est rapide en ce point.", life: 5000 });
-
 
             this.dimension = 3;
             this.createDimensionEnvironment(3);
@@ -1321,17 +1345,24 @@ export default {
             if (this.devices.length === 0)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
             else
-                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit. Plus il y a d'équipe qui sont sur une même portion la nuit plus la couleur de la trajectoir est \"chaude\".", life: 5000 });
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit. Plus il y a d'équipe qui sont sur une même portion la nuit plus la couleur de la trajectoire est \"chaude\".", life: 5000 });
 
             this.addNightCoverage(this.devices).then(res => {
                 this.$emit("legend", res);
             });
         },
+        /* 
+         * Cette visualisation fait varier l'épaisseur et la couleur de la trajectoire en fonction de la vitesse.
+         */
         async addDifficultyInfo(deviceNumbers) {
+
+            toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
+                this.disposeThreeMesh(sphere.mesh);
+            })
 
             // Initialisation
             this.devices = deviceNumbers;
-            this.visu_function = this.addDifficultyInfo;
+            this.visu_function = this.displayDifficultyInfo;
             this.controller.threeViewer.scene.add(this.controller.threeViewer.traj_parts)
 
             this.controller.threeViewer.traj_parts.clear();
