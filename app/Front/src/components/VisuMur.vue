@@ -41,6 +41,7 @@ export default {
         return {
             devices: this.devicesProps,
             visu_function: this.visu_functionProps,
+            visu_function_app: null,
             dimension: this.dimensionProps,
             controller: this.controllerProps,
             visu_meshes: this.visu_meshesProps,
@@ -62,12 +63,22 @@ export default {
     watch: {
         devicesProps: {
             handler(oldDevices) {
-                if (this.visu_function)
+                if (this.visu_function && this.visu_function == this.visu_functionProps)
                     this.visu_function(oldDevices);
 
                 this.devices = oldDevices;
+
+                console.log("rrr 0", this.visu_function);
             },
             deep: true
+        },
+        visu_functionProps: {
+            handler(oldVisu) {
+
+                this.visu_function_app = oldVisu;
+                console.log("rrr 1", this.visu_function_app)
+                console.log("rrr 2", this.visu_function)
+            }
         }
     },
     mounted() {
@@ -76,7 +87,6 @@ export default {
     methods: {
         // fonction appelée lorsque l'utilisateur clique sur une checkbox
         display() {
-            console.log("oooooooooo display")
             //toRaw(this.functions[toRaw(this.category).key])();
             this.visu_function = this.functions[toRaw(this.category).key];
             // on envoit à la vue parente la focntion concernée et la nouvelle liste des vicualisations présentes dans la scène
@@ -133,7 +143,7 @@ export default {
             })
 
             const device = this.devices[0];
-            this.visu_function = this.addItineraireSpeed3D;
+            this.visu_function = this.displayVisuMontagne;
 
             const data = await getLiveDataDevice(device);
 
@@ -253,8 +263,6 @@ export default {
         },
         displayVisuMontagne() {
 
-            console.log("ooooooooo colline")
-
             this.toast.removeAllGroups();
 
             if (this.devices.length > 1)
@@ -266,7 +274,7 @@ export default {
                 this.createDimensionEnvironment(3);
 
                 this.addItineraireSpeed3D(this.devices).then(res => {
-                    this.$emit("legend", [tronquer(res[0], 2), tronquer(res[1], 2)]);
+                    this.$emit("legend", res);
                 });
             }
         },
@@ -409,7 +417,7 @@ export default {
             this.visu_meshes.push(visu_mesh);
             this.controller.threeViewer.scene.add(visu_mesh);
 
-            this.visu_function = this.addItineraireEpaisseur;
+            this.visu_function = this.displayVisuEpaisseur;
 
             return [[tronquer(minSpeed, 2), tronquer(maxSpeed, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
@@ -451,7 +459,7 @@ export default {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.visu_function = this.addItineraireMoustache;
+            this.visu_function = this.displayVisuMoustache;
 
             let devicesData = [];
 
@@ -909,7 +917,7 @@ export default {
 
             let indexVisu = 0;
 
-            this.visu_function = this.addItineraireSpeedWall;
+            this.visu_function = this.displayVisuMur;
 
             let moyennes
             let moyennesDict;
@@ -1110,7 +1118,7 @@ export default {
                 this.disposeThreeMesh(sphere.mesh);
             })
 
-            this.visu_function = this.addNightCoverage;
+            this.visu_function = this.displayVisuNuit;
 
             const date_nuit = "2021-03-07T21:57:00.000Z";
             const date_matin = "2021-04-07T05:53:00.000Z";
@@ -1319,7 +1327,7 @@ export default {
             if (this.devices.length === 0)
                 this.toast.add({ severity: 'warn', summary: 'Warn', detail: "Vous devez choisir au moins un device pour afficher cette visualisation.", life: 3000 });
             else
-                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit. Plus il y a d'équipe qui sont sur une même portion la nuit plus la couleur de la trajectoir est \"chaude\".", life: 5000 });
+                this.toast.add({ severity: 'info', summary: 'Info', detail: "Cette visualisation permet de voir les portions du parcours sur lesquelles les coureurs se deplacent la nuit. Plus il y a d'équipe qui sont sur une même portion la nuit plus la couleur de la trajectoire est \"chaude\".", life: 5000 });
 
             this.addNightCoverage(this.devices).then(res => {
                 this.$emit("legend", res);
@@ -1333,7 +1341,7 @@ export default {
 
             // Initialisation
             this.devices = deviceNumbers;
-            this.visu_function = this.addDifficultyInfo;
+            this.visu_function = this.displayDifficultyInfo;
             this.controller.threeViewer.scene.add(this.controller.threeViewer.traj_parts)
 
             this.controller.threeViewer.traj_parts.clear();

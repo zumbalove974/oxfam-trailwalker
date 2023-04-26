@@ -2,7 +2,8 @@
   <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
   <div id="map" class="map"></div>
 
-  <Toast position="bottom-center" />
+  <Toast @pointerover="removeEventListeners" v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }"
+    position="bottom-center" />
 
   <Accordion :style="[helpIndex === 0 ? { 'border': borderStyle } : { 'border': '' }]" @pointerover="removeEventListeners"
     v-on="{ pointerleave: dimension == 2 ? addEventListeners : null }" :activeIndex="accordionIndex" class="onglet up">
@@ -360,11 +361,12 @@ export default {
       }
       else {
         this.addItineraireReference();
-      }
+      }////////
     },
     actualiserLegend: function (legend) {
       this.legends = [];
       let index = 0;
+      console.log("rrr legend", legend)
       legend[0].forEach(nombre => {
         toRaw(this.legends).push({ value: nombre, decalage: 'translate(' + (200 / (legend[0].length - 1) * index - 5).toString() + 'px , -20px)' });
         index++;
