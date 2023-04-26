@@ -168,25 +168,25 @@ export class VTThreeViewer {
       if (calculerDiffRotation(rx, ry, rz) > 0.1 && (!this.counterEnd[0] || !this.counterEnd[1] || !this.counterEnd[2])) {
         if (rx > 0.1) {
           this.perspectiveCamera.rotation.x -= 0.05;
-        } else if (rx < -0.1) {
+        } if (rx < -0.1) {
           this.perspectiveCamera.rotation.x += 0.05;
-        } else {
+        } if (rx <= 0.1 && rx >= -0.1) {
           this.counterEnd[0] = true;
         }
 
         if (ry > 0.1) {
           this.perspectiveCamera.rotation.y -= 0.05;
-        } else if (ry < -0.1) {
+        } if (ry < -0.1) {
           this.perspectiveCamera.rotation.y += 0.05;
-        } else {
+        } if (ry <= 0.1 && ry >= -0.1) {
           this.counterEnd[1] = true;
         }
 
         if (rz > 0.1) {
           this.perspectiveCamera.rotation.z -= 0.05;
-        } else if (rz < -0.1) {
+        } if (rz < -0.1) {
           this.perspectiveCamera.rotation.z += 0.05;
-        } else {
+        } if (rz <= 0.1 && rz >= -0.1) {
           this.counterEnd[2] = true;
         }
       } else {
