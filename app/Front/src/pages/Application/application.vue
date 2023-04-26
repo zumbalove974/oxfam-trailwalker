@@ -361,11 +361,12 @@ export default {
       }
       else {
         this.addItineraireReference();
-      }
+      }////////
     },
     actualiserLegend: function (legend) {
       this.legends = [];
       let index = 0;
+      console.log("rrr legend", legend)
       legend[0].forEach(nombre => {
         toRaw(this.legends).push({ value: nombre, decalage: 'translate(' + (200 / (legend[0].length - 1) * index - 5).toString() + 'px , -20px)' });
         index++;
