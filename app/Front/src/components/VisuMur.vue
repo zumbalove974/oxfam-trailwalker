@@ -67,17 +67,12 @@ export default {
                     this.visu_function(oldDevices);
 
                 this.devices = oldDevices;
-
-                console.log("rrr 0", this.visu_function);
             },
             deep: true
         },
         visu_functionProps: {
             handler(oldVisu) {
-
                 this.visu_function_app = oldVisu;
-                console.log("rrr 1", this.visu_function_app)
-                console.log("rrr 2", this.visu_function)
             }
         }
     },
@@ -135,7 +130,9 @@ export default {
 
             return vertices;
         },
-        // Visualisation qui fait varier la couleur et la hauteur (en z) en fonction de la vitesse
+        /* 
+         * Visualisation qui fait varier la couleur et la hauteur (en z) en fonction de la vitesse.
+         */
         async addItineraireSpeed3D() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
@@ -261,6 +258,10 @@ export default {
             // on retourne ces valeurs car on en a besoin pour la légende
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51)', 'rgb(0, 255, 51)']];
         },
+        /* 
+        * Affichage de la visualisation montagne si une seule device a été sélectionnée.
+        * + passage en 3D
+        */
         displayVisuMontagne() {
 
             this.toast.removeAllGroups();
@@ -278,9 +279,12 @@ export default {
                 });
             }
         },
+        /* 
+         * Création de la trajectoire enregistrée par le GPS.
+         * On peut afficher les trajectoires de plusieurs devices.
+         */
         addItineraire() {
 
-            //device = devices[0]; //////temporaire
             this.devices.forEach(async device => {
                 this.visu_function = this.addItineraire;
 
@@ -308,6 +312,9 @@ export default {
                 this.controller.threeViewer.scene.add(visu_mesh);
             });
         },
+        /* 
+         * Cette visualisation fait varier l'épaisseur et la couleur de la trajectoire en fonction de la vitesse.
+         */
         async addItineraireEpaisseur() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
@@ -421,7 +428,7 @@ export default {
 
             return [[tronquer(minSpeed, 2), tronquer(maxSpeed, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
-        // calcul les vitesse moyennesde tous les trajets sélectionnés
+        /* calcul les vitesse moyennesde tous les trajets sélectionnés */
         async getMoyenneDevice(devices) {
             let moyennes = [];
             let moyennesDict = {};
@@ -435,13 +442,13 @@ export default {
 
             return [moyennes, moyennesDict];
         },
-        // supprime un mesh threesjs présents dans la scène
+        /* supprime un mesh threesjs présents dans la scène */
         disposeThreeMesh(mesh) {
             mesh.geometry.dispose();
             mesh.material.dispose();
             this.controller.threeViewer.scene.remove(mesh);
         },
-        // calcul la vitesse moyenne d'une trajectoire
+        /* calcul la vitesse moyenne d'une trajectoire */
         async getVitesseMoyenne(device) {
             const data = await getLiveDataDevice(device);
 
@@ -453,6 +460,9 @@ export default {
 
             return somme / data.length;
         },
+        /* 
+         * Cette visualisation permet de visualiser les quartiles des vitesses d'un ensemble d'équipe en chaque point de la trajectoire.
+         */
         async addItineraireMoustache() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
@@ -908,6 +918,11 @@ export default {
             this.controller.threeViewer.scene.add(lineQ1);
             this.controller.threeViewer.scene.add(lineQ0);
         },
+        /* 
+         * Cette visualisation fait varier la couleur en fonction de la vitesse tandis que la hauteur des murs restent fixes.
+         * On peut afficher plusieurs équipes en même temps, les murs sont alors superposés.
+         * Une simulation avec des sphères bleus représentant les coureurs permet de visualiser la course en temps réelle.
+         */
         async addItineraireSpeedWall() {
 
             // supprime les objets de la visualisation s'il y en a (parfois des objets sont en cache)
@@ -1112,6 +1127,9 @@ export default {
 
             return [[tronquer(min, 2), tronquer(max, 2)], ['rgb(255, 0, 51 )', 'rgb(0, 255, 51)']];
         },
+        /* 
+         * Cette visualisation fait varier la couleur en fonction de la densité de coureur la nuit.
+         */
         async addNightCoverage() {
 
             toRaw(this.controller.threeViewer.shperes).forEach(sphere => {
