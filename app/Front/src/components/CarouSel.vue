@@ -1,9 +1,9 @@
 <template>
-    <Carousel :autoplay="2000" :wrap-around="true">
+    <Carousel v-bind="settings" :autoplay="4000" :wrap-around="true" :itemsToShow="1.5">
         <Slide v-for="image in images" :key="image.id">
-            {{ image.url }}
-            <div class='carousel-img'>
-                <img :src=image.url />
+            <div class="carousel__item">
+
+                <img class="image" :src=image.url />
             </div>
         </Slide>
 
@@ -29,18 +29,18 @@ export default defineComponent({
     data() {
         return {
             images: [
-                { id: 1, url: require('../assets/mur.png') },
-                { id: 2, url: require('../assets/nuit.png') },
-                { id: 3, url: require('../assets/difficu.png') },
-                { id: 4, url: require('../assets/epaisseur.png') },
-                { id: 5, url: require('../assets/mousta.png') },
-
-            ]
-        }
-    },
-    methods: {
-        getImage(imagePath) {
-            return imagePath;
+                { id: 1, url: require('../assets/traj.png') },
+                { id: 2, url: require('../assets/epaiss.png') },
+                { id: 3, url: require('../assets/colline.png') },
+                { id: 4, url: require('../assets/mur.png') },
+                { id: 5, url: require('../assets/nuit.png') },
+                { id: 6, url: require('../assets/mouftard.png') },
+                { id: 7, url: require('../assets/diffi.png') },
+            ],
+            settings: {
+                itemsToShow: 1,
+                snapAlign: 'center',
+            },
         }
     }
 })
@@ -48,11 +48,36 @@ export default defineComponent({
 
 
 <style>
-.carousel- {
-    border-radius: 50%;
-    width: 200px;
-    height: 200px;
-    margin-bottom: 10px;
-    object-fit: contain;
+.carousel-component {
+    padding: 10px;
+}
+
+.carousel__item {
+    min-height: 200px;
+    width: 100%;
+    min-width: 100%;
+    background-color: var(--vc-clr-primary);
+    color: var(--vc-clr-white);
+    font-size: 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel__slide {
+    padding-left: 10px;
+    width: 100%;
+}
+
+.carousel__prev,
+.carousel__next {
+    box-sizing: content-box;
+    border: 5px solid white;
+}
+
+.image {
+    width: 100%;
+    min-width: 100%;
 }
 </style>

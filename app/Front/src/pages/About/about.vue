@@ -3,19 +3,25 @@
     <div id="app"> </div>
     <!-- Composant de la barre de menu -->
     <MenuBar pageName="Accueil" pageURL="home">></MenuBar>
+    <a class='appButton' label="Go to app" href='/application'>
+        <!-- Bouton de redirection -->
+        <Button>Aller à la Visualisation </Button>
+    </a>
     <!-- Section de présentation -->
     <div id="myPresentation">
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-            magna
-            aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat.
-            Duis
-            aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-            occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </p>
+        <h3>
+            Le Trailwalker Oxfam est un événement sportif qui a eu lieu à Dieppe, où des équipes de quatre personnes
+            marchent 100 km sans relais en moins de 30 heures. Cet exploit est à la fois physique et mental. <br>
+        </h3>
+        <h4>
+            Pour mieux comprendre le comportement des équipes pendant la course, TrailLove76200 est une application qui
+            permet de visualiser les trajectoires de chaque équipe. Cette application représente l'évolution de l'allure des
+            participants en fonction de différents paramètres tels que le terrain, le moment de la course et la vitesse de
+            l'équipe. Ainsi, le projet vise à offrir une analyse spatio-temporelle des trajectoires de la course Oxfam
+            Trailwalker de 2021.
+        </h4>
     </div>
-    <!-- Image de l'aaplication -->
+    <!-- Image du site de l'Oxfam -->
     <img name="parcours" src="../../assets/parcours.png" width="700" height="400" />
 </template>
   
@@ -24,17 +30,14 @@
 import "primevue/resources/themes/bootstrap4-dark-purple/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
-
-// https://github.com/OmranEdoo/rasberryWeather974/tree/dev/Front/dist
-// avoir une page router
-
-// Importation du composant de la barre de menu
 import MenuBar from '../../components/MenuBar.vue'
+import Button from 'primevue/button';
 
 export default {
     name: 'App',
     components: {
-        MenuBar
+        MenuBar,
+        Button
     }
 }
 </script>
@@ -52,9 +55,15 @@ export default {
 
 /* Style pour la section de présentation */
 #myPresentation {
-    background-color: ;
+    font-family: system-ui;
     color: white;
     padding: 40px;
     text-align: center;
+}
+
+.p-button {
+    margin-top: 50px;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    color: black;
 }
 </style>
