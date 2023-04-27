@@ -13,8 +13,7 @@ git clone https://github.com/zumbalove974/oxfam-trailwalker.git
 cd oxfam-trailwalker
 ```
 
-## Utilisation
-Si on ajoute une nouvelle librairie ou bibliothèque, on re-build le projet avec :
+Build le projet avec
 ```cmd
 sudo docker compose build --no-cache
 ```
@@ -26,12 +25,24 @@ sudo docker compose up -d
 ```
 
 Les services sont utilisables.
-Le site web est disponible à l'adresse : http://localhost:8500
+Le site web est disponible à l'adresse : http://localhost:8500/home
 
 Pour arrêter les services : 
 ```cmd
 sudo docker compose down
 ```
+
+N'hésitez pas à lire le [guide d'utilisation](./Guide_Utilisation.md)
+
+## Livrables
+
+Rapport: 
+- [Overleaf](https://www.overleaf.com/3983765366srgnhqdfqvdh)
+- [Version PDF](./rapport/Rapport.pdf)
+
+Présentation: 
+- [Canva](https://www.canva.com/design/DAFhRy5EKeI/3IweNNkSO9Ci0i29ZuVX1A/edit?utm_content=DAFhRy5EKeI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+- [Version PDF](https://github.com/zumbalove974/oxfam-trailwalker/blob/main/rapport/Presentation.md)
 
 ## Documentation rapide
 
@@ -56,18 +67,15 @@ Tout est sur `localhost`
 
 
 
-## Logiciels utilisés qu'on peut retrouver dans la partie architecture de l'appli:
+#### Technologies utilisées
 
-Front : Vue.js, PrimeVue
+Front : [Vue.js](https://vuejs.org/), [PrimeVue](https://primevue.org/)
 
-Back: Express, PostgreSQL
+Back: [Express](https://expressjs.com/), [PostgreSQL](https://www.postgresql.org/)
 
-Test: Jest
+Test: [Jest](https://jestjs.io/)
 
-Build: Docker
+Build: [Docker](https://www.docker.com/)
 
-Rapport: Overleaf https://www.overleaf.com/3983765366srgnhqdfqvdh
-Présentation: https://www.canva.com/design/DAFhRy5EKeI/3IweNNkSO9Ci0i29ZuVX1A/edit?utm_content=DAFhRy5EKeI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
-
-IDE: Visual Studio Code
+IDE: [Visual Studio Code](https://code.visualstudio.com/)
 
