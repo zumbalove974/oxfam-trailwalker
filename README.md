@@ -67,7 +67,7 @@ Test: Jest
 Build: Docker
 
 Rapport: Overleaf https://www.overleaf.com/3983765366srgnhqdfqvdh
-
+Présentation: https://www.canva.com/design/DAFhRy5EKeI/3IweNNkSO9Ci0i29ZuVX1A/edit?utm_content=DAFhRy5EKeI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 
 IDE: Visual Studio Code
 
