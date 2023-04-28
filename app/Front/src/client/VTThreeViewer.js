@@ -1,0 +1,446 @@
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+//import { ZOOM_RES_L93 } from "./Utils";
+import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils";
+import { getEquationDroite2D, calculerDistance2D, calculerDiffRotation } from "./mathUtils.js";
+import { calculerTempsTimestamp } from "./bddUtils.js";
+//import { clickUp } from "./index.js";
+
+export const mergedRender = "Merged";
+export const singleRender = "Single";
+
+export class VTThreeViewer {
+  constructor(
+    width,
+    height,
+    backgroundColor,
+    zoomEnabled,
+    mapCenter,
+    zoomFactor
+  ) {
+    this.width = width;
+    this.height = height;
+    this.zoomEnabled = zoomEnabled;
+    this.mapCenter = mapCenter;
+    this.zoomFactor = zoomFactor;
+    this.planes = new THREE.Group();
+    this.traj_parts = new THREE.Group();
+    this.rayCaster = new THREE.Raycaster();
+    this.featuresGroup = new Map();
+    this.animate = this.animate.bind(this);
+    this.doubleClick = this.doubleClick.bind(this);
+    this.initThree(backgroundColor);
+    this.addHemisphereLights2();
+    this.animeTrailer = false; // "animeTrailer" est un booléen qui permet de démarrer la course
+    this.shperes = [];
+    this.state = {
+      clock: new THREE.Clock(),
+      frame: 0,
+      maxFrame: 90,
+      fps: 30,
+      per: 0
+    };
+    this.coeficientVitesseAnimation = 1000;
+    this.translateX = 0;
+    this.translateZ = 0;
+    this.cameraZ = null;
+    this.isTransitioning = [false, false];
+    this.vavinCenter = null;
+    this.counterEnd = [false, false, false];
+  }
+
+  initThree(backgroundColor) {
+    this.renderer = new THREE.WebGLRenderer();
+    this.renderer.setSize(this.width, this.height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(this.renderer.domElement);
+    this.renderer.domElement.style.position = "absolute";
+    this.renderer.domElement.style.top = "0px";
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(backgroundColor);
+
+    var depht_s = Math.tan(((45 / 2.0) * Math.PI) / 180.0) * 2.0;
+    let z = this.height / depht_s;
+
+    this.orthoCamera = new THREE.OrthographicCamera(
+      this.width / -2,
+      this.width / 2,
+      this.height / 2,
+      this.height / -2,
+      1,
+      1000
+    );
+    this.orthoCamera.position.set(0, 0, z);
+
+    this.perspectiveCamera = new THREE.PerspectiveCamera(
+      45,
+      this.width / this.height,
+      10,
+      1000000
+    );
+    this.perspectiveCamera.up.set(0, 0, 1);
+    this.perspectiveCamera.position.set(0, 0, z);
+
+    this.controls = new OrbitControls(
+      this.perspectiveCamera,
+      this.renderer.domElement
+    );
+    if (!this.zoomEnabled) {
+      this.controls.enableDamping = false;
+    }
+    this.controls.maxPolarAngle = Math.PI / 2;
+    //this.controls.enabled = false;//
+
+    var geometry = new THREE.PlaneBufferGeometry(
+      this.width * 2,
+      this.height * 2,
+      100
+    );
+    /*
+    var testmaterial = new THREE.MeshBasicMaterial({
+      color: 0xffff00,
+      side: THREE.DoubleSide
+    });
+    */
+    var material = new THREE.MeshBasicMaterial({
+      transparent: true
+      //color: 0xffff00
+    });
+    var plane = new THREE.Mesh(geometry, material);
+    plane.position.set(0, 0, -0.1);
+
+    this.planes.add(plane);
+    this.scene.add(this.planes);
+
+    this.currentCamera = this.perspectiveCamera;
+
+    this.renderer.domElement.addEventListener(
+      "dblclick",
+      this.doubleClick,
+      false
+    );
+    //this.animate();
+  }
+
+  animate() {
+    this.renderer.render(this.scene, this.currentCamera);
+
+    this.perspectiveCamera.translateX(this.translateX);
+    this.perspectiveCamera.translateZ(this.translateZ);
+
+    if (this.isTransitioning[0] || this.isTransitioning[1]) {
+
+      let x2 = this.getWorldCoords(this.vavinCenter)[0];
+      let y2 = this.getWorldCoords(this.vavinCenter)[1];
+      let x1 = this.perspectiveCamera.position.x;
+      let y1 = this.perspectiveCamera.position.y;
+
+      if (calculerDistance2D(x1, y1, x2, y2) > 50) {
+        const params = getEquationDroite2D(x1, y1, x2, y2);
+
+        if (x2 > x1) {
+          this.perspectiveCamera.position.x += 25;
+        } else {
+          this.perspectiveCamera.position.x -= 25;
+        }
+
+        this.perspectiveCamera.position.y = params[0] * this.perspectiveCamera.position.x + params[1];
+
+        if (this.perspectiveCamera.position.z > this.cameraZ) {
+          this.perspectiveCamera.position.z -= 25;
+        } else {
+          this.perspectiveCamera.position.z += 25;
+        }
+      } else {
+        this.isTransitioning[0] = false;
+        this.perspectiveCamera.position.set(x2, y2, this.cameraZ);
+
+        //this.perspectiveCamera.lookAt(new THREE.Vector3(0, 0, 0));
+        //this.perspectiveCamera.rotation.z += Math.PI / 2;
+
+        this.controls.enabled = true;
+      }
+
+      let rx = this.perspectiveCamera.rotation.x;
+      let ry = this.perspectiveCamera.rotation.y;
+      let rz = this.perspectiveCamera.rotation.z;
+
+      if (calculerDiffRotation(rx, ry, rz) > 0.1 && (!this.counterEnd[0] || !this.counterEnd[1] || !this.counterEnd[2])) {
+        if (rx > 0.1) {
+          this.perspectiveCamera.rotation.x -= 0.05;
+        } if (rx < -0.1) {
+          this.perspectiveCamera.rotation.x += 0.05;
+        } if (rx <= 0.1 && rx >= -0.1) {
+          this.counterEnd[0] = true;
+        }
+
+        if (ry > 0.1) {
+          this.perspectiveCamera.rotation.y -= 0.05;
+        } if (ry < -0.1) {
+          this.perspectiveCamera.rotation.y += 0.05;
+        } if (ry <= 0.1 && ry >= -0.1) {
+          this.counterEnd[1] = true;
+        }
+
+        if (rz > 0.1) {
+          this.perspectiveCamera.rotation.z -= 0.05;
+        } if (rz < -0.1) {
+          this.perspectiveCamera.rotation.z += 0.05;
+        } if (rz <= 0.1 && rz >= -0.1) {
+          this.counterEnd[2] = true;
+        }
+      } else {
+        this.isTransitioning[1] = false;
+        this.perspectiveCamera.rotation.set(0, 0, 0);
+      }
+
+      if (!this.isTransitioning[0] && !this.isTransitioning[1]) {
+        this.counterEnd = [false, false, false];
+
+        //clickUp();
+      }
+    }
+
+    if (this.animeTrailer) {
+      this.shperes.forEach(sphere => {
+        // On vérifie que les coureurs n'ont pas finis la course
+        if (sphere.indexTraj < sphere.data.length - 1) {
+
+          sphere.indexPoint = 1;
+
+          if (this.state.clock.getElapsedTime() > sphere.temps) {
+
+            let x1;
+            let y1;
+            //console.log(sphere.temps)
+
+            while (sphere.tempsBetweenPoints == 0 && sphere.running && sphere.data.length > sphere.indexTraj + sphere.indexPoint) {
+              //let x0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[0];
+              //let y0 = this.getWorldCoords([sphere.data[sphere.indexTraj].x, sphere.data[sphere.indexTraj].y])[1];
+              x1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[0];
+              y1 = this.getWorldCoords([sphere.data[sphere.indexTraj + sphere.indexPoint].x, sphere.data[sphere.indexTraj + sphere.indexPoint].y])[1];
+
+              //let distance = calculerDistance(x0, y0, x1, y1);
+              sphere.tempsBetweenPoints = calculerTempsTimestamp(sphere.data[sphere.indexTraj + sphere.indexPoint].timestamp) - calculerTempsTimestamp(sphere.data[sphere.indexTraj].timestamp);
+
+              if (sphere.indexTraj < sphere.data.length - sphere.indexPoint - 1) {
+                sphere.indexPoint++;
+              } else {
+                sphere.running = false;
+                break;
+              }
+
+              sphere.indexTraj++;
+            }
+
+            if (sphere.tempsBetweenPoints > 0) {
+              sphere.mesh.position.x = x1;
+              sphere.mesh.position.y = y1;
+            }
+
+            sphere.temps += (sphere.tempsBetweenPoints / this.coeficientVitesseAnimation);
+            sphere.tempsBetweenPoints = 0;
+          }
+        }
+      })
+    }
+  }
+
+  enableOrbitControls() {
+    this.controls.enabled = true;
+  }
+
+  disableOrbitControls() {
+    this.controls.enabled = false;
+  }
+
+  setPlaneTexture(canvas) {
+    var texture = new THREE.CanvasTexture(canvas);
+    let plane = this.planes.children[0];
+    plane.material.map = texture;
+    plane.material.map.anisotropy = 0;
+    plane.material.map.magFilter = THREE.LinearFilter;
+    plane.material.map.minFilter = THREE.LinearFilter;
+    plane.material.needsUpdate = true;
+  }
+
+  addTestBox(coords, width, height, depth) {
+    let x = (coords[0] - this.mapCenter[0]) / this.zoomFactor;
+    let y = (coords[1] - this.mapCenter[1]) / this.zoomFactor;
+    var geometry = new THREE.BoxBufferGeometry(width, height, depth);
+    var material = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+    var cube = new THREE.Mesh(geometry, material);
+    cube.position.x = x;
+    cube.position.y = y;
+    cube.position.z = 0;
+    this.scene.add(cube);
+    return cube;
+  }
+
+  //transforms webmercator coords into three "world" coords
+  getWorldCoords(coords) {
+    let x = (coords[0] - this.mapCenter[0]) / this.zoomFactor;
+    let y = (coords[1] - this.mapCenter[1]) / this.zoomFactor;
+    return [x, y];
+  }
+
+  addFeatures(features, mapCenter, zoomFactor, layer, renderMode) {
+    this.mapCenter = mapCenter;
+    this.zoomFactor = zoomFactor;
+    let material = new THREE.MeshStandardMaterial({
+      color: 0xf1ecdb,
+      flatShading: true,
+      side: THREE.DoubleSide
+    });
+    var extrudeSettings = {
+      steps: 2,
+      depth: 1,
+      bevelEnabled: false,
+      bevelThickness: 1,
+      bevelSize: 0,
+      bevelOffset: 0,
+      bevelSegments: 1
+    };
+    if (!this.featuresGroup.has(layer)) {
+      this.featuresGroup.set(layer, new THREE.Group());
+      this.scene.add(this.featuresGroup.get(layer));
+    }
+    if (renderMode == mergedRender) {
+      let geometries = [];
+      for (let feature of features) {
+        geometries.push(
+          this.createGeometryForMergedMesh(
+            feature,
+            mapCenter,
+            zoomFactor,
+            extrudeSettings
+          )
+        );
+        // }
+      }
+      const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+        geometries,
+        false
+      );
+      const mesh = new THREE.Mesh(mergedGeometry, material);
+      if (mesh != null) {
+        this.featuresGroup.get(layer).add(mesh);
+      }
+    } else if (renderMode == singleRender) {
+      for (let feature of features) {
+        this.addFeature(feature, layer, mapCenter, zoomFactor);
+      }
+    }
+  }
+
+  createGeometryForMergedMesh(feature, mapCenter, zoomFactor, extrudeSettings) {
+    let coords = feature.getGeometry().getCoordinates()[0];
+    let points = [];
+
+    for (let coordinate of coords) {
+      let x = (coordinate[0] - mapCenter[0]) / zoomFactor;
+      let y = (coordinate[1] - mapCenter[1]) / zoomFactor;
+      points.push(new THREE.Vector2(x, y));
+    }
+    let threeShape = new THREE.Shape(points);
+    for (let j = 1; j < feature.getGeometry().getCoordinates().length; j++) {
+      let holeCoords = [];
+      for (let coordinate of feature.getGeometry().getCoordinates()[j]) {
+        let x = (coordinate[0] - mapCenter[0]) / zoomFactor;
+        let y = (coordinate[1] - mapCenter[1]) / zoomFactor;
+        holeCoords.push(new THREE.Vector2(x, y));
+      }
+      let holeShape = new THREE.Shape(holeCoords);
+      threeShape.holes.push(holeShape);
+    }
+
+    var shapegeometry = new THREE.ExtrudeBufferGeometry(threeShape, {
+      ...extrudeSettings,
+      depth:
+        feature.getProperties().hauteur != undefined
+          ? feature.getProperties().hauteur / zoomFactor
+          : 0
+    });
+    return shapegeometry;
+  }
+
+  addFeature(feature, layer, mapCenter, zoomFactor) {
+    let material = new THREE.MeshStandardMaterial({
+      color: 0xf1ecdb,
+      flatShading: true,
+      side: THREE.DoubleSide
+    });
+    var extrudeSettings = {
+      steps: 2,
+      depth: 1,
+      bevelEnabled: false,
+      bevelThickness: 1,
+      bevelSize: 0,
+      bevelOffset: 0,
+      bevelSegments: 1
+    };
+    let coords = feature.getGeometry().getCoordinates()[0];
+    let points = [];
+
+    for (let coordinate of coords) {
+      let x = (coordinate[0] - mapCenter[0]) / zoomFactor;
+      let y = (coordinate[1] - mapCenter[1]) / zoomFactor;
+      points.push(new THREE.Vector2(x, y));
+    }
+    let threeShape = new THREE.Shape(points);
+    for (let j = 1; j < feature.getGeometry().getCoordinates().length; j++) {
+      let holeCoords = [];
+      for (let coordinate of feature.getGeometry().getCoordinates()[j]) {
+        let x = (coordinate[0] - mapCenter[0]) / zoomFactor;
+        let y = (coordinate[1] - mapCenter[1]) / zoomFactor;
+        holeCoords.push(new THREE.Vector2(x, y));
+      }
+      let holeShape = new THREE.Shape(holeCoords);
+      threeShape.holes.push(holeShape);
+    }
+
+    var shapegeometry = new THREE.ExtrudeBufferGeometry(
+      threeShape,
+      extrudeSettings
+    );
+    shapegeometry.computeBoundingBox();
+    var center = new THREE.Vector3();
+    shapegeometry.boundingBox.getCenter(center);
+    shapegeometry.center();
+
+    shapegeometry.translate(0, 0, 0.5);
+    shapegeometry.verticesNeedUpdate = true;
+    var mesh = new THREE.Mesh(shapegeometry, material);
+    mesh.position.copy(center);
+    mesh.scale.set(1, 1, feature.getProperties().hauteur / zoomFactor);
+    this.featuresGroup.get(layer).add(mesh);
+  }
+
+  addHemisphereLights2() {
+    var light = new THREE.HemisphereLight(0xf1ecdb, 0x777788, 1);
+    light.position.set(5, 7.5, 10);
+    this.scene.add(light);
+
+    var floorGeometry = new THREE.PlaneBufferGeometry(1000, 1000, 10, 10);
+
+    var groundMat = new THREE.MeshLambertMaterial({ color: 0x808080 });
+    var floor = new THREE.Mesh(floorGeometry, groundMat);
+    floor.position.set(0, 0, 0);
+  }
+
+  doubleClick(event) {
+    let x = (event.clientX / window.innerWidth) * 2 - 1;
+    let y = -(event.clientY / window.innerHeight) * 2 + 1;
+    //let self = this;
+    this.rayCaster.setFromCamera(new THREE.Vector2(x, y), this.currentCamera);
+    var intersects = this.rayCaster.intersectObjects(this.planes.children);
+    console.log(this.zoomFactor);
+    console.log(intersects);
+    console.log(
+      "point",
+      intersects[0].point.x * this.zoomFactor + this.mapCenter[0],
+      " ",
+      intersects[0].point.y * this.zoomFactor + this.mapCenter[1]
+    );
+  }
+}
