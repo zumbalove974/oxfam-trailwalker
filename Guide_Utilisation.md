@@ -64,4 +64,4 @@ vous pouvez changer de dimmension avec les boutons en bas a droite. Certaines vi
 
 ---
 
-Retrouvez ces informations dans la [vidéo de démonstration](https://github.com/zumbalove974/oxfam-trailwalker/blob/main/rapport/Video.mp4)
+Retrouvez ces informations dans la [vidéo de démonstration](./oxfam-trailwalker-demo.mp4)
