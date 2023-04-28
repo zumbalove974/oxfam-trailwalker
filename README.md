@@ -44,6 +44,9 @@ Présentation:
 - [Canva](https://www.canva.com/design/DAFhRy5EKeI/3IweNNkSO9Ci0i29ZuVX1A/edit?utm_content=DAFhRy5EKeI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 - [Version PDF](https://github.com/zumbalove974/oxfam-trailwalker/blob/main/rapport/Presentation.md)
 
+## Vidéo expliquant le fonctionnement de l'application
+![](./oxfam-trailwalker-demo.mp4)
+
 ## Documentation rapide
 
 #### Organisation des dossiers
